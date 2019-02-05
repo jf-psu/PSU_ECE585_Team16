@@ -1,0 +1,14 @@
+R0:			.WORD 			0.
+R1:			.WORD			  0.
+
+START:
+    MOV #30,R0  
+    MOV R0,R1
+    MOV @#1234,r1
+    
+    MOV (R1),R0
+		MOV @R1,R0 
+    
+    MOV R0,-(R6) 
+    MOV (R6)+,R1
+		.END	START
