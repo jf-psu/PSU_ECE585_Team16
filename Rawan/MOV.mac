@@ -1,14 +1,13 @@
-R0:			.WORD 			0.
-R1:			.WORD			  0.
-
+; Test Purpose:
+; Expected Outcome: 
 START:
-    MOV #30,R0  
-    MOV R0,R1
-    MOV @#1234,r1
-    
+    MOV #30,R0          ; R0=30
+    MOV R0,R1           ; R1 = R0 = 30
+    MOV @#10,R3         ; R3 = [PC+10]
+
     MOV (R1),R0
-		MOV @R1,R0 
-    
-    MOV R0,-(R6) 
-    MOV (R6)+,R1
-		.END	START
+    MOV @R1,R0
+
+    MOV R0,-(SP)
+    MOV (SP)+,R1
+.END    START
