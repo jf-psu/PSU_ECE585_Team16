@@ -1,0 +1,29 @@
+;Test for CLR(Ming)
+A: .WORD 000070
+B: .WORD 000400
+
+START: MOV A, R1 ;R1 = 000070
+       CLR R1 ;R1 = 0
+	   MOV A, R1 ;R1 = 000070
+	   CLR (R1) ;content of address 000070 = 0
+	   CLR (R1)+ ;content of address 000070 = 0, then R1 = 000072
+	   CLR @(R1)+ ;content of address which is the content of address 000072 = 0, then R1 = 000074
+	   CLR -(R1) ;R1 = 000072, then clear the content of address 000072
+	   CLR @-(R1) ;R1 = 000070, then clear the content of address which is the content of address 000070
+	   CLR 8(R1) ;clear the content of address 000078
+	   CLR @8(R1) ;clear the content of address which is the content of address 000078
+	   
+	   CLR @#100 ;clear the content of address 100
+	   CLR A ;Relative: A = 0(not sure about this)
+	   CLR @B ;Relative deferred: clear the content of address 000400(not sure about this)
+	   
+	   CLR (SP) ;clear the content in the top of the stack
+	   CLR (SP)+ ;clear the content in the top of the stack then pop it off
+	   CLR @(SP)+ ;clear the content of address which is the content in the top of stack, then pop the pointer off
+	   CLR -(SP) ;clear the content in the stack(not sure about this)
+	   CLR 4(SP) ;clear the content of the stack which distance is 4 from the top
+	   CLR @4(SP) ;clear the content of address which is the content in the stack with distance of 4 from top stack
+
+.END START
+	   
+	   
