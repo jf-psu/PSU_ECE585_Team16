@@ -1,0 +1,28 @@
+;Test for DECB(Ming)
+A: .WORD 000070
+B: .WORD 000400
+
+START: MOV A, R1 ;R1 = 000070
+       DECB R1 ;R1 = 000067
+       MOV A, R1
+       DECB (R1)
+       DECB (R1)+ ;R1 = 000071 
+       DECB @(R1)+ ;R1 = 000072
+       DECB -(R1) ;R1 = 000071
+       DECB @-(R1) ;R1 = 000070
+       DECB 8(R1)
+       DECB @8(R1)
+       
+       DECB #000050 ;000047(not sure)
+       DECB @#100
+       DECB A ;Relative: A = 000067(not sure)
+       DECB @B ;Relative deferred: content of address 0000400 decrement by 1.(not sure)
+
+       DECB (SP)
+       DECB (SP)+
+       DECB @(SP)+
+       DECB -(SP)
+       DECB 4(SP)
+       DECB @4(SP)
+
+.END START

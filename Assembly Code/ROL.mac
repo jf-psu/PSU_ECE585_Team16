@@ -1,0 +1,28 @@
+;Test for ROL(Ming), rotate all bits of the destination left one place. Bit 15 is loaded into C-bit and previous C-bit is loaded into bit 0.
+A: .WORD 000070
+B: .WORD 000400
+
+START: MOV A, R1 ;R1 = 000070
+       ROL R1 ;R1 = 000160 assume previous C-bit is 0
+       MOV A, R1
+       ROL (R1)
+       ROL (R1)+ ;R1 = 000072
+       ROL @(R1)+ ;R1 = 000074
+       ROL -(R1) ;R1 = 000072
+       ROL @-(R1) ; R1 = 000070
+       ROL 8(R1)
+       ROL @8(R1)
+       
+       ROL #000050 ;000120(not sure) assume previous C-bit is 0
+       ROL @#100
+       ROL A ;Relative: A = 000070(not sure)
+       ROL @B ;Relative deferred: rotate content of address 000400 to left 1 bit.(not sure)
+
+       ROL (SP)
+       ROL (SP)+
+       ROL @(SP)+
+       ROL -(SP)
+       ROL 4(SP)
+       ROL @4(SP)
+
+.END START

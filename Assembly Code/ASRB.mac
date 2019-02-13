@@ -1,0 +1,28 @@
+;Test for ASRB(Ming), arithmetic shift right. Bit 15 or 7is replicated.
+A: .WORD 000070
+B: .WORD 000400
+
+START: MOV A, R1 ;R1 = 000070
+       ASRB R1 ;R1 = 000034
+       MOV A, R1
+       ASRB (R1)
+       ASRB (R1)+ ;R1 = 000071
+       ASRB @(R1)+ ;R1 = 000072
+       ASRB -(R1) ;R1 = 000071
+       ASRB @-(R1) ; R1 = 000070
+       ASRB 8(R1)
+       ASRB @8(R1)
+       
+       ASRB #000050 ;000024(not sure)
+       ASRB @#100
+       ASRB A ;Relative: A = 000034(not sure)
+       ASRB @B ;Relative deferred: shift content(lowest byte (7:0)) of address 000400 1 bit to right.(not sure)
+
+       ASRB (SP)
+       ASRB (SP)+
+       ASRB @(SP)+
+       ASRB -(SP)
+       ASRB 4(SP)
+       ASRB @4(SP)
+
+.END START

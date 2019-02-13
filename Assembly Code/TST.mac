@@ -1,0 +1,27 @@
+;Test for TST(Ming), TST for the content of destination address. V and C is cleared. N and Z is setted or cleared according to the content.
+A: .WORD 000070
+B: .WORD 000400
+
+START: MOV A, R1 ;R1 = 000070
+       TST R1 
+       MOV A, R1
+       TST (R1)
+       TST (R1)+ ;R1 = 000072
+       TST @(R1)+ ;R1 = 000074
+       TST -(R1) ;R1 = 000072
+       TST @-(R1) ; R1 = 000070
+       TST 8(R1)
+       TST @8(R1)
+       
+       TST #000050
+       TST @#100
+       TST A 
+       TST @B 
+       TST (SP)
+       TST (SP)+
+       TST @(SP)+
+       TST -(SP)
+       TST 4(SP)
+       TST @4(SP)
+
+.END START

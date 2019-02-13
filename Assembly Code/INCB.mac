@@ -1,0 +1,28 @@
+;Test for INCB(Ming)
+A: .WORD 000070
+B: .WORD 000400
+
+START: MOV A, R1 ;R1 = 000070
+       INCB R1 ;R1 = 000071
+       MOV A, R1
+       INCB (R1)
+       INCB (R1)+ ;R1 = 000071
+       INCB @(R1)+ ;R1 = 000072
+       INCB -(R1) ;R1 = 000071
+       INCB @-(R1) ;R1 = 000070
+       INCB 8(R1)
+       INCB @8(R1)
+       
+       INCB #000050 ;000051(not sure)
+       INCB @#100 ;content of address(lowest byte(7:0)) 100 increments by 1
+       INCB A ;Relative: A = 000071(not sure)
+       INCB @B ;Relative deferred: content(lowest byte(7:0)) of address 0000400 increment by 1.(not sure)
+
+       INCB (SP)
+       INCB (SP)+
+       INCB @(SP)+
+       INCB -(SP)
+       INCB 4(SP)
+       INCB @4(SP)
+
+.END START

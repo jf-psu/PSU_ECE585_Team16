@@ -1,0 +1,28 @@
+;Test for INC(Ming)
+A: .WORD 000070
+B: .WORD 000400
+
+START: MOV A, R1 ;R1 = 000070
+       INC R1 ;R1 = 000071
+       MOV A, R1
+       INC (R1)
+       INC (R1)+
+       INC @(R1)+
+       INC -(R1)
+       INC @-(R1)
+       INC 8(R1)
+       INC @8(R1)
+       
+       INC #000050 ;000051(not sure)
+       INC @#100
+       INC A ;Relative: A = 000071(not sure)
+       INC @B ;Relative deferred: content of address 0000400 increment by 1.(not sure)
+
+       INC (SP)
+       INC (SP)+
+       INC @(SP)+
+       INC -(SP)
+       INC 4(SP)
+       INC @4(SP)
+
+.END START

@@ -1,0 +1,28 @@
+;Test for DEC(Ming)
+A: .WORD 000070
+B: .WORD 000400
+
+START: MOV A, R1 ;R1 = 000070
+       DEC R1 ;R1 = 000067
+       MOV A, R1
+       DEC (R1)
+       DEC (R1)+ ;R1 = 000072 
+       DEC @(R1)+ ;R1 = 000074
+       DEC -(R1) ;R1 = 000072
+       DEC @-(R1) ;R1 = 000070
+       DEC 8(R1)
+       DEC @8(R1)
+       
+       DEC #000050 ;000047(not sure)
+       DEC @#100
+       DEC A ;Relative: A = 000067(not sure)
+       DEC @B ;Relative deferred: content of address 0000400 decrement by 1.(not sure)
+
+       DEC (SP)
+       DEC (SP)+
+       DEC @(SP)+
+       DEC -(SP)
+       DEC 4(SP)
+       DEC @4(SP)
+
+.END START

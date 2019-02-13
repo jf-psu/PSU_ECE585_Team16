@@ -1,0 +1,28 @@
+;Test for ADCB(Ming), add the content of the C-bit into the destination(high byte or low byte).
+A: .WORD 000070
+B: .WORD 000400
+
+START: MOV A, R1 ;R1 = 000070
+       ADCB R1 ;R1 = 000070 assume previous C-bit is 0
+       MOV A, R1
+       ADCB (R1)
+       ADCB (R1)+ ;R1 = 000071
+       ADCB @(R1)+ ;R1 = 000072
+       ADCB -(R1) ;R1 = 000071
+       ADCB @-(R1) ; R1 = 000070
+       ADCB 8(R1)
+       ADCB @8(R1)
+       
+       ADCB #000050 ;000050(not sure) assume previous C-bit is 0
+       ADCB @#100
+       ADCB A ;Relative: A = 000070(not sure)
+       ADCB @B ;Relative deferred: add C-bit to the content(lowest byte(7:0)) of address 000400
+
+       ADCB (SP)
+       ADCB (SP)+
+       ADCB @(SP)+
+       ADCB -(SP)
+       ADCB 4(SP)
+       ADCB @4(SP)
+
+.END START

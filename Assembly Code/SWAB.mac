@@ -1,0 +1,28 @@
+;Test for SWAB(Ming), exchanges high-order byte and low-order byte of the destination word.
+A: .WORD 000070
+B: .WORD 000400
+
+START: MOV A, R1 ;R1 = 000070
+       SWAB R1 ;R1 = 034000
+       MOV A, R1
+       SWAB (R1)
+       SWAB (R1)+ ;R1 = 000072
+       SWAB @(R1)+ ;R1 = 000074
+       SWAB -(R1) ;R1 = 000072
+       SWAB @-(R1) ; R1 = 000070
+       SWAB 8(R1)
+       SWAB @8(R1)
+       
+       SWAB #000050 ;024000(not sure)
+       SWAB @#100
+       SWAB A ;Relative: A = 034000(not sure)
+       SWAB @B ;Relative deferred: exchange high-order content of address 000400 and low-order content of address 000400
+
+       SWAB (SP)
+       SWAB (SP)+
+       SWAB @(SP)+
+       SWAB -(SP)
+       SWAB 4(SP)
+       SWAB @4(SP)
+
+.END START

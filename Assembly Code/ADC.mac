@@ -1,0 +1,28 @@
+;Test for ADC(Ming), add the content of the C-bit into the destination.
+A: .WORD 000070
+B: .WORD 000400
+
+START: MOV A, R1 ;R1 = 000070
+       ADC R1 ;R1 = 000070 assume previous C-bit is 0
+       MOV A, R1
+       ADC (R1)
+       ADC (R1)+ ;R1 = 000072
+       ADC @(R1)+ ;R1 = 000074
+       ADC -(R1) ;R1 = 000072
+       ADC @-(R1) ; R1 = 000070
+       ADC 8(R1)
+       ADC @8(R1)
+       
+       ADC #000050 ;000050(not sure) assume previous C-bit is 0
+       ADC @#100
+       ADC A ;Relative: A = 000070(not sure) assume previous C-bit is 0
+       ADC @B ;Relative deferred: add C-bit to the content of address 000400
+
+       ADC (SP)
+       ADC (SP)+
+       ADC @(SP)+
+       ADC -(SP)
+       ADC 4(SP)
+       ADC @4(SP)
+
+.END START

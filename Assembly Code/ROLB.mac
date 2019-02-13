@@ -1,0 +1,28 @@
+;Test for ROLB(Ming), rotate all bits of one byte to right. Bit 15 or Bit 7 is loaded to C-bit and previous C-bit is loaded to bit 8 or bit 0.
+A: .WORD 000070
+B: .WORD 000400
+
+START: MOV A, R1 ;R1 = 000070
+       ROLB R1 ;R1 = 000170 assume previous C-bit is 0
+       MOV A, R1
+       ROLB (R1)
+       ROLB (R1)+ ;R1 = 000071
+       ROLB @(R1)+ ;R1 = 000072
+       ROLB -(R1) ;R1 = 000071
+       ROLB @-(R1) ; R1 = 000070
+       ROLB 8(R1)
+       ROLB @8(R1)
+       
+       ROLB #000050 ;000120(not sure) assume previous C-bit is 0
+       ROLB @#100
+       ROLB A ;Relative: A = 000170(not sure)
+       ROLB @B ;Relative deferred: rotate content(lowest byte (7:0)) of address 000400 to left 1 bit.(not sure)
+
+       ROLB (SP)
+       ROLB (SP)+
+       ROLB @(SP)+
+       ROLB -(SP)
+       ROLB 4(SP)
+       ROLB @4(SP)
+
+.END START

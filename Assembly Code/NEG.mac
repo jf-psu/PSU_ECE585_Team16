@@ -1,0 +1,28 @@
+;Test for NEG(Ming), convert to 2's complement.
+A: .WORD 000070
+B: .WORD 000400
+
+START: MOV A, R1 ;R1 = 000070
+       NEG R1 ;R1 = 177710
+       MOV A, R1
+       NEG (R1)
+       NEG (R1)+ ;R1 = 000072
+       NEG @(R1)+ ;R1 = 000074
+       NEG -(R1) ;R1 = 000072
+       NEG @-(R1) ; R1 = 000070
+       NEG 8(R1)
+       NEG @8(R1)
+       
+       NEG #000050 ;177730(not sure)
+       NEG @#100
+       NEG A ;Relative: A = 177710(not sure)
+       NEG @B ;Relative deferred: content of address 0000400 becomes its 2's complement.(not sure)
+
+       NEG (SP)
+       NEG (SP)+
+       NEG @(SP)+
+       NEG -(SP)
+       NEG 4(SP)
+       NEG @4(SP)
+
+.END START

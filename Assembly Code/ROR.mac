@@ -1,0 +1,28 @@
+;Test for ROR(Ming), rotate all bits of the destination right one place. Bit 0 is loaded into C-bit and previous C-bit is loaded into bit 15.
+A: .WORD 000070
+B: .WORD 000400
+
+START: MOV A, R1 ;R1 = 000070
+       ROR R1 ;R1 = 000034 assume previous C-bit is 0
+       MOV A, R1
+       ROR (R1)
+       ROR (R1)+ ;R1 = 000072
+       ROR @(R1)+ ;R1 = 000074
+       ROR -(R1) ;R1 = 000072
+       ROR @-(R1) ; R1 = 000070
+       ROR 8(R1)
+       ROR @8(R1)
+       
+       ROR #000050 ;000024(not sure) assume previous C-bit is 0
+       ROR @#100
+       ROR A ;Relative: A = 000034(not sure)
+       ROR @B ;Relative deferred: rotate content of address 000400 to right 1 bit.(not sure)
+
+       ROR (SP)
+       ROR (SP)+
+       ROR @(SP)+
+       ROR -(SP)
+       ROR 4(SP)
+       ROR @4(SP)
+
+.END START

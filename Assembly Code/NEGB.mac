@@ -1,0 +1,28 @@
+;Test for NEGB(Ming), convert to 2's complement.(not sure about this)
+A: .WORD 000070
+B: .WORD 000400
+
+START: MOV A, R1 ;R1 = 000070
+       NEGB R1 ;R1 = 000310(not sure about this)
+       MOV A, R1
+       NEGB (R1)
+       NEGB (R1)+ ;R1 = 000071
+       NEGB @(R1)+ ;R1 = 000072
+       NEGB -(R1) ;R1 = 000071
+       NEGB @-(R1) ; R1 = 000070
+       NEGB 8(R1) ;lowest byte(7:0) becomes its 2's complement
+       NEGB @8(R1) ;lowest byte(7:0) becomes its 2's complement
+       
+       NEGB #000050 ;000330(not sure)
+       NEGB @#100 ;lowest byte(7:0) becomes its 2's complement
+       NEGB A ;Relative: A = 000310(not sure)
+       NEGB @B ;Relative deferred: content(lowest byte(7:0)) of address 0000400 becomes its 2's complement.(not sure)
+
+       NEGB (SP)
+       NEGB (SP)+
+       NEGB @(SP)+
+       NEGB -(SP)
+       NEGB 4(SP)
+       NEGB @4(SP)
+
+.END START

@@ -1,0 +1,28 @@
+;Test for SBC(Ming), subtract the content of the C-bit from the destination.
+A: .WORD 000070
+B: .WORD 000400
+
+START: MOV A, R1 ;R1 = 000070
+       SBC R1 ;R1 = 000070 assume previous C-bit is 0
+       MOV A, R1
+       SBC (R1)
+       SBC (R1)+ ;R1 = 000072
+       SBC @(R1)+ ;R1 = 000074
+       SBC -(R1) ;R1 = 000072
+       SBC @-(R1) ; R1 = 000070
+       SBC 8(R1)
+       SBC @8(R1)
+       
+       SBC #000050 ;000050(not sure) assume previous C-bit is 0
+       SBC @#100
+       SBC A ;Relative: A = 000070(not sure) assume previous C-bit is 0
+       SBC @B ;Relative deferred: subtract C-bit to the content of address 000400
+
+       SBC (SP)
+       SBC (SP)+
+       SBC @(SP)+
+       SBC -(SP)
+       SBC 4(SP)
+       SBC @4(SP)
+
+.END START

@@ -1,0 +1,28 @@
+;Test for COM(Ming)
+A: .WORD 000070
+B: .WORD 000400
+
+START: MOV A, R1 ;R1 = 000070
+       COM R1 ;R1 = 177707
+       MOV A, R1 ;R1 = 000070
+       COM (R1) ;content of address 000070 becomes its complement
+       COM (R1)+ ;content of address 000070 becomes its complement, then R1 = 000072
+       COM @(R1)+ ;content of address which is the content of address 000072 becomes its complement, then R1 = 000074
+       COM -(R1) ;R1 = 000072, then the content of address 000072 becomes its complement
+       COM @-(R1) ;R1 = 000070, then the content of address which it the content of address 000070 becomes its complement
+       COM 8(R1) ;content of address 000078 becomes its complement
+       COM @8(R1) ;content of address which is the content of address 000078 becomes its complement
+
+       COM #000050 ; 177727
+       COM @#100 ;content of address 100 becomes its complement
+       COM A ;Relative: A = 177707(not sure about this)
+       COM @B ;Relative deferred: the content of address 000400 becomes its complement(not sure about this)
+
+       COM (SP) ;the content in the top of stack becomes its complement
+       COM (SP)+ ;the content in the top of stack becomes its complement, then pop it off
+       COM @(SP)+ ;the content of address which is the content in the top of stack becomes its complement
+       COM -(SP) ;the content in the stack becomes its complement(not sure about this)
+       COM 4(SP) ;the content of the stack which distance is 4 from the top stack becomes its complement
+       COM @4(SP) ;the content of address which is the content in the stack with distance of 4 from top stack becomes its complement
+
+.END START

@@ -1,0 +1,28 @@
+;Test for COMB(Ming)
+A: .WORD 000070
+B: .WORD 000400
+
+START: MOV A, R1 ;R1 = 000070
+       COMB R1 ;R1 = 000307
+       MOV A, R1 ;R1 = 000070
+       COMB (R1) ;content of address(lowest byte(7:0)) 000070 becomes its complement
+       COMB (R1)+ ;content of address(lowest byte(7:0)) 000070 becomes its complement, then R1 = 000071
+       COMB @(R1)+ ;content of address which is the content of address 000071 becomes its complement, then R1 = 000072
+       COMB -(R1) ;R1 = 000071, then the content of address 000071 becomes its complement
+       COMB @-(R1) ;R1 = 000070, then the content of address(lowest byte(7:0)) which it the content of address 000070 becomes its complement
+       COMB 8(R1) ;content of address(lowest byte(7:0)) 000078 becomes its complement
+       COMB @8(R1) ;content of address(lowest byte(7:0)) which is the content of address 000078 becomes its complement
+
+       COMB #000050 ; 000327
+       COMB @#100 ;content of address(lowest byte(7:0)) 100 becomes its complement
+       COMB A ;Relative: A = 000307(not sure about this)
+       COMB @B ;Relative deferred: the content of address(lowest byte(7:0)) 000400 becomes its complement(not sure about this)
+
+       COMB (SP) ;the content(lowest byte(7:0)) in the top of stack becomes its complement
+       COMB (SP)+ ;the content(lowest byte(7:0)) in the top of stack becomes its complement, then pop it off
+       COMB @(SP)+ ;the content(lowest byte(7:0)) of address which is the content in the top of stack becomes its complement
+       COMB -(SP) ;the content(lowest byte(7:0)) in the stack becomes its complement(not sure about this)
+       COMB 4(SP) ;the content(lowest byte(7:0)) of the stack which distance is 4 from the top stack becomes its complement
+       COMB @4(SP) ;the content(lowest byte(7:0)) of address which is the content in the stack with distance of 4 from top stack becomes its complement
+
+.END START
