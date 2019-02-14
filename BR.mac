@@ -1,0 +1,58 @@
+;Branch
+
+START: 
+	
+	BR L1 	;Unconditional branch. Opcode:000400
+
+L1:
+	mov #5, R1 ;R1 = 5
+	add R1, #1 ;R1 = 6
+	BNE L2	;Branch if result not equal to 0. Opcode:001000
+L2:
+	sub R1, #6 ;R1 = 0
+	BEQ L3 ;branch if equals 0. Opcode: 001400
+
+L3:
+	add R1, #1 ;R1 = 1
+	BPL L4	;branch if plus. Opcode: 100000
+
+L4:
+	sub R1, #5 ;R1 = -4
+	BMI L5	;branch if minus. Opcode: 100400
+
+L5:
+	BVC L6 	;branch if overflow is clear. Opcode: 102000
+L6:
+	BVS L7	;branch if overflow set. Opcode: 102400
+L7:
+	mov #1, R1
+	add #1, R1
+	BCC L8 	;branch if carry is clear. Opcode: 103000
+L8:
+	BCS L9 	;branch if carry is set. Opcode: 103400
+
+;Signed conditional branches
+L9:
+	BGE L10	;Branch if greater than or equal 0. Opcode: 002000
+L10:
+	BLT L11	;Branch if less than 0. Opcode: 002400
+L11:
+	BGT L12	;Branch if greater than 0. Opcode: 003000
+L12:
+	BLE L13	;Branch if less than or equal to 0. Opcode: 003400
+
+;Unsigned conditional
+L13:
+	BHI L14	;Branch if higher. Opcode: 101000 
+L14:
+	BLOS L15 ;Branch if lower or same. Opcode: 101400
+L15:
+	BHIS L16 ;branch if higher or same. Opcode: 103000
+L16:
+	BLO LAST ;Branch if lower 103400. Opcode: 103400
+LAST:
+	
+
+.END START
+	   
+	   
