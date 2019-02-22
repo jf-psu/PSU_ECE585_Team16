@@ -1,0 +1,61 @@
+;Jump
+A: .WORD 77777777777777777777
+B: .WORD 000500
+c: .WORD 000001
+
+START:
+;JMP 
+	;Mov L1, -(R6) ;load calling address into source reg
+    mov PC, L1    ;move 
+	JMP L1 	;jump. Opcode:0001DD
+    
+;JSR
+    JSR R5, SRT1     ;jump to subroutine. Opcode:004RDD
+    ;JSR (R1)+, SRT2  ;autoinc
+    ;JSR (R2)+ SRT3 
+    ;JSR 10(R1) SRT4
+    ;JSR @(R1)+ SRT5
+    ;JSR @10(R1)+ SRT6
+    JSR PC, @(SP) + ;special case goes to stack pointer
+    JSR PC, SRT7 ;nother special case
+;Mark Opcode: 006400 causes stack pointer to be adjusted to point to old r5
+    mov R5, -(SP) ;old r5 on stack pointer
+    MOV A, -(SP)
+    mov #MARK1, -(SP)
+    mov SP, R5
+    JSR PC, SRT8
+;SOB Opcode: 077ROO Subtracts one and branches if !=0
+    ;mov R1, C
+    ;SOB R1, SRT1
+    ;SOB C, 39
+	
+;Testing RTS Opcode:004RDD
+SRT1:
+;returning with values
+    ;(R5)+   
+    ;10(R5)
+    ;@10(R5)  
+    RTS R5 	;return from subroutine. Opcode:004RDD
+SRT2:
+    RTS R1 	;return from subroutine. Opcode:004RDD
+SRT3:
+    RTS R1 	;return from subroutine. Opcode:004RDD
+SRT4:
+    RTS R1 	;return from subroutine. Opcode:004RDD
+SRT5:
+    RTS R1 	;return from subroutine. Opcode:004RDD
+SRT6:
+    RTS R1 	;return from subroutine. Opcode:004RDD
+SRT7:
+    RTS R1 	;return from subroutine. Opcode:004RDD
+SRT8:
+    RTS R5
+SRT9:
+    RTS R5
+SRT10:
+    mov A, R1
+    RTS R1
+
+.END START
+	   
+	
