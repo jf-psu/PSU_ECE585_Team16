@@ -1,336 +1,128 @@
-;Test cases for MOV
-;Testing addressing modes Register, Register deffered, autoincrement, autoincrement deffered, autodecrment, autodecrment deffered, index, and index deffered on Registers R0-R5
+;Test for MOV
+;Testing addressing modes Register, Register deffered, autoincrement, autoincrement deffered, autodecrment, autodecrment deffered, index, and index deffered on Registers R0 and R5
 ;Testig addressing modes Deffered, Autoincrment, autoincrment deffered, autodecrement, indexed, and indexed deffered on Regsiter SP
 A: .WORD 000070
 B: .WORD 000400
 
-;Regsiter Addressing mode on R0-R5
-Test1: 	MOV R0,R1
-	MOV R0,R2
-	MOV R0,R3
-	MOV R0,R4
-	MOV R0,R5
+Test1:  MOV A,R0
+        MOV B,R5
+        MOV R0,R5 ;set flag to N
+        MOV R5,R0 ;set flag to N
+         HALT
+        .END TEST1
 
-	MOV R1,R0
-	MOV R1,R2
-	MOV R1,R3
-	MOV R1,R4
-	MOV R1,R5
-
-	MOV R2,R0
-	MOV R2,R1
-	MOV R2,R3
-	MOV R2,R4
-	MOV R2,R5
-
-	MOV R3,R0
-	MOV R3,R1
-	MOV R3,R2
-	MOV R3,R4
-	MOV R3,R5
-
-	MOV R4,R1
-	MOV R4,R2	
-	MOV R4,R3
-	MOV R4,R5
-	MOV R4,R0
-
-	MOV R5,R0
-	MOV R5,R1
-	MOV R5,R2
-	MOV R5,R3
-	MOV R5,R4
 ;Register Deffered
-Test2:	MOV (R0),R1
-        MOV (R0),R2
-        MOV (R0),R3
-        MOV (R0),R4
+Test2:   MOV A,R0
+        MOV B,R5
         MOV (R0),R5
-
-        MOV (R1),R0
-        MOV (R1),R2
-        MOV (R1),R3
-        MOV (R1),R4
-        MOV (R1),R5
-
-        MOV (R2),R0
-        MOV (R2),R1
-        MOV (R2),R3
-        MOV (R2),R4
-        MOV (R2),R5
-
-        MOV (R3),R0
-        MOV (R3),R1
-        MOV (R3),R2
-        MOV (R3),R4
-        MOV (R3),R5
-
-        MOV (R4),R1
-        MOV (R4),R2
-        MOV (R4),R3
-        MOV (R4),R5
-        MOV (R4),R0
-
         MOV (R5),R0
-        MOV (R5),R1
-        MOV (R5),R2
-        MOV (R5),R3
-        MOV (R5),R4
+         HALT
+        .END TEST2
+
 ;Autoincrement
-Test3:	MOV (R0)+,R1
-        MOV (R0)+,R2
-        MOV (R0)+,R3
-        MOV (R0)+,R4
+Test3:   MOV A,R0
+        MOV B,R5
         MOV (R0)+,R5
-
-        MOV (R1)+,R0
-        MOV (R1)+,R2
-        MOV (R1)+,R3
-        MOV (R1)+,R4
-        MOV (R1)+,R5
-
-        MOV (R2)+,R0
-        MOV (R2)+,R1
-        MOV (R2)+,R3
-        MOV (R2)+,R4
-        MOV (R2)+,R5
-
-        MOV (R3)+,R0
-        MOV (R3)+,R1
-        MOV (R3)+,R2
-        MOV (R3)+,R4
-        MOV (R3)+,R5
-
-        MOV (R4)+,R1
-        MOV (R4)+,R2
-        MOV (R4)+,R3
-        MOV (R4)+,R5
-        MOV (R4)+,R0
-
         MOV (R5)+,R0
-        MOV (R5)+,R1
-        MOV (R5)+,R2
-        MOV (R5)+,R3
-        MOV (R5)+,R4
+         HALT
+        .END TEST3
+
 ;Autoincrement deffered
-Test4:	MOV @(R0)+,R1
-        MOV @(R0)+,R2
-        MOV @(R0)+,R3
-        MOV @(R0)+,R4
+Test4:   MOV A,R0
+        MOV B,R5
         MOV @(R0)+,R5
-
-        MOV @(R1)+,R0
-        MOV @(R1)+,R2
-        MOV @(R1)+,R3
-        MOV @(R1)+,R4
-        MOV @(R1)+,R5
-
-        MOV @(R2)+,R0
-        MOV @(R2)+,R1
-        MOV @(R2)+,R3
-        MOV @(R2)+,R4
-        MOV @(R2)+,R5
-
-        MOV @(R3)+,R0
-        MOV @(R3)+,R1
-        MOV @(R3)+,R2
-        MOV @(R3)+,R4
-        MOV @(R3)+,R5
-
-        MOV @(R4)+,R1
-        MOV @(R4)+,R2
-        MOV @(R4)+,R3
-        MOV @(R4)+,R5
-        MOV @(R4)+,R0
-
         MOV @(R5)+,R0
-        MOV @(R5)+,R1
-        MOV @(R5)+,R2
-        MOV @(R5)+,R3
-        MOV @(R5)+,R4
-;Autodecrment 
-Test5:	MOV -(R0),R1
-        MOV -(R0),R2
-        MOV -(R0),R3
-        MOV -(R0),R4
+         HALT
+        .END TEST4
+;Autodecrment
+Test5:   MOV A,R0
+        MOV B,R5
         MOV -(R0),R5
-
-        MOV -(R1),R0
-        MOV -(R1),R2
-        MOV -(R1),R3
-        MOV -(R1),R4
-        MOV -(R1),R5
-
-        MOV -(R2),R0
-        MOV -(R2),R1
-        MOV -(R2),R3
-        MOV -(R2),R4
-        MOV -(R2),R5
-
-        MOV -(R3),R0
-        MOV -(R3),R1
-        MOV -(R3),R2
-        MOV -(R3),R4
-        MOV -(R3),R5
-
-        MOV -(R4),R1
-        MOV -(R4),R2
-        MOV -(R4),R3
-        MOV -(R4),R5
-        MOV -(R4),R0
-
         MOV -(R5),R0
-        MOV -(R5),R1
-        MOV -(R5),R2
-        MOV -(R5),R3
-        MOV -(R5),R4
+         HALT
+        .END TEST5
 ;Autodecrement deffered
-Test6:	MOV @-(R0),R1
-        MOV @-(R0),R2
-        MOV @-(R0),R3
-        MOV @-(R0),R4
+Test6:   MOV A,R0
+        MOV B,R5
         MOV @-(R0),R5
-
-        MOV @-(R1),R0
-        MOV @-(R1),R2
-        MOV @-(R1),R3
-        MOV @-(R1),R4
-        MOV @-(R1),R5
-
-        MOV @-(R2),R0
-        MOV @-(R2),R1
-        MOV @-(R2),R3
-        MOV @-(R2),R4
-        MOV @-(R2),R5
-
-        MOV @-(R3),R0
-        MOV @-(R3),R1
-        MOV @-(R3),R2
-        MOV @-(R3),R4
-        MOV @-(R3),R5
-
-        MOV @-(R4),R1
-        MOV @-(R4),R2
-        MOV @-(R4),R3
-        MOV @-(R4),R5
-        MOV @-(R4),R0
-
         MOV @-(R5),R0
-        MOV @-(R5),R1
-        MOV @-(R5),R2
-        MOV @-(R5),R3
-        MOV @-(R5),R4
+         HALT
+        .END TEST14
+
 ;Index
-Test7:MOV 3(R0),R1
-        MOV 3(R0),R2
-        MOV 3(R0),R3
-        MOV 3(R0),R4
+Test7:   MOV A,R0
+        MOV B,R5
         MOV 3(R0),R5
-
-        MOV 3(R1),R0
-        MOV 3(R1),R2
-        MOV 3(R1),R3
-        MOV 3(R1),R4
-        MOV 3(R1),R5
-
-        MOV 3(R2),R0
-        MOV 3(R2),R1
-        MOV 3(R2),R3
-        MOV 3(R2),R4
-        MOV 3(R2),R5
-
-        MOV 3(R3),R0
-        MOV 3(R3),R1
-        MOV 3(R3),R2
-        MOV 3(R3),R4
-        MOV 3(R3),R5
-
-        MOV 3(R4),R1
-        MOV 3(R4),R2
-        MOV 3(R4),R3
-        MOV 3(R4),R5
-        MOV 3(R4),R0
-
         MOV 3(R5),R0
-        MOV 3(R5),R1
-        MOV 3(R5),R2
-        MOV 3(R5),R3
-        MOV 3(R5),R4
+         HALT
+        .END TEST7
+
 ;index deffered
-Test8:MOV @3(R0),R1
-        MOV @3(R0),R2
-        MOV @3(R0),R3
-        MOV @3(R0),R4
+Test8:   MOV A,R0
+        MOV B,R5
         MOV @3(R0),R5
-
-        MOV @3(R1),R0
-        MOV @3(R1),R2
-        MOV @3(R1),R3
-        MOV @3(R1),R4
-        MOV @3(R1),R5
-
-        MOV @3(R2),R0
-        MOV @3(R2),R1
-        MOV @3(R2),R3
-        MOV @3(R2),R4
-        MOV @3(R2),R5
-
-        MOV @3(R3),R0
-        MOV @3(R3),R1
-        MOV @3(R3),R2
-        MOV @3(R3),R4
-        MOV @3(R3),R5
-
-        MOV @3(R4),R1
-        MOV @3(R4),R2
-        MOV @3(R4),R3
-        MOV @3(R4),R5
-        MOV @3(R4),R0
-
         MOV @3(R5),R0
-        MOV @3(R5),R1
-        MOV @3(R5),R2
-        MOV @3(R5),R3
-        MOV @3(R5),R4
+         HALT
+        .END TEST8
 ;stack address mode: deffered
-Test9:  MOV (SP),R0
-        MOV (SP),R1
-        MOV (SP),R2
-        MOV (SP),R3
-        MOV (SP),R4
+Test9:   MOV A,R0
+        MOV B,R5
+        MOV (SP),R0
         MOV (SP),R5
+         HALT
+        .END TEST9
+
 ;stack address mode: autoincrement
-Test10: MOV (SP)+,R0
-        MOV (SP)+,R1
-        MOV (SP)+,R2
-        MOV (SP)+,R3
-        MOV (SP)+,R4
+Test10:  MOV A,R0
+        MOV B,R5
+        MOV (SP)+,R0
         MOV (SP)+,R5
+         HALT
+        .END TEST10
+
 ;stack address mode: autoincrement deffered
-Test11: MOV @(SP)+,R0
-        MOV @(SP)+,R1
-        MOV @(SP)+,R2
-        MOV @(SP)+,R3
-        MOV @(SP)+,R4
+Test11:  MOV A,R0
+        MOV B,R5
+        MOV @(SP)+,R0
         MOV @(SP)+,R5
+         HALT
+        .END TEST11
+
 ;stack address mode: deffered
-Test12:  MOV -(SP),R0
-        MOV -(SP),R1
-        MOV -(SP),R2
-        MOV -(SP),R3
-        MOV -(SP),R4
+Test12:  MOV A,R0
+        MOV B,R5
+        MOV -(SP),R0
         MOV -(SP),R5
+         HALT
+        .END TEST12
+
 ;stack address mode: index deffered
-Test13:  MOV @3(SP),R0
-        MOV @3(SP),R1
-        MOV @3(SP),R2
-        MOV @3(SP),R3
-        MOV @3(SP),R4
+Test13:  MOV A,R0
+        MOV B,R5
+         MOV @3(SP),R0
         MOV @3(SP),R5
+         HALT
+        .END TEST13
+
 ;stack address mode: indexed
-Test14:  MOV 3(SP),R0
-	MOV 3(SP),R1
-        MOV 3(SP),R2
-        MOV 3(SP),R3
-        MOV 3(SP),R4
+Test14:  MOV A,R0
+        MOV B,R5
+        MOV 3(SP),R0
         MOV 3(SP),R5
+        HALT
+        .END TEST14
+;pc addressing mode: immediate
+Test15: MOV A,R0
+	MOV B,R5
+	MOV #100,R0
+	MOV #200,R5
+	HALT
+	.END TEST15
+;Absolute
+Test16: MOV A,R0
+	MOV B,R5
+	MOV @#100,R0
+	MOV @#100,R5
+	HALT
+	.END TEST16
+
