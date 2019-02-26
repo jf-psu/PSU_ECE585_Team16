@@ -1,0 +1,27 @@
+;jump. 
+;Opcode:0001DD
+
+;Jump is more flexable than branch
+;Branch can move backwards by 200, words (400 bytes) 
+;or forwards by 177, words (376 bytes) from the current PC. 
+
+;Jump isn't bound by this
+
+
+
+START: 
+	mov #5, R1 ;R1 = 5
+	ADD R1, #5 ;R1 = 0 shouldnt cause overflow
+    JMP L1
+
+	BR L2 	;Fallthru, Should never run!. Opcode:000400
+    HALT
+
+L1:
+	mov #1, R1
+    HALT
+L2:
+	mov #2, R1
+    HALT
+
+.END START
