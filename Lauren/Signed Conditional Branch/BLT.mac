@@ -1,0 +1,33 @@
+;Branch if less than 0. 
+;Opcode: 002400
+
+START: 
+	mov #5, R1 ;R1 = 5
+    sub R1, #4
+    BLT L1	;Shouldn't work
+
+	sub R1, #1
+    BLT L2	;Shouldn't work
+
+    sub R1, #1
+    BLT L3	;should work
+    
+	BR L4 	;Fallthru, Should never run!. Opcode:000400
+    HALT
+
+L1:
+	mov #1, R1
+    HALT
+L2:
+	mov #2, R1
+    HALT
+
+L3:
+    mov #3, R1
+    HALT
+
+L4:
+    mov #4, R1
+    HALT
+
+.END START

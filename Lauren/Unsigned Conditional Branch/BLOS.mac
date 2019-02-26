@@ -1,0 +1,36 @@
+;Branch if lower or same. 
+;Opcode: 101400
+
+
+START: 
+	mov #5, R1
+    mov #6, R2
+    CMP R2, R1 ; R2 > R1
+    BLOS L1	;Shouldn't work
+
+    mov #6, R3
+    CMP R2, R3 ;R2 == R3
+    BLOS L2	;Should work
+    
+	BR L4 	;Fallthru, Should never run!. Opcode:000400
+    HALT
+
+L1:
+	mov #1, R1
+    HALT
+L2:
+	mov #2, R1
+    mov #1, R2
+    CMP R2, R1 ; R2 < R1
+    BLOS L3	;Should work
+    HALT
+
+L3:
+    mov #3, R1
+    HALT
+
+L4:
+    mov #4, R1
+    HALT
+
+.END START

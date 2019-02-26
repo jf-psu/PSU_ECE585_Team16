@@ -1,0 +1,15 @@
+;Branch
+
+START: 
+	
+    BR L2 	;Unconditional branch. Opcode:000400
+	BR L1 	;Should never run
+    
+L1:
+	mov #1, R1
+    HALT
+L2:
+    mov #2, R1
+    HALT
+
+.END START

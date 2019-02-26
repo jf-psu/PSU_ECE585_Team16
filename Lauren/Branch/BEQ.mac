@@ -1,0 +1,33 @@
+;Branch Equal
+;Branch if result equal to 0. Z = 1. Opcode:001400
+
+START: 
+	mov #5, R1 ;R1 = 5
+	SUB R1, #1 ;R1 = 4
+    BEQ L1	;Testing with positive. Opcode:001400
+
+	SUB R1, #5 ;R1 = -1
+    BEQ L2	;Testing negative. Opcode:001400
+
+    ADD R1, #1 ;R1 = 0
+    BEQ L3	;This should work. Opcode:001400
+    
+	BR L4 	;Should never run!. Opcode:000400
+    HALT
+
+L1:
+	mov #1, R1
+    HALT
+L2:
+	mov #2, R1
+    HALT
+
+L3:
+    mov #3, R1
+    HALT
+
+L4:
+    mov #4, R1
+    HALT
+
+.END START

@@ -1,0 +1,27 @@
+;branch if carry is set. 
+;Opcode: 103400
+
+START: 
+	mov #6, R1 ;R1 = 000006
+	ADC R1, #1 ;R1 = 000007. No carry
+    BCS L1	;Shouldn't work
+
+	ADC R1, #1 ;R1 = 000010. Carried
+    BCS L2	;Should work
+    
+	BR L3 	;Fallthru, Should never run!. Opcode:000400
+    HALT
+
+L1:
+	mov #1, R1
+    HALT
+L2:
+	mov #2, R1
+    HALT
+
+L3:
+    mov #3, R1
+    HALT
+
+
+.END START
