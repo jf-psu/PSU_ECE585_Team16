@@ -18,11 +18,4 @@ START: MOV A, R1 ;R1 = 000070
        COM A ;Relative: A = 177707(not sure about this)
        COM @B ;Relative deferred: the content of address 000400 becomes its complement(not sure about this)
 
-       COM (SP) ;the content in the top of stack becomes its complement
-       COM (SP)+ ;the content in the top of stack becomes its complement, then pop it off
-       COM @(SP)+ ;the content of address which is the content in the top of stack becomes its complement
-       COM -(SP) ;the content in the stack becomes its complement(not sure about this)
-       COM 4(SP) ;the content of the stack which distance is 4 from the top stack becomes its complement
-       COM @4(SP) ;the content of address which is the content in the stack with distance of 4 from top stack becomes its complement
-
 .END START

@@ -18,11 +18,4 @@ START: MOV A, R1 ;R1 = 000070
        INCB A ;Relative: A = 000071(not sure)
        INCB @B ;Relative deferred: content(lowest byte(7:0)) of address 0000400 increment by 1.(not sure)
 
-       INCB (SP)
-       INCB (SP)+
-       INCB @(SP)+
-       INCB -(SP)
-       INCB 4(SP)
-       INCB @4(SP)
-
 .END START

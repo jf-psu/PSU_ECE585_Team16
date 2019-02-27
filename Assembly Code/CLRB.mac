@@ -15,12 +15,5 @@ START: MOV A, R2 ;R2 = 007070
 	   CLRB @#100 ;clear the content(lowest byte) of address 100
 	   CLRB A ;Relative: A = 007000(not sure about this)
 	   CLR @B ;Relative deferred: clear the content(lowest byte) of address 005400(not sure about this)
-	   
-	   CLRB (SP) ;clear the content(lowest byte) in the top of the stack
-	   CLRB (SP)+ ;clear the content(lowest byte) in the top of the stack then pop it off
-	   CLRB @(SP)+ ;clear the content(lowest byte) of address which is the content in the top of stack, then pop the pointer off
-	   CLRB -(SP) ;clear the content(lowest byte) in the stack(not sure about this)
-	   CLRB 4(SP) ;clear the content(lowest byte) of the stack which distance is 4 from the top
-	   CLRB @4(SP) ;clear the content(lowest byte) of address which is the content in the stack with distance of 4 from top stack
 
 .END START

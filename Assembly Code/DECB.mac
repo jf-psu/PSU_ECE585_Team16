@@ -18,11 +18,4 @@ START: MOV A, R1 ;R1 = 000070
        DECB A ;Relative: A = 000067(not sure)
        DECB @B ;Relative deferred: content of address 0000400 decrement by 1.(not sure)
 
-       DECB (SP)
-       DECB (SP)+
-       DECB @(SP)+
-       DECB -(SP)
-       DECB 4(SP)
-       DECB @4(SP)
-
 .END START

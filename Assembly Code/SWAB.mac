@@ -18,11 +18,4 @@ START: MOV A, R1 ;R1 = 000070
        SWAB A ;Relative: A = 034000(not sure)
        SWAB @B ;Relative deferred: exchange high-order content of address 000400 and low-order content of address 000400
 
-       SWAB (SP)
-       SWAB (SP)+
-       SWAB @(SP)+
-       SWAB -(SP)
-       SWAB 4(SP)
-       SWAB @4(SP)
-
 .END START
