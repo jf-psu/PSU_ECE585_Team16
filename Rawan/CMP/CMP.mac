@@ -4,124 +4,84 @@
 A: .WORD 000070
 B: .WORD 000400
 
-Test1:	MOV A,R0
-	MOV B,R5 
- 	CMP R0,R5 ;set flag to N
-	CMP R5,R0 ;set flag to N
-	 HALT
+Test1:  MOV A,R0
+        MOV B,R5
+        CMP R0,R5 ;set flag to N
+        CMP R5,R0 ;set flag to N
+         HALT
         .END TEST1
 
 ;Register Deffered
-Test2:	 MOV A,R0
-        MOV A,R5
-	CMP (R0),R5
+Test2:   MOV A,R0
+        MOV B,R5
+        CMP (R0),R5
         CMP (R5),R0
-	 HALT
+         HALT
         .END TEST2
 
 ;Autoincrement
-Test3:	 MOV A,R0
+Test3:   MOV A,R0
         MOV B,R5
-	CMP (R0)+,R5
+        CMP (R0)+,R5
         CMP (R5)+,R0
-	 HALT
+         HALT
         .END TEST3
 
 ;Autoincrement deffered
-Test4:	 MOV A,R0
+Test4:   MOV A,R0
         MOV B,R5
-	CMP @(R0)+,R5
+        CMP @(R0)+,R5
         CMP @(R5)+,R0
-	 HALT
+         HALT
         .END TEST4
-;Autodecrment 
-Test5:	 MOV A,R0
+;Autodecrment
+Test5:   MOV A,R0
         MOV B,R5
-	CMP -(R0),R5
+        CMP -(R0),R5
         CMP -(R5),R0
-	 HALT
+         HALT
         .END TEST5
 ;Autodecrement deffered
-Test6:	 MOV A,R0
+Test6:  MOV A,R0
         MOV B,R5
-	CMP @-(R0),R5
+        CMP @-(R0),R5
         CMP @-(R5),R0
-	 HALT
-        .END TEST6
+         HALT
+        .END TEST14
 
 ;Index
-Test7:	 MOV A,R0
-        MOV A,R5
-	CMP 4(R0),R5
-        CMP 4(R5),R0
-	 HALT
+Test7:  MOV A,R0
+        MOV B,R5
+        CMP 3(R0),R5
+        CMP 3(R5),R0
+         HALT
         .END TEST7
 
 ;index deffered
-Test8:	 MOV A,R0
+Test8:   MOV A,R0
         MOV B,R5
-	CMP @4(R0),R5
-        CMP @4(R5),R0
-	 HALT
+        CMP @3(R0),R5
+        CMP @3(R5),R0
+         HALT
         .END TEST8
-;stack address mode: deffered
-Test9:   MOV A,R0
-        MOV B,R5
-	CMP (SP),R0
-        CMP (SP),R5
-	 HALT
-        .END TEST9
 
-;stack address mode: autoincrement
-Test10:  MOV A,R0
-        MOV B,R5
-	CMP (SP)+,R0
-        CMP (SP)+,R5
-	 HALT
-        .END TEST10
-
-;stack address mode: autoincrement deffered
-Test11:  MOV A,R0
-        MOV B,R5
-	CMP @(SP)+,R0
-        CMP @(SP)+,R5
-	 HALT
-        .END TEST11
-
-;stack address mode: deffered
-Test12:  MOV A,R0
-        MOV B,R5
-        CMP -(SP),R0
-        CMP -(SP),R5
-	 HALT
-        .END TEST12
-
-;stack address mode: index deffered
-Test13:  MOV A,R0
-        MOV B,R5
-	 CMP @4(SP),R0
-        CMP @4(SP),R5
-	 HALT
-        .END TEST13
-
-;stack address mode: indexed
-Test14:  MOV A,R0
-        MOV B,R5
-	CMP 4(SP),R0
-        CMP 4(SP),R5
-	HALT
-	.END TEST14
 ;pc addressing mode: immediate
-Test15: MOV A,R0
-	MOV B,R5
-	CMP #100,R0
-	CMP #200,R5
-	HALT
-	.END TEST15
+Test9: MOV A,R0
+        MOV B,R5
+        CMP #100,R0
+        CMP #200,R5
+        HALT
+        .END TEST9
 ;Absolute
-Test16: MOV A,R0
-	MOV B,R5
-	CMP @#100,R0
-	CMP @#100,R5
-	HALT
-	.END TEST16
+Test10: MOV A,R0
+        MOV B,R5
+        CMP @#100,R0
+        CMP @#100,R5
+        HALT
+        .END TEST10
+Test11: MOV A,R0
+        MOV B,R5
+        CMP @A,R0
+        CMP @B,R5
+        HALT
+        .END TEST11
