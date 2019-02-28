@@ -1,6 +1,6 @@
 ;Test for BIC
 ;Testing addressing modes Register, Register deffered, autoincrement, autoincrement deffered, autodecrment, autodecrment deffered, index, and index deffered on Registers R0 and R5
-;Testig addressing modes Deffered, Autoincrment, autoincrment deffered, autodecrement, indexed, and indexed deffered on Regsiter SP
+;Testig addressing modes Deffered, Autoincrment, autoincerment deffered, autodecrement, indexed, and indexed deffered on Regsiter SP
 A: .WORD 000070
 B: .WORD 000400
 
@@ -81,7 +81,7 @@ Test10: MOV A,R0
         .END TEST10
 Test11: MOV A,R0
         MOV B,R5
-        BIC @100,R0
-        BIC @100,R5
+        BIC @A,R0
+        BIC @B,R5
         HALT
         .END TEST11
