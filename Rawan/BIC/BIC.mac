@@ -64,66 +64,24 @@ Test8:   MOV A,R0
         BIC @3(R5),R0
          HALT
         .END TEST8
-;stack address mode: deffered
-Test9:  MOV A,R0
-        MOV B,R5
-        BIC (SP),R0
-        BIC (SP),R5
-         HALT
-        .END TEST9
 
-;stack address mode: autoincrement
-Test10: MOV A,R0
-        MOV B,R5
-        BIC (SP)+,R0
-        BIC (SP)+,R5
-         HALT
-        .END TEST10
-
-;stack address mode: autoincrement deffered
-Test11: MOV A,R0
-        MOV B,R5
-        BIC @(SP)+,R0
-        BIC @(SP)+,R5
-         HALT
-        .END TEST11
-
-;stack address mode: deffered
-Test12: MOV A,R0
-        MOV B,R5
-        BIC -(SP),R0
-        BIC -(SP),R5
-         HALT
-        .END TEST12
-
-;stack address mode: index deffered
-Test13: MOV A,R0
-        MOV B,R5
-         BIC @4(SP),R0
-        BIC @4(SP),R5
-         HALT
-        .END TEST13
-
-;stack address mode: indexed
-Test14: MOV A,R0
-        MOV B,R5
-        BIC 4(SP),R0
-        BIC 4(SP),R5
-        HALT
-        .END TEST14
 ;pc addressing mode: immediate
-Test15: MOV A,R0
+Test9: MOV A,R0
         MOV B,R5
         BIC #100,R0
         BIC #200,R5
         HALT
-        .END TEST15
+        .END TEST9
 ;Absolute
-Test16: MOV A,R0
+Test10: MOV A,R0
         MOV B,R5
         BIC @#100,R0
         BIC @#100,R5
         HALT
-        .END TEST16
-
-
+        .END TEST10
+Test11: MOV A,R0
+        MOV B,R5
+        BIC @100,R0
+        BIC @100,R5
+        HALT
+        .END TEST11
