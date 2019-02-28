@@ -18,11 +18,4 @@ START: MOV A, R1 ;R1 = 000070
        ASR A ;Relative: A = 000034(not sure)
        ASR @B ;Relative deferred: shift content of address 000400 1 bit to right.(not sure)
 
-       ASR (SP)
-       ASR (SP)+
-       ASR @(SP)+
-       ASR -(SP)
-       ASR 4(SP)
-       ASR @4(SP)
-
 .END START

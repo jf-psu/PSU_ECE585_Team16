@@ -18,11 +18,4 @@ START: MOV A, R1 ;R1 = 000070
        ASLB A ;Relative: A = 000160(not sure)
        ASLB @B ;Relative deferred: shift content(lowest byte (7:0)) of address 000400 to left 1 bit.(not sure)
 
-       ASLB (SP)
-       ASLB (SP)+
-       ASLB @(SP)+
-       ASLB -(SP)
-       ASLB 4(SP)
-       ASLB @4(SP)
-
 .END START

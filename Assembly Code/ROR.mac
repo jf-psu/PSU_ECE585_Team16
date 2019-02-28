@@ -18,11 +18,4 @@ START: MOV A, R1 ;R1 = 000070
        ROR A ;Relative: A = 000034(not sure)
        ROR @B ;Relative deferred: rotate content of address 000400 to right 1 bit.(not sure)
 
-       ROR (SP)
-       ROR (SP)+
-       ROR @(SP)+
-       ROR -(SP)
-       ROR 4(SP)
-       ROR @4(SP)
-
 .END START

@@ -18,11 +18,4 @@ START: MOV A, R1 ;R1 = 000070
        ASL A ;Relative: A = 000160(not sure)
        ASL @B ;Relative deferred: shift content of address 000400 to left 1 bit.(not sure)
 
-       ASL (SP)
-       ASL (SP)+
-       ASL @(SP)+
-       ASL -(SP)
-       ASL 4(SP)
-       ASL @4(SP)
-
 .END START

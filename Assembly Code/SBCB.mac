@@ -18,11 +18,4 @@ START: MOV A, R1 ;R1 = 000070
        SBCB A ;Relative: A = 000070(not sure)
        SBCB @B ;Relative deferred: subtract C-bit to the content(lowest byte(7:0)) of address 000400
 
-       SBCB (SP)
-       SBCB (SP)+
-       SBCB @(SP)+
-       SBCB -(SP)
-       SBCB 4(SP)
-       SBCB @4(SP)
-
 .END START
