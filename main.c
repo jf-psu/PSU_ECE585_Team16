@@ -774,6 +774,7 @@ int run_simulation()
 
 }
 
+
 /*
 Most instructions allocate six bits to specify an operand. Three bits
 select one of eight addressing modes, and three bits select one of the
@@ -794,26 +795,53 @@ or allow the user to otherwise input the starting address
 
 
 
+
+
 int main(int argc, char *argv[])
 {
-    int result;
-    printf("PDP11 Instruction Set Simulator\n");
-
-    log_level = LOG_DEBUG; //LOG_INFO; //LOG_NONE;
-
-    test_psw();
-    test_regs();
-
     uint16_t mem_load_address = 0000000;
     uint16_t proc_start_address = 0000000;
     uint16_t word_offset = 0;
     uint16_t *word = NULL;
     uint8_t *hi_byte = NULL;
     uint8_t *low_byte = NULL;    
-
     
-    FILE *fp; 
-    char *file_name = "MOV_absolute.ascii"; //"MOV_rel_defer.ascii"; //"CLR.ascii"; //"c:\\ece-586\\CLR.ascii";
+    FILE *fp;
+    int result;
+
+
+    printf("PDP11 Instruction Set Simulator\n");
+
+    log_level = LOG_DEBUG; //LOG_INFO; //LOG_NONE;
+
+
+    switch (argc)
+    {
+        case 1:
+            printf("Usage: %s file.ascii [starting adress]\n", argv[0]);
+            exit(-1);
+            break;
+
+        case 2: // file name only
+            break;
+
+        case 3:
+            proc_start_address = strtol(argv[2], NULL, 8);
+            break;
+
+        default:
+            printf("Invalid command line arguments.\n");
+            printf("Usage: %s file.ascii [starting adress]\n", argv[0]);
+            exit(-1);
+            break;
+    }
+
+
+
+    test_psw();
+    test_regs();
+
+    char *file_name = argv[1]; //"MOV_absolute.ascii"; //"MOV_rel_defer.ascii"; //"CLR.ascii"; //"c:\\ece-586\\CLR.ascii";
 
     fp = fopen(file_name, "r");
     if (fp == NULL) {
@@ -848,8 +876,16 @@ int main(int argc, char *argv[])
                 break;
 
             case '*': //  set PC to value
-                proc_start_address = strtol(line+1, NULL, 8);
-                log(LOG_INFO, "Processor start adress set to %0.6o\n", proc_start_address);
+                if (proc_start_address == 0)
+                {
+                    proc_start_address = strtol(line+1, NULL, 8);
+                    log(LOG_INFO, "Processor start address set to %0.6o\n", proc_start_address);
+                }
+                else
+                {
+                    log(LOG_INFO, "Processor start address from file overriden by command line option\n");
+                }
+                
                 break;
 
             case '@': //@ set start memory address
