@@ -81,7 +81,7 @@ Test10: MOV A,R0
         .END TEST10
 Test11: MOV A,R0
         MOV B,R5
-        SUB @100,R0
-        SUB @100,R5
+        SUB @A,R0
+        SUB @B,R5
         HALT
         .END TEST11
