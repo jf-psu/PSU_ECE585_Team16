@@ -364,7 +364,11 @@ int op_mov(uint16_t instruction) // double operand instruction
         case 6:
             if (src ==7) // PC_MODE_RELATIVE
             {
-                printf("FIXME PC mode relative not implemented\n");
+                /*  contents of memory location immediately following instruction word are added to (PC) to produce address */
+                reg[7] += 2;
+                uint16_t addr_word = reg[7] + data_read_word(reg[7]);
+                uint16_t ptr = data_read_word(addr_word);
+                src_value = data_read_word(ptr);
             }
             else // GEN_MODE_INDEX:
             {
@@ -592,7 +596,7 @@ void print_memory()
     
     printf("Contents of occupied memory locations (in octal):\nAddr    Word     Hi  Low\n");
     
-    for(int word_offset=0; word_offset <= MEMORY_SIZE / 2; word_offset++)
+    for(int word_offset=0; word_offset < MEMORY_SIZE / 2; word_offset++)
     {
         word = (uint16_t *)memory+word_offset;
         if (*word != 0) // only print locations that are not 0
@@ -681,8 +685,6 @@ int init_cpu(uint16_t start_pc)
 
 int decode_and_execute(uint16_t instruction)
 {
-    //cpu->registers.R0 = 4;
-    //reg.R0 = 4;
 
     int (*decoder)(uint16_t) = NULL;    //function pointer to actual decoder
 
@@ -752,19 +754,24 @@ int run_simulation()
 
     while (1)
     {
-        pc = reg[7];
-        opcode = fetch_instruction(pc);
-
+        opcode = fetch_instruction(reg[7]);
         
-        print_memory();
-        print_psw();
-        print_regs();
-        decode_and_execute(opcode);
-        print_memory();
-        print_psw();
-        print_regs();
+        if (log_level == LOG_DEBUG)
+        {
+            print_memory();
+            print_psw();
+            print_regs();
+            decode_and_execute(opcode);
+            print_memory();
+            print_psw();
+            print_regs();
+        }
+        else
+        {
+            decode_and_execute(opcode);
+        }
+        
 
-        break;
         if (opcode == OP_HALT)
         {
             log(LOG_NORMAL, "Ending simulation due to halt instruction");
@@ -807,41 +814,39 @@ int main(int argc, char *argv[])
     uint8_t *low_byte = NULL;    
     
     FILE *fp;
+    char *file_name;
     int result;
 
 
     printf("PDP11 Instruction Set Simulator\n");
 
-    log_level = LOG_DEBUG; //LOG_INFO; //LOG_NONE;
+    log_level = LOG_NONE;//LOG_DEBUG; //LOG_INFO; //LOG_NONE;
 
 
-    switch (argc)
+    switch (argc) // NOTE using fall through in the cases, so watch out
     {
-        case 1:
-            printf("Usage: %s file.ascii [starting adress]\n", argv[0]);
-            exit(-1);
-            break;
+        case 4: // file name, start address, and debug level
+            log_level = strtol(argv[3], NULL, 10);
+
+        case 3: // file name and start address
+            proc_start_address = strtol(argv[2], NULL, 8);
 
         case 2: // file name only
-            break;
-
-        case 3:
-            proc_start_address = strtol(argv[2], NULL, 8);
+            file_name = argv[1];
             break;
 
         default:
-            printf("Invalid command line arguments.\n");
-            printf("Usage: %s file.ascii [starting adress]\n", argv[0]);
+            printf("Usage: %s file.ascii [starting adress] [debug level]\n", argv[0]);
             exit(-1);
             break;
     }
 
 
-
-    test_psw();
-    test_regs();
-
-    char *file_name = argv[1]; //"MOV_absolute.ascii"; //"MOV_rel_defer.ascii"; //"CLR.ascii"; //"c:\\ece-586\\CLR.ascii";
+    if (log_level == LOG_DEBUG)
+    {
+        test_psw();
+        test_regs();
+    }
 
     fp = fopen(file_name, "r");
     if (fp == NULL) {
@@ -876,14 +881,10 @@ int main(int argc, char *argv[])
                 break;
 
             case '*': //  set PC to value
-                if (proc_start_address == 0)
+                if (proc_start_address == 0) // protect override from command line
                 {
                     proc_start_address = strtol(line+1, NULL, 8);
                     log(LOG_INFO, "Processor start address set to %0.6o\n", proc_start_address);
-                }
-                else
-                {
-                    log(LOG_INFO, "Processor start address from file overriden by command line option\n");
                 }
                 
                 break;
@@ -904,6 +905,7 @@ int main(int argc, char *argv[])
     fclose(fp);
 
     print_memory();
+    log(LOG_INFO, "Processor start address %0.6o\n", proc_start_address);
 
     init_cpu(proc_start_address);
 
