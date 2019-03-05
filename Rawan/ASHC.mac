@@ -1,0 +1,88 @@
+;Test for ASHC
+;Testing addressing modes Register, Register deffered, autoincrement, autoincrement deffered, autodecrment, autodecrment deffered, index, and index deffered on Registers R0 and R5
+;Testig addressing modes Deffered, Autoincrment, autoincrment deffered, autodecrement, indexed, and indexed deffered on Regsiter SP
+A: .WORD 000070
+B: .WORD 000400
+
+Test1:  MOV A,R0
+        MOV B,R5
+        ASHC R0,R5 ;set flag to N
+        ASHC R5,R0 ;set flag to N
+         HALT
+        .END TEST1
+
+;Register Deffered
+Test2:   MOV A,R0
+        MOV B,R5
+        ASHC (R0),R5
+        ASHC (R5),R0
+         HALT
+        .END TEST2
+
+;Autoincrement
+Test3:   MOV A,R0
+        MOV B,R5
+        ASHC (R0)+,R5
+        ASHC (R5)+,R0
+         HALT
+        .END TEST3
+
+;Autoincrement deffered
+Test4:   MOV A,R0
+        MOV B,R5
+        ASHC @(R0)+,R5
+        ASHC @(R5)+,R0
+         HALT
+        .END TEST4
+;Autodecrment
+Test5:   MOV A,R0
+        MOV B,R5
+        ASHC -(R0),R5
+        ASHC -(R5),R0
+         HALT
+        .END TEST5
+;Autodecrement deffered
+Test6:  MOV A,R0
+        MOV B,R5
+        ASHC @-(R0),R5
+        ASHC @-(R5),R0
+         HALT
+        .END TEST14
+
+;Index
+Test7:  MOV A,R0
+        MOV B,R5
+        ASHC 3(R0),R5
+        ASHC 3(R5),R0
+         HALT
+        .END TEST7
+
+;index deffered
+Test8:   MOV A,R0
+        MOV B,R5
+        ASHC @3(R0),R5
+        ASHC @3(R5),R0
+         HALT
+        .END TEST8
+
+;pc addressing mode: immediate
+Test9: MOV A,R0
+        MOV B,R5
+        ASHC #100,R0
+        ASHC #200,R5
+        HALT
+        .END TEST9
+;Absolute
+Test10: MOV A,R0
+        MOV B,R5
+        ASHC @#100,R0
+        ASHC @#100,R5
+        HALT
+        .END TEST10
+Test11: MOV A,R0
+        MOV B,R5
+        ASHC @A,R0
+        ASHC @B,R5
+        HALT
+        .END TEST11
+
