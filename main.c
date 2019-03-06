@@ -763,16 +763,21 @@ int run_simulation()
             print_memory();
             print_psw();
             print_regs();
-            decode_and_execute(opcode);
+            result = decode_and_execute(opcode);
             print_memory();
             print_psw();
             print_regs();
         }
         else
         {
-            decode_and_execute(opcode);
+            result = decode_and_execute(opcode);
         }
-        
+
+        if (result == E_INVALID_OP_CODE);
+        {
+            log(LOG_ERROR, "Stopping simnluation due to invalid opcode");        
+            break;
+        }
 
         if (opcode == OP_HALT)
         {
