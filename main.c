@@ -255,7 +255,7 @@ int op_clr(uint16_t instruction) // single operand
             {
                 /* Index addressing instructions are of the form OPR X(Rn) where X is the indexed word and is located in the
                 memory location following the instruction word and Rn is the selected general register. */
-                uint16_t next_word = data_read_word(reg[7] + 2);
+                uint16_t next_word = data_read_word(reg[7]); // PC is already pointing to next instruction
                 data_write_word(reg[reg_num] + next_word, 0);
                 // TODO does PC need to be incremented to avoid next instruction actually being a data operand for this instruction?
             }
@@ -270,7 +270,7 @@ int op_clr(uint16_t instruction) // single operand
             {
                 /* Value X (stored in a word following the instruction) and (Rn) are added and the sum is used as a pointer to a word containing the
                 address of the operand. Neither X nor (Rn) are modified. */
-                uint16_t next_word = data_read_word(reg[7] + 2);
+                uint16_t next_word = data_read_word(reg[7]);
                 data_write_word(reg[reg_num] + next_word, 0);
             }
             break;
@@ -281,7 +281,6 @@ int op_clr(uint16_t instruction) // single operand
     psw.overflow = 0;
     psw.carry = 0;
 
-    reg[7] += 2;  // increment PC to next instruction
     return 0;
 }
 
@@ -365,25 +364,31 @@ int op_mov(uint16_t instruction) // double operand instruction
             if (src ==7) // PC_MODE_RELATIVE
             {
                 /*  contents of memory location immediately following instruction word are added to (PC) to produce address */
-                reg[7] += 4;
-                uint16_t addr_word = reg[7] + data_read_word(reg[7]);
-                uint16_t ptr = data_read_word(addr_word);
+                uint16_t next_word = data_read_word(reg[7]);
+                reg[7] += 2; // move PC past data operand
+                uint16_t ptr = (uint16_t)(reg[7] + next_word);
                 src_value = data_read_word(ptr);
             }
             else // GEN_MODE_INDEX:
             {
                 /* Index addressing instructions are of the form OPR X(Rn) where X is the indexed word and is located in the
                 memory location following the instruction word and Rn is the selected general register. */
-                uint16_t next_word = data_read_word(reg[7] + 2);
+                uint16_t next_word = data_read_word(reg[7]);
+                reg[7] += 2; // move PC past data operand
                 src_value = data_read_word(reg[src] + next_word);
-                // TODO does PC need to be incremented to avoid next instruction actually being a data operand for this instruction?
             }
             break;
 
         case 7:
             if (src == 7) // PC_MODE_RELATIVE_DEFERRED
             {
-                printf("FIXME PC mode relative deferred not implemented\n");
+                // second word of the instruction, when added to the PC, contains the address of the address of the operand                
+                uint16_t addr_word =  data_read_word(reg[7]);
+                reg[7] += 2; // move PC past data operand
+                addr_word = (uint16_t)(addr_word + reg[7]);
+                uint16_t ptr = data_read_word(addr_word);
+                src_value = data_read_word(ptr);                
+
             }
             else // GEN_MODE_INDEX_DEFERRED:
             {
@@ -493,7 +498,6 @@ int op_mov(uint16_t instruction) // double operand instruction
     psw.zero = (src == 0);
     psw.overflow = 0;
 
-    reg[7] += 2;
     return 0;
 }
 
@@ -757,6 +761,7 @@ int run_simulation()
     while (1)
     {
         opcode = fetch_instruction(reg[7]);
+        reg[7] += 2;  // move PC to next instruction
         
         if (log_level == LOG_DEBUG)
         {
@@ -764,18 +769,18 @@ int run_simulation()
             print_psw();
             print_regs();
             result = decode_and_execute(opcode);
-            print_memory();
             print_psw();
             print_regs();
+            print_memory();
         }
         else
         {
             result = decode_and_execute(opcode);
         }
 
-        if (result == E_INVALID_OP_CODE);
+        if (result == E_INVALID_OP_CODE)
         {
-            log(LOG_ERROR, "Stopping simnluation due to invalid opcode");        
+            log(LOG_ERROR, "Ending simulation due to invalid opcode");        
             break;
         }
 
@@ -849,11 +854,13 @@ int main(int argc, char *argv[])
     }
 
 
+    /*
     if (log_level == LOG_DEBUG)
     {
         test_psw();
         test_regs();
     }
+    */
 
     fp = fopen(file_name, "r");
     if (fp == NULL) {
@@ -879,10 +886,12 @@ int main(int argc, char *argv[])
                 word = (uint16_t *)memory+word_offset;
                 *word = strtol(line+1, NULL, 8);
 
+                
                 low_byte = (uint8_t *)memory+(2*word_offset);
                 hi_byte = (uint8_t *)memory+(2*word_offset)+1;
                 log(LOG_DEBUG, "%0.6o: %0.6o\t %0.3o %0.3o\n", word_offset, *word, *hi_byte, *low_byte);
-
+                
+               
                 //sscanf(line, "%o", pdp11.memory.word[mem_load_address]);
                 word_offset += 1;
                 break;
@@ -893,6 +902,11 @@ int main(int argc, char *argv[])
                     proc_start_address = strtol(line+1, NULL, 8);
                     log(LOG_INFO, "Processor start address set to %0.6o\n", proc_start_address);
                 }
+                else
+                {
+                    log(LOG_INFO, "File requested start address %0.6o overriden by command line.\n", proc_start_address);
+                }
+                
                 
                 break;
 
