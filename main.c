@@ -365,7 +365,7 @@ int op_mov(uint16_t instruction) // double operand instruction
             if (src ==7) // PC_MODE_RELATIVE
             {
                 /*  contents of memory location immediately following instruction word are added to (PC) to produce address */
-                reg[7] += 2;
+                reg[7] += 4;
                 uint16_t addr_word = reg[7] + data_read_word(reg[7]);
                 uint16_t ptr = data_read_word(addr_word);
                 src_value = data_read_word(ptr);
@@ -510,7 +510,9 @@ int op_halt(uint16_t instruction)
 void print_regs()
 {
     for (int i=0; i <= 7; i++)
-        printf("R%d:\t%0.6o\n", i, reg[i]);
+        printf("R%d:\t%0.6o\t", i, reg[i]);
+
+    printf("\n");
 }
 
 
