@@ -317,7 +317,10 @@ int op_mov(uint16_t instruction) // double operand instruction
         case 2:
             if (src == 7) // PC_MODE_IMMEDIATE
             {
-                printf("FIXME PC mode immediate not implemented\n");
+                /* The value is located in the second word of the instruction and is added to the contents of the register.
+                    the PC is used as a pointer to fetch the operand before being incremented by two to point to the next instruction.  */
+                src_value = data_read_word(reg[7]);
+                reg[7] += 2;
             }
             else // GEN_MODE_AUTO_INCREMENT
             {
@@ -329,18 +332,26 @@ int op_mov(uint16_t instruction) // double operand instruction
             break;
             
         case 3:
+            // FIXME remove 'if' block, PC_MODE_ABSOLUTE and GEN_MODE_AUTO_INCREMENT_DEFERRED are the same
             if (src == 7) // PC_MODE_ABSOLUTE:
             {
-                printf("FIXME PC mode absolute not implemented\n");
+                /*  The contents of the location following the instruction are taken as the
+                    address of the operand. Immediate data is interpreted as an absolute address
+                    (i.e., an address that remains constant no matter where in memory the assembled instruction is executed). */
+
+                uint16_t addr_word = data_read_word(reg[7]);
+                reg[7] += 2;
+                src_value = data_read_word(addr_word);                
             }
             else // GEN_MODE_AUTO_INCREMENT_DEFERRED:
             {
                 /* Register is first used as a pointer to a word containing the address of the operand, then incremented (always by 2; even for byte instructions). */
                 /* The contents of register used as the address of the address of the operand. Operation is performed,  Contents of register incremented by 2. */
                 uint16_t addr_word = data_read_word(reg[src]);
-                uint16_t ptr = data_read_word(addr_word);
-                src_value = data_read_word(ptr);
                 reg[src] += 2;
+                //uint16_t ptr = data_read_word(addr_word);
+                src_value = data_read_word(addr_word);
+                
             }       
             break;
 
@@ -361,21 +372,24 @@ int op_mov(uint16_t instruction) // double operand instruction
             break;
 
         case 6:
+            // FIXME remove 'if' block, PC_MODE_RELATIVE and GEN_MODE_INDEX are the same
             if (src ==7) // PC_MODE_RELATIVE
             {
                 /*  contents of memory location immediately following instruction word are added to (PC) to produce address */
                 uint16_t next_word = data_read_word(reg[7]);
                 reg[7] += 2; // move PC past data operand
-                uint16_t ptr = (uint16_t)(reg[7] + next_word);
-                src_value = data_read_word(ptr);
+                uint16_t data_word = (uint16_t)(reg[7] + next_word);
+                src_value = data_read_word(data_word);
             }
             else // GEN_MODE_INDEX:
             {
+                /* The contents of the selected general register, and an index word following the instruction word, are summed to form the address of the operand.  */
                 /* Index addressing instructions are of the form OPR X(Rn) where X is the indexed word and is located in the
                 memory location following the instruction word and Rn is the selected general register. */
                 uint16_t next_word = data_read_word(reg[7]);
                 reg[7] += 2; // move PC past data operand
-                src_value = data_read_word(reg[src] + next_word);
+                uint16_t data_word = (uint16_t)(reg[src] + next_word);
+                src_value = data_read_word(data_word);
             }
             break;
 
@@ -392,10 +406,13 @@ int op_mov(uint16_t instruction) // double operand instruction
             }
             else // GEN_MODE_INDEX_DEFERRED:
             {
-                /* Value X (stored in a word following the instruction) and (Rn) are added and the sum is used as a pointer to a word containing the
+                /* Value X (stored in a word following the instruction) and (Rn) are added and used as a pointer to a word containing the
                 address of the operand. Neither X nor (Rn) are modified. */
-                uint16_t next_word = data_read_word(reg[7] + 2);
-                src_value = data_read_word(reg[src] + next_word);
+                uint16_t addr_word = data_read_word(reg[src]);
+                reg[src] += 2; // move PC past data operand                
+                addr_word = (uint16_t)(addr_word + reg[src]);
+                uint16_t ptr = data_read_word(addr_word);
+                src_value = data_read_word(ptr);    
             }
             break;
     }
