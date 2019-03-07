@@ -5,7 +5,7 @@ A: .WORD 000070
 B: .WORD 000400
 
 Test1:  MOV A,R0
-        MOV B,R5
+        MOV B,  R5
         ADD R0,R5 ;set flag to N
         ADD R5,R0 ;set flag to N
          HALT
