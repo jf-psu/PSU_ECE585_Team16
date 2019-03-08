@@ -17,5 +17,6 @@ START: MOV A, R1 ;R1 = 000070
        COM @#100 ;content of address 100 becomes its complement
        COM A ;Relative: A = 177707(not sure about this)
        COM @B ;Relative deferred: the content of address 000400 becomes its complement(not sure about this)
+	   HALT
 
 .END START

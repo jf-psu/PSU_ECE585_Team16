@@ -17,5 +17,6 @@ START: MOV A, R1 ;R1 = 000070
        COMB @#100 ;content of address(lowest byte(7:0)) 100 becomes its complement
        COMB A ;Relative: A = 000307(not sure about this)
        COMB @B ;Relative deferred: the content of address(lowest byte(7:0)) 000400 becomes its complement(not sure about this)
+	   HALT
 
 .END START

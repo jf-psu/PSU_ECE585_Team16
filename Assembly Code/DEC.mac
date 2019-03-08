@@ -17,5 +17,6 @@ START: MOV A, R1 ;R1 = 000070
        DEC @#100
        DEC A ;Relative: A = 000067(not sure)
        DEC @B ;Relative deferred: content of address 0000400 decrement by 1.(not sure)
+	   HALT
 
 .END START

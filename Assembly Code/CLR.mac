@@ -16,6 +16,7 @@ START: MOV A, R1 ;R1 = 000070
 	   CLR @#100 ;clear the content of address 100
 	   CLR A ;Relative: A = 0(not sure about this)
 	   CLR @B ;Relative deferred: clear the content of address 000400(not sure about this)
+	   HALT
 
 .END START
 	   

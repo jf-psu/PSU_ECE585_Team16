@@ -17,5 +17,6 @@ START: MOV A, R1 ;R1 = 000070
        ROL @#100
        ROL A ;Relative: A = 000070(not sure)
        ROL @B ;Relative deferred: rotate content of address 000400 to left 1 bit.(not sure)
+	   HALT
 
 .END START

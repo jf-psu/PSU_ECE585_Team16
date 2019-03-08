@@ -17,5 +17,6 @@ START: MOV A, R1 ;R1 = 000070
        NEGB @#100 ;lowest byte(7:0) becomes its 2's complement
        NEGB A ;Relative: A = 000310(not sure)
        NEGB @B ;Relative deferred: content(lowest byte(7:0)) of address 0000400 becomes its 2's complement.(not sure)
+	   HALT
 
 .END START

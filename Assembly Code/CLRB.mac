@@ -15,5 +15,6 @@ START: MOV A, R2 ;R2 = 007070
 	   CLRB @#100 ;clear the content(lowest byte) of address 100
 	   CLRB A ;Relative: A = 007000(not sure about this)
 	   CLR @B ;Relative deferred: clear the content(lowest byte) of address 005400(not sure about this)
+	   HALT
 
 .END START

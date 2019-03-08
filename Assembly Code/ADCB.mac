@@ -17,5 +17,6 @@ START: MOV A, R1 ;R1 = 000070
        ADCB @#100
        ADCB A ;Relative: A = 000070(not sure)
        ADCB @B ;Relative deferred: add C-bit to the content(lowest byte(7:0)) of address 000400
+	   HALT
 
 .END START

@@ -17,5 +17,6 @@ START: MOV A, R1 ;R1 = 000070
        SBC @#100
        SBC A ;Relative: A = 000070(not sure) assume previous C-bit is 0
        SBC @B ;Relative deferred: subtract C-bit to the content of address 000400
+	   HALT
 
 .END START
