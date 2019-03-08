@@ -2,8 +2,8 @@
 #include <inttypes.h>
 #include <stdlib.h>
 
-#include "opcodes.h"
-#include "log.h"
+#include "C:\Users\58390\Documents\WorkspaceForC\opcodes.h"
+#include "C:\Users\58390\Documents\WorkspaceForC\log.h"
 
 
 #define K 1024 // 2^10
@@ -132,7 +132,8 @@ uint16_t data_write_word(uint16_t memory_address, uint16_t data)
     word = (uint16_t *)memory + memory_address / 2;
 
     printf("1 %0.6o (data write)\n", memory_address);
-    return *word = data;
+    return *word
+      = data;
 }
 
 
@@ -156,7 +157,7 @@ uint16_t write_operand_value(uint8_t dst_field, uint16_t value)
     uint8_t dst = dst_field & 07; // bits 2-0
     uint16_t addr_word, ptr;
 
-    log(LOG_DEBUG, "write_operand_value(%0.2o, %0.6o) mode: %o reg: %o\n", dst_field, value, mode, dst);
+    log(LOG_INFO, "write_operand_value(%0.2o, %0.6o) mode: %o reg: %o\n", dst_field, value, mode, dst);
 
     switch (mode)
     {
@@ -244,7 +245,7 @@ uint16_t read_operand_value(uint8_t src_field)
     uint8_t src = src_field & 07; // bits 2-0
     uint16_t value, addr_word, ptr;
 
-    log(LOG_DEBUG, "read_operand_value(%0.2o) mode: %o reg: %o\n", src_field, mode, src);
+    log(LOG_INFO, "read_operand_value(%0.2o) mode: %o reg: %o\n", src_field, mode, src);
 
     switch (mode)
     {
@@ -358,121 +359,6 @@ int op_clr(uint16_t instruction)
     return 0;
 }
 
-int op_clr_old(uint16_t instruction)
-{
-    uint8_t mode = (instruction & 0070) >> 3;
-    uint8_t reg_num = instruction & 07;
-    log(LOG_INFO, "CLR function called, mode: %o reg: %o\n", mode, reg_num);
-
-    /* The PC responds to all the standard PDP-11 addressing modes. However, there are four of these modes with which the PC can provide
-       advantages for handling position independent code (PIC - see Chapter 5) and unstructured data. When regarding the PC these modes 
-       are termed immediate, absolute (or immediate deferred), relative and relative deferred 
-       
-       Immediate mode is equivalent to using the autoincrement mode with the PC. operands are in the memory location immediately following
-       the instruction word. The PC is used as a pointer to fetch the operand (the second word of the instruction) before being incremented
-       by two to point to the next instruction.
-       
-       In index and index deferred modes, X is a 16-bit value taken from a second word of the instruction. In double-operand instructions, both
-       operands can use these modes. Such instructions are three words long.
- */
-
-    switch (mode)
-    {
-        case 0:// GEN_MODE_REGISTER:
-            reg[reg_num] = 0;            
-            break;
-
-        case 1:// GEN_MODE_REGISTER_DEFERRED:
-            /* Register contains the address of the operand */
-            data_write_word(reg[reg_num], 0);
-            break;
-
-        case 2:
-            if (reg_num == 7) // PC_MODE_IMMEDIATE
-            {
-                printf("FIXME PC mode immediate not implemented\n");
-            }
-            else // GEN_MODE_AUTO_INCREMENT
-            {
-                /* Register is used as a pointer to sequential data then incremented. contents of the general register is the address of the operand
-                /* Contents of registers are stepped (by one for bytes, by two for words, always by two for R6 and R7 */
-                data_write_word(reg[reg_num], 0);
-                reg[reg_num] += 2;
-            }
-            break;
-            
-        case 3:
-            if (reg_num == 7) // PC_MODE_ABSOLUTE:
-            {
-                printf("FIXME PC mode absolute not implemented\n");
-            }
-            else // GEN_MODE_AUTO_INCREMENT_DEFERRED:
-            {
-                /* Register is first used as a pointer to a word containing the address of the operand, then incremented (always by 2; even for byte instructions). */
-                /* The contents of register used as the address of the address of the operand. Operation is performed,  Contents of register incremented by 2. */
-                uint16_t addr_word = data_read_word(reg[reg_num]);
-                uint16_t ptr = data_read_word(addr_word);
-                data_write_word(ptr, 0);
-                reg[reg_num] += 2;
-            }       
-            break;
-
-        case 4:// GEN_MODE_AUTO_DECREMENT:
-            /* The contents of the selected general register are decremented (by two for word instructions, by one for byte instructions)
-               and then used as the address of the operand */
-            reg[reg_num] -= 2;
-            data_write_word(reg[reg_num], 0);
-            break;
-
-        case 5:// GEN_MODE_AUTO_DECREMENT_DEFERRED:
-            /* Register is decremented (always by two; even for byte instructions) and then used as a pointer to a word
-               containing the address of the operand */
-            reg[reg_num] -= 2;
-            uint16_t addr_word = data_read_word(reg[reg_num]);
-            uint16_t ptr = data_read_word(addr_word);
-            data_write_word(ptr, 0);
-
-            break;
-
-        case 6:
-            if (reg_num ==7) // PC_MODE_RELATIVE
-            {
-                printf("FIXME PC mode relative not implemented\n");
-            }
-            else // GEN_MODE_INDEX:
-            {
-                /* Index addressing instructions are of the form OPR X(Rn) where X is the indexed word and is located in the
-                memory location following the instruction word and Rn is the selected general register. */
-                uint16_t next_word = data_read_word(reg[7]); // PC is already pointing to next instruction
-                data_write_word(reg[reg_num] + next_word, 0);
-                // TODO does PC need to be incremented to avoid next instruction actually being a data operand for this instruction?
-            }
-            break;
-
-        case 7:
-            if (reg_num == 7) // PC_MODE_RELATIVE_DEFERRED
-            {
-                printf("FIXME PC mode relative deferred not implemented\n");
-            }
-            else // GEN_MODE_INDEX_DEFERRED:
-            {
-                /* Value X (stored in a word following the instruction) and (Rn) are added and the sum is used as a pointer to a word containing the
-                address of the operand. Neither X nor (Rn) are modified. */
-                uint16_t next_word = data_read_word(reg[7]);
-                data_write_word(reg[reg_num] + next_word, 0);
-            }
-            break;
-    }
-
-    psw.negative = 0;
-    psw.zero = 1;
-    psw.overflow = 0;
-    psw.carry = 0;
-
-    return 0;
-}
-
-
 
 int op_xor(uint16_t instruction)
 {
@@ -536,198 +422,6 @@ result; cleared otherwise
 
 
 
-
-
-int op_mov_old(uint16_t instruction) // double operand instruction
-{
-    uint16_t opcode = instruction >> 12; // 4 msb
-    uint8_t src_mode = (instruction >> 9) & 07; // bits 9-11
-    uint8_t src = (instruction >> 6) & 07; // bits 6-8
-    uint8_t dst_mode = (instruction >> 3) & 07; // bits 3-5
-    uint8_t dst = instruction & 07; // bits 0-2
-
-    log(LOG_DEBUG, "Move word instruction: opcode=%o src_mode=%o src=%o dst_mode=%o dst=%o\n", opcode, src_mode, src, dst_mode, dst);
-
-    uint16_t src_value, addr_word, ptr, data_word;
-
-    switch (src_mode)
-    {
-        case 0:// GEN_MODE_REGISTER:
-            src_value = reg[src];            
-            break;
-
-        case 1:// GEN_MODE_REGISTER_DEFERRED:
-            /* Register contains the address of the operand */
-            src_value = data_read_word(reg[src]);
-            break;
-
-        case 2: // GEN_MODE_AUTO_INCREMENT / PC_MODE_IMMEDIATE
-            /* The value is located in the second word of the instruction and is added to the contents of the register.
-                the PC is used as a pointer to fetch the operand before being incremented by two to point to the next instruction.  */
-
-            /* Register is used as a pointer to sequential data then incremented. contents of the general register is the address of the operand
-            /* Contents of registers are stepped (by one for bytes, by two for words, always by two for R6 and R7 */
-            src_value = data_read_word(reg[src]);
-            reg[src] += 2;
-
-            break;
-            
-        case 3: // GEN_MODE_AUTO_INCREMENT_DEFERRED / PC_MODE_ABSOLUTE
-            /*  The contents of the location following the instruction are taken as the
-                address of the operand. Immediate data is interpreted as an absolute address
-                (i.e., an address that remains constant no matter where in memory the assembled instruction is executed). */
-
-            /* Register is first used as a pointer to a word containing the address of the operand, then incremented (always by 2; even for byte instructions). */
-            /* The contents of register used as the address of the address of the operand. Operation is performed,  Contents of register incremented by 2. */
-            addr_word = data_read_word(reg[src]);
-            reg[src] += 2;
-            src_value = data_read_word(addr_word);
-       
-            break;
-
-        case 4:// GEN_MODE_AUTO_DECREMENT:
-            /* The contents of the selected general register are decremented (by two for word instructions, by one for byte instructions)
-               and then used as the address of the operand */
-            reg[src] -= 2;
-            src_value = data_read_word(reg[src]);
-            break;
-
-        case 5:// GEN_MODE_AUTO_DECREMENT_DEFERRED:
-            /* Register is decremented (always by two; even for byte instructions) and then used as a pointer to a word
-               containing the address of the operand */
-            reg[src] -= 2;
-            addr_word = data_read_word(reg[src]);
-            ptr = data_read_word(addr_word);
-            src_value = data_read_word(ptr);
-            break;
-
-        case 6: // GEN_MODE_INDEX / PC_MODE_RELATIVE
-            /*  contents of memory location immediately following instruction word are added to (PC) to produce address */
-            /* The contents of the selected general register, and an index word following the instruction word, are summed to form the address of the operand.  */
-            /* Index addressing instructions are of the form OPR X(Rn) where X is the indexed word and is located in the
-            memory location following the instruction word and Rn is the selected general register. */
-            addr_word = data_read_word(reg[7]);
-            reg[7] += 2; // move PC past data operand
-            data_word = (uint16_t)(reg[src] + addr_word);
-            src_value = data_read_word(data_word);
-
-            break;
-
-        case 7: // GEN_MODE_INDEX_DEFERRED / PC_MODE_RELATIVE_DEFERRED
-            // second word of the instruction, when added to the PC, contains the address of the address of the operand                
-            /* Value X (stored in a word following the instruction) and (Rn) are added and used as a pointer to a word containing the
-            address of the operand. Neither X nor (Rn) are modified. */
-            addr_word = data_read_word(reg[src]);
-            reg[src] += 2; // move PC past data operand                
-            addr_word = (uint16_t)(addr_word + reg[src]);
-            ptr = data_read_word(addr_word);
-            src_value = data_read_word(ptr);    
-
-            break;
-    }
-
-
-    switch (dst_mode)
-    {
-        case 0:// GEN_MODE_REGISTER:
-            reg[dst] = src_value;            
-            break;
-
-        case 1:// GEN_MODE_REGISTER_DEFERRED:
-            /* Register contains the address of the operand */
-            data_write_word(reg[dst], src_value);
-            break;
-
-        case 2:
-            if (dst == 7) // PC_MODE_IMMEDIATE
-            {
-                printf("FIXME PC mode immediate not implemented\n");
-            }
-            else // GEN_MODE_AUTO_INCREMENT
-            {
-                /* Register is used as a pointer to sequential data then incremented. contents of the general register is the address of the operand
-                /* Contents of registers are stepped (by one for bytes, by two for words, always by two for R6 and R7 */
-                data_write_word(reg[dst], src_value);
-                reg[dst] += 2;
-            }
-            break;
-            
-        case 3:
-            if (dst == 7) // PC_MODE_ABSOLUTE:
-            {
-                printf("FIXME PC mode absolute not implemented\n");
-            }
-            else // GEN_MODE_AUTO_INCREMENT_DEFERRED:
-            {
-                /* Register is first used as a pointer to a word containing the address of the operand, then incremented (always by 2; even for byte instructions). */
-                /* The contents of register used as the address of the address of the operand. Operation is performed,  Contents of register incremented by 2. */
-                uint16_t addr_word = data_read_word(reg[dst]);
-                uint16_t ptr = data_read_word(addr_word);
-                data_write_word(ptr, src_value);
-                reg[dst] += 2;
-            }       
-            break;
-
-        case 4:// GEN_MODE_AUTO_DECREMENT:
-            /* The contents of the selected general register are decremented (by two for word instructions, by one for byte instructions)
-               and then used as the address of the operand */
-            reg[dst] -= 2;
-            data_write_word(reg[dst], src_value);
-            break;
-
-        case 5:// GEN_MODE_AUTO_DECREMENT_DEFERRED:
-            /* Register is decremented (always by two; even for byte instructions) and then used as a pointer to a word
-               containing the address of the operand */
-            reg[dst] -= 2;
-            uint16_t addr_word = data_read_word(reg[dst]);
-            uint16_t ptr = data_read_word(addr_word);
-            data_write_word(ptr, src_value);
-            break;
-
-        case 6:
-            if (dst ==7) // PC_MODE_RELATIVE
-            {
-                printf("FIXME PC mode relative not implemented\n");
-            }
-            else // GEN_MODE_INDEX:
-            {
-                /* Index addressing instructions are of the form OPR X(Rn) where X is the indexed word and is located in the
-                memory location following the instruction word and Rn is the selected general register. */
-                uint16_t next_word = data_read_word(reg[7] + 2);
-                data_write_word(reg[dst] + next_word, src_value);
-                // TODO does PC need to be incremented to avoid next instruction actually being a data operand for this instruction?
-            }
-            break;
-
-        case 7:
-            if (dst == 7) // PC_MODE_RELATIVE_DEFERRED
-            {
-                printf("FIXME PC mode relative deferred not implemented\n");
-            }
-            else // GEN_MODE_INDEX_DEFERRED:
-            {
-                /* Value X (stored in a word following the instruction) and (Rn) are added and the sum is used as a pointer to a word containing the
-                address of the operand. Neither X nor (Rn) are modified. */
-                uint16_t next_word = data_read_word(reg[7] + 2);
-                data_write_word(reg[src] + next_word, src_value);
-            }
-            break;
-    }
-
-/*
-    N: set if (src) <0; cleared otherwise
-    Z: set if (src) = 0; cleared otherwise
-    V: cleared
-    C: not affected 
-*/
-    psw.negative = (src_value < 0);
-    psw.zero = (src == 0);
-    psw.overflow = 0;
-
-    return 0;
-}
-
-
 int op_halt(uint16_t instruction)
 {
     log(LOG_INFO, "HALT function called\n");
@@ -739,10 +433,13 @@ int op_halt(uint16_t instruction)
 
 void print_regs()
 {
-    for (int i=0; i <= 7; i++)
-        printf("R%d:\t%0.6o\t", i, reg[i]);
+    if (log_level > LOG_NORMAL)
+    {
+        for (int i=0; i <= 7; i++)
+            printf("R%d:\t%0.6o\t", i, reg[i]);
 
-    printf("\n");
+        printf("\n");
+    }
 }
 
 
@@ -772,6 +469,8 @@ void test_regs()
 
 void print_psw()
 {
+    if (log_level > LOG_NORMAL)
+    {    
     char buf[125];
     //Current Mode (2), Previous Mode (2), Reserved (4), Priority (3), Trap (1), Negative (1), Zero (1), Overflow (1), Carry (1)
     //sprintf(buf, "Current Mode (%d), Previous Mode (%d), Reserved (%d), Priority (%d), Trap (%d), Negative (%d), Zero (%d), Overflow (%d), Carry (%d)\n",
@@ -818,24 +517,28 @@ void print_psw()
     buf[20] = '\n';
     buf[21] = '\0';
     printf(buf);
+    }
 }
 
 
 void print_memory()
 {
-    uint16_t *word = NULL;
-    uint8_t *hi_byte, *low_byte = NULL;
-    
-    printf("Contents of occupied memory locations (in octal):\nAddr    Word     Hi  Low\n");
-    
-    for(int word_offset=0; word_offset < MEMORY_SIZE / 2; word_offset++)
+    if (log_level >= LOG_MEMORY)
     {
-        word = (uint16_t *)memory+word_offset;
-        if (*word != 0) // only print locations that are not 0
+        uint16_t *word = NULL;
+        uint8_t *hi_byte, *low_byte = NULL;
+        
+        printf("Contents of occupied memory locations (in octal):\nAddr    Word     Hi  Low\n");
+        
+        for(int word_offset=0; word_offset < MEMORY_SIZE / 2; word_offset++)
         {
-            low_byte = (uint8_t *)memory+(2*word_offset);
-            hi_byte = (uint8_t *)memory+(2*word_offset)+1;
-            printf("%0.6o: %0.6o\t %0.3o %0.3o\n", word_offset*2, *word, *hi_byte, *low_byte);
+            word = (uint16_t *)memory+word_offset;
+            if (*word != 0) // only print locations that are not 0
+            {
+                low_byte = (uint8_t *)memory+(2*word_offset);
+                hi_byte = (uint8_t *)memory+(2*word_offset)+1;
+                printf("%0.6o: %0.6o\t %0.3o %0.3o\n", word_offset*2, *word, *hi_byte, *low_byte);
+            }
         }
     }
 }
@@ -992,20 +695,13 @@ int run_simulation()
         opcode = fetch_instruction(reg[7]);
         reg[7] += 2;  // move PC to next instruction
         
-        if (log_level == LOG_DEBUG)
-        {
-            print_memory();
-            print_psw();
-            print_regs();
-            result = decode_and_execute(opcode);
-            print_psw();
-            print_regs();
-            print_memory();
-        }
-        else
-        {
-            result = decode_and_execute(opcode);
-        }
+        print_memory();
+        print_psw();
+        print_regs();
+        result = decode_and_execute(opcode);
+        print_psw();
+        print_regs();
+        print_memory();
 
         if (result == E_INVALID_OP_CODE)
         {
