@@ -52,16 +52,16 @@ Test6:  MOV A,R0
 ;Index
 Test7:  MOV A,R0
         MOV B,R5
-        ADD 3(R0),R5
-        ADD 3(R5),R0
+        ADD R0,20(R5)
+        ADD R5,20(R0)
          HALT
         .END TEST7
 
 ;index deffered
 Test8:   MOV A,R0
         MOV B,R5
-        ADD @3(R0),R5
-        ADD @3(R5),R0
+        ADD R0,@20(R5)
+        ADD R5,@20(R0)
          HALT
         .END TEST8
 
