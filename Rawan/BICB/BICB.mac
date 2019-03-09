@@ -1,94 +1,92 @@
 ;Test for BICB
-	;Testing addressing modes Register, Register deffered, autoincrement, autoincrement deffered, autodecrment, autodecrment deffered, index, and index deffered on Registers R0 and R5
-	;Testig addressing modes Deffered, Autoincrment, autoincrment deffered, autodecrement, indexed, and indexed deffered on Regsiter SP
-	A: .BYTE 000070
-	B: .BYTE 000400
-	
-
-	Test1:  MOV A,R0
-	        MOV B,R5
-	        BICB R0,R5 ;set flag to N
-	        BICB R5,R0 ;set flag to N
-	         HALT
-	        .END TEST1
-	
-
-	;Register Deffered
-	Test2:   MOV A,R0
-	        MOV B,R5
-	        BICB (R0),R5
-	        BICB (R5),R0
-	         HALT
-	        .END TEST2
-	
-
-	;Autoincrement
-	Test3:   MOV A,R0
-	        MOV B,R5
-	        BICB (R0)+,R5
-	        BICB (R5)+,R0
-	         HALT
-	        .END TEST3
-	
-
-	;Autoincrement deffered
-	Test4:   MOV A,R0
-	        MOV B,R5
-	        BICB @(R0)+,R5
-	        BICB @(R5)+,R0
-	         HALT
-	        .END TEST4
-	;Autodecrment
-	Test5:   MOV A,R0
-	        MOV B,R5
-	        BICB -(R0),R5
-	        BICB -(R5),R0
-	         HALT
-	        .END TEST5
-	;Autodecrement deffered
-	Test6:  MOV A,R0
-	        MOV B,R5
-	        BICB @-(R0),R5
-	        BICB @-(R5),R0
-	         HALT
-	        .END TEST14
-	
-
-	;Index
-	Test7:  MOV A,R0
-	        MOV B,R5
-	        BICB 3(R0),R5
-	        BICB 3(R5),R0
-	         HALT
-	        .END TEST7
-	
-
-	;index deffered
-	Test8:   MOV A,R0
-	        MOV B,R5
-	        BICB @3(R0),R5
-	        BICB @3(R5),R0
-	         HALT
-	        .END TEST8
-	;pc addressing mode: immediate
-	Test9: MOV A,R0
-	        MOV B,R5
-	        BICB #100,R0
-	        BICB #200,R5
-	        HALT
-	        .END TEST9
-	;Absolute
-	Test10: MOV A,R0
-	        MOV B,R5
-	        BICB @#100,R0
-	        BICB @#100,R5
-	        HALT
-	        .END TEST10
-	Test11: MOV A,R0
-	        MOV B,R5
-	        BICB @A,R0
-	        BICB @B,R5
-	        HALT
-	        .END TEST11
+;Testing addressing modes Register, Register deffered, autoincrement, autoincrement deffered, autodecrment, autodecrment deffered, index, and index deffered on Registers R0 and R5
+;Testig addressing modes Deffered, Autoincrment, autoincrment deffered, autodecrement, indexed, and indexed deffered on Regsiter SP
+A: .BYTE 000070
+B: .BYTE 000400
 
 
+Test1:  MOV A,R0
+		MOV B,R5
+		BICB R0,R5 ;set flag to N
+		BICB R5,R0 ;set flag to N
+		 HALT
+		.END TEST1
+
+
+;Register Deffered
+Test2:   MOV A,R0
+		MOV B,R5
+		BICB (R0),R5
+		BICB (R5),R0
+		 HALT
+		.END TEST2
+
+
+;Autoincrement
+Test3:   MOV A,R0
+		MOV B,R5
+		BICB (R0)+,R5
+		BICB (R5)+,R0
+		 HALT
+		.END TEST3
+
+
+;Autoincrement deffered
+Test4:   MOV A,R0
+		MOV B,R5
+		BICB @(R0)+,R5
+		BICB @(R5)+,R0
+		 HALT
+		.END TEST4
+;Autodecrment
+Test5:   MOV A,R0
+		MOV B,R5
+		BICB -(R0),R5
+		BICB -(R5),R0
+		 HALT
+		.END TEST5
+;Autodecrement deffered
+Test6:  MOV A,R0
+		MOV B,R5
+		BICB @-(R0),R5
+		BICB @-(R5),R0
+		 HALT
+		.END TEST14
+
+
+;Index
+Test7:  MOV A,R0
+		MOV B,R5
+		BICB 3(R0),R5
+		BICB 3(R5),R0
+		 HALT
+		.END TEST7
+
+
+;index deffered
+Test8:   MOV A,R0
+		MOV B,R5
+		BICB @3(R0),R5
+		BICB @3(R5),R0
+		 HALT
+		.END TEST8
+;pc addressing mode: immediate
+Test9: MOV A,R0
+		MOV B,R5
+		BICB #100,R0
+		BICB #200,R5
+		HALT
+		.END TEST9
+;Absolute
+Test10: MOV A,R0
+		MOV B,R5
+		BICB @#100,R0
+		BICB @#100,R5
+		HALT
+		.END TEST10
+Test11: MOV A,R0
+		MOV B,R5
+		BICB @A,R0
+		BICB @B,R5
+		HALT
+		.END TEST11
