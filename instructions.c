@@ -95,10 +95,22 @@ uint16_t read_operand_value(uint8_t src_field, int byte)
 
             /* Register is first used as a pointer to a word containing the address of the operand, then incremented (always by 2; even for byte instructions). */
             /* The contents of register used as the address of the address of the operand. Operation is performed,  Contents of register incremented by 2. */
-            addr_word = data_read_word(reg[src]);
+            if(byte)
+				addr_word = data_read_byte(reg[src]);
+			else
+				addr_word = data_read_word(reg[src]);
             reg[src] += 2;
-            ptr = data_read_word(addr_word);
-            value = data_read_word(ptr);
+            
+            if(byte)
+            {
+				ptr = data_read_byte(addr_word);
+				value = data_read_byte(ptr);
+			}
+			else
+			{
+				ptr = data_read_word(addr_word);
+				value = data_read_word(ptr);
+			}
             break;
 
         case 4:// GEN_MODE_AUTO_DECREMENT:
@@ -115,9 +127,18 @@ uint16_t read_operand_value(uint8_t src_field, int byte)
             /* Register is decremented (always by two; even for byte instructions) and then used as a pointer to a word
                containing the address of the operand */
             reg[src] -= 2;
-            addr_word = data_read_word(reg[src]);
-            ptr = data_read_word(addr_word);
-            value = data_read_word(ptr);
+            if(byte)
+            {
+				addr_word = data_read_byte(reg[src]);
+				ptr = data_read_byte(addr_word);
+				value = data_read_byte(ptr);
+			}
+			else
+			{
+				addr_word = data_read_word(reg[src]);
+				ptr = data_read_word(addr_word);
+				value = data_read_word(ptr);
+			}
             break;
 
         case 6: // GEN_MODE_INDEX / PC_MODE_RELATIVE
@@ -125,6 +146,7 @@ uint16_t read_operand_value(uint8_t src_field, int byte)
             /* The contents of the selected general register, and an index word following the instruction word, are summed to form the address of the operand.  */
             /* Index addressing instructions are of the form OPR X(Rn) where X is the indexed word and is located in the
             memory location following the instruction word and Rn is the selected general register. */
+            
             addr_word = data_read_word(reg[7]);
             reg[7] += 2; // move PC past data operand
             ptr = (uint16_t)(reg[src] + addr_word);
