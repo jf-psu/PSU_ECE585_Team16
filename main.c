@@ -317,18 +317,7 @@ void decode_double_operand(uint16_t instruction)
 
 
 // ***** Single Operand Instructions ***** //
-int op_clr(uint16_t instruction)
-{
-    uint8_t dst = instruction && 077;
-    log(LOG_INFO, "CLR function called\n"); //, mode: %o reg: %o\n", mode, reg_num);
 
-    write_operand_value(0, dst);
-    psw.negative = 0;
-    psw.zero = 1;
-    psw.overflow = 0;
-    psw.carry = 0;
-    return 0;
-}
 
 int op_clr_old(uint16_t instruction)
 {
@@ -446,66 +435,6 @@ int op_clr_old(uint16_t instruction)
 
 
 
-int op_xor(uint16_t instruction)
-{
-
-}
-
-
-
-int op_mov(uint16_t instruction)
-{
-    uint8_t src = (instruction >> 6) & 077; // bits 11-6
-    uint8_t dst = instruction & 077; // bits 5-0
-    uint16_t value;
-    log(LOG_INFO, "MOV function called\n");
-    value = read_operand_value(src);
-    write_operand_value(dst, value);
-    
-/*
-    N: set if (src) <0; cleared otherwise
-    Z: set if (src) = 0; cleared otherwise
-    V: cleared
-    C: not affected 
-*/
-    psw.negative = ((int8_t)value < 0);
-    psw.zero = (src == 0);
-    psw.overflow = 0;
-
-    return 0;
-
-}
-
-
-int op_add(uint16_t instruction)
-{
-    uint8_t src = (instruction >> 6) & 077; // bits 11-6
-    uint8_t dst = instruction & 077; // bits 5-0
-    int16_t value;
-    log(LOG_INFO, "ADD function called\n");
-    value = (int16_t)read_operand_value(src) + (int16_t)read_operand_value(dst);
-    write_operand_value(dst, (uint16_t)value);
-    
-/*
-N: set if result <0; cleared otherwise
-Z: set if result = 0; cleared otherwise
-V: set if there was arithmetic overflow as a result of the oper·
-ation; that is both operands were of the same sign and the
-result was of the opposite sign; cleared otherwise
-C: set if thf!re was a carry from the most significant bit of the
-result; cleared otherwise 
-*/
-    psw.negative = (value < 0);
-    psw.zero = (value == 0);
-    /* FIXME
-    psw.overflow = 
-    psw.carry =
-    */
-
-    return 0;
-
-}
-
 
 
 
@@ -513,13 +442,12 @@ result; cleared otherwise
 int op_mov_old(uint16_t instruction) // double operand instruction
 {
     uint16_t opcode = instruction >> 12; // 4 msb
-    uint8_t branch = (instruction >> 8) & 07; // bits 6-8
     uint8_t src_mode = (instruction >> 9) & 07; // bits 9-11
     uint8_t src = (instruction >> 6) & 07; // bits 6-8
     uint8_t dst_mode = (instruction >> 3) & 07; // bits 3-5
     uint8_t dst = instruction & 07; // bits 0-2
 
-    log(LOG_DEBUG, "Move word instruction: opcode=%o branch=%o src_mode=%o src=%o dst_mode=%o dst=%o\n", opcode, branch, src_mode, src, dst_mode, dst);
+    log(LOG_DEBUG, "Move word instruction: opcode=%o src_mode=%o src=%o dst_mode=%o dst=%o\n", opcode, src_mode, src, dst_mode, dst);
 
     uint16_t src_value, addr_word, ptr, data_word;
 
@@ -701,11 +629,7 @@ int op_mov_old(uint16_t instruction) // double operand instruction
     return 0;
 }
 
-int op_halt(uint16_t instruction)
-{
-    log(LOG_INFO, "HALT function called\n");
-    return 0;
-}
+
 
 
 
@@ -963,14 +887,6 @@ int decode_and_execute(uint16_t instruction)
         case OP_BLOS: 
             decoder = op_blos;
             break;
-        /*
-        case OP_BHIS: 
-            decoder = op_bhis;
-            break;
-        case OP_BLO: 
-            decoder = op_blo;
-            break;
-        */
     }
 
 

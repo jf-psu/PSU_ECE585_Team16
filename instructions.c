@@ -2,70 +2,244 @@
 
 //SINGLE OPERAND
 //General
-int op_clr(uint16_t instruction);
-int op_clrb(uint16_t instruction);
+int op_clr(uint16_t instruction)
+{
+    uint8_t dst = instruction && 077;
+    log(LOG_INFO, "CLR function called\n"); //, mode: %o reg: %o\n", mode, reg_num);
 
-int op_com(uint16_t instruction);
-int op_comb(uint16_t instruction);
+    write_operand_value(0, dst);
+    psw.negative = 0;
+    psw.zero = 1;
+    psw.overflow = 0;
+    psw.carry = 0;
+    return 0;
+}
 
-int op_inc(uint16_t instruction);
-int op_incb(uint16_t instruction);
+int op_clrb(uint16_t instruction){
+	return 0;
+}
 
-int op_dec(uint16_t instruction);
-int op_decb(uint16_t instruction);
 
-int op_neg(uint16_t instruction);
-int op_negb(uint16_t instruction);
+int op_com(uint16_t instruction){
+	return 0;
+}
+
+int op_comb(uint16_t instruction){
+	return 0;
+}
+
+
+int op_inc(uint16_t instruction){
+	return 0;
+}
+
+int op_incb(uint16_t instruction){
+	return 0;
+}
+
+
+int op_dec(uint16_t instruction){
+	return 0;
+}
+
+int op_decb(uint16_t instruction){
+	return 0;
+}
+
+
+int op_neg(uint16_t instruction){
+	return 0;
+}
+
+int op_negb(uint16_t instruction){
+	return 0;
+}
+
 
 //Shift and Rotate
-int op_asr(uint16_t instruction);
-int op_asrb(uint16_t instruction);
+int op_asr(uint16_t instruction){
+	return 0;
+}
 
-int op_asl(uint16_t instruction);
-int op_aslb(uint16_t instruction);
+int op_asrb(uint16_t instruction){
+	return 0;
+}
 
-int op_ror(uint16_t instruction);
-int op_rorb(uint16_t instruction);
 
-int op_rol(uint16_t instruction);
-int op_rolb(uint16_t instruction);
+int op_asl(uint16_t instruction){
+	return 0;
+}
 
-int op_swab(uint16_t instruction);
+int op_aslb(uint16_t instruction){
+	return 0;
+}
+
+
+int op_ror(uint16_t instruction){
+	return 0;
+}
+
+int op_rorb(uint16_t instruction){
+	return 0;
+}
+
+
+int op_rol(uint16_t instruction){
+	return 0;
+}
+
+int op_rolb(uint16_t instruction){
+	return 0;
+}
+
+
+int op_swab(uint16_t instruction){
+	return 0;
+}
+
 
 //Multiple Precision
-int op_adc(uint16_t instruction);
-int op_adcb(uint16_t instruction);
+int op_adc(uint16_t instruction){
+	return 0;
+}
 
-int op_sbc(uint16_t instruction);
-int op_sbcb(uint16_t instruction);
+int op_adcb(uint16_t instruction){
+	return 0;
+}
+
+
+int op_sbc(uint16_t instruction){
+	return 0;
+}
+
+int op_sbcb(uint16_t instruction){
+	return 0;
+}
+
 
 //DOUBLE OPERAND
 //General
-int op_mov(uint16_t instruction);
-int op_movb(uint16_t instruction);
+int op_mov(uint16_t instruction)
+{
+    uint8_t src = (instruction >> 6) & 077; // bits 11-6
+    uint8_t dst = instruction & 077; // bits 5-0
+    uint16_t value;
+    log(LOG_INFO, "MOV function called\n");
+    value = read_operand_value(src);
+    write_operand_value(dst, value);
+    
+/*
+    N: set if (src) <0; cleared otherwise
+    Z: set if (src) = 0; cleared otherwise
+    V: cleared
+    C: not affected 
+*/
+    psw.negative = ((int8_t)value < 0);
+    psw.zero = (src == 0);
+    psw.overflow = 0;
 
-int op_cmp(uint16_t instruction);
-int op_cmpb(uint16_t instruction);
+    return 0;
 
-int op_add(uint16_t instruction);
-int op_sub(uint16_t instruction);
+}
+
+int op_movb(uint16_t instruction){
+	return 0;
+}
+
+
+int op_cmp(uint16_t instruction){
+	return 0;
+}
+
+int op_cmpb(uint16_t instruction){
+	return 0;
+}
+
+
+int op_add(uint16_t instruction)
+{
+    uint8_t src = (instruction >> 6) & 077; // bits 11-6
+    uint8_t dst = instruction & 077; // bits 5-0
+    int32_t value;
+    log(LOG_INFO, "ADD function called\n");
+    int16_t src_val = read_operand_value(src);
+    int16_t dst_val = read_operand_value(dst);
+    value = src_val + dst_val;
+	psw.carry = value & (1 << 17);
+    write_operand_value(dst, (uint16_t)value);
+    
+/*
+N: set if result <0; cleared otherwise
+Z: set if result = 0; cleared otherwise
+V: set if there was arithmetic overflow as a result of the oper·
+ation; that is both operands were of the same sign and the
+result was of the opposite sign; cleared otherwise
+C: set if there was a carry from the most significant bit of the
+result; cleared otherwise 
+*/
+    psw.negative = (value < 0);
+    psw.zero = (value == 0);
+    psw.overflow = (((src_val < 0) && (dst_val < 0) && (value >=0)) || 
+					((src_val >= 0) && (dst_val >= 0) && (value < 0)));
+
+    return 0;
+
+}
+
+int op_sub(uint16_t instruction){
+	return 0;
+}
+
 
 //logical
-int op_bit(uint16_t instruction);
-int op_bitb(uint16_t instruction);
+int op_bit(uint16_t instruction){
+	return 0;
+}
 
-int op_bic(uint16_t instruction);
-int op_bicb(uint16_t instruction);
+int op_bitb(uint16_t instruction){
+	return 0;
+}
 
-int op_bis(uint16_t instruction);
-int op_bisb(uint16_t instruction);
+
+int op_bic(uint16_t instruction){
+	return 0;
+}
+
+int op_bicb(uint16_t instruction){
+	return 0;
+}
+
+
+int op_bis(uint16_t instruction){
+	return 0;
+}
+
+int op_bisb(uint16_t instruction){
+	return 0;
+}
+
 
 //Register
-int op_mul(uint16_t instruction);
-int op_div(uint16_t instruction);
-int op_ash(uint16_t instruction);
-int op_ashc(uint16_t instruction);
-int op_xor(uint16_t instruction);
+int op_mul(uint16_t instruction){
+	return 0;
+}
+
+int op_div(uint16_t instruction){
+	return 0;
+}
+
+int op_ash(uint16_t instruction){
+	return 0;
+}
+
+int op_ashc(uint16_t instruction){
+	return 0;
+}
+
+int op_xor(uint16_t instruction){
+	return 0;
+}
+
 
 int op_br(uint16_t instruction)
 {
@@ -297,4 +471,8 @@ int op_blos(uint16_t instruction)
 int op_jmp(uint16_t instruction);
 
 //Halt
-
+int op_halt(uint16_t instruction)
+{
+    log(LOG_INFO, "HALT function called\n");
+    return 0;
+}
