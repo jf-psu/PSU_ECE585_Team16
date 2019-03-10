@@ -346,6 +346,19 @@ int op_clrb(uint16_t instruction){
 
 
 int op_com(uint16_t instruction){
+    uint8_t dst = instruction & 077;
+    log(LOG_INFO, "COM function called %d\n", dst);
+    uint16_t value;
+    value = read_operand_value(dst);
+    value = (~value);
+    write_operand_value(dst, value);
+
+    //if msb of result is set 
+    psw.negative = ((value >> 15) == 1);
+    //set if result is 0
+    psw.zero = (value == 0);
+    psw.overflow = 0;
+    psw.carry = 1;
 	return 0;
 }
 
@@ -355,6 +368,20 @@ int op_comb(uint16_t instruction){
 
 
 int op_inc(uint16_t instruction){
+    uint8_t dst = instruction & 077;
+	log(LOG_INFO, "INC function called\n", dst);
+	uint16_t value;
+	value = read_operand_value(dst);
+	value = (1 + value);
+	write_operand_value(dst,value);
+
+	//set if result is less than 0
+	psw.negative = (value < 0);
+	//set if result is 0
+   	psw.zero = (value == 0);
+	//set if dst held 077777 cleared otherwise
+    	psw.overflow = (dst == 077777);
+    	psw.carry = 0;
 	return 0;
 }
 
@@ -364,6 +391,20 @@ int op_incb(uint16_t instruction){
 
 
 int op_dec(uint16_t instruction){
+    uint8_t dst = instruction & 077;
+	log(LOG_INFO, "DEC function called %d\n", dst);
+        uint16_t value, val;
+        value = read_operand_value(dst);
+	val = (value - 1);
+	write_operand_value(dst,val);
+
+	 //set if result is less than 0
+        psw.negative = (value < 0);
+        //set if result is 0
+        psw.zero = (value == 0);
+        //set if dst held 100000 cleared otherwise
+        psw.overflow = (dst == 100000);
+        psw.carry = 0;
 	return 0;
 }
 
@@ -373,6 +414,22 @@ int op_decb(uint16_t instruction){
 
 
 int op_neg(uint16_t instruction){
+    uint8_t dst = instruction & 077;
+	log(LOG_INFO, "NEG function called\n");
+	uint16_t value, val, i;
+	value = read_operand_value(dst);
+	i = (~value);
+	val = i + 1;
+	write_operand_value(dst, val);
+	
+	 //set if result is less than 0
+        psw.negative = (value < 0);
+        //set if result is 0
+        psw.zero = (value == 0);
+        //set if dst held 100000 cleared otherwise
+        psw.overflow = (dst == 100000);
+        psw.carry = (value != 0);
+
 	return 0;
 }
 
@@ -383,6 +440,21 @@ int op_negb(uint16_t instruction){
 
 //Shift and Rotate
 int op_asr(uint16_t instruction){
+    uint8_t dst = instruction & 077;
+	log(LOG_INFO, "ASR function called\n");
+	uint16_t value;
+	value = read_operand_value(dst);
+	value = value >> 1;
+	log(LOG_INFO, "VALue %d\n", value);
+	write_operand_value(dst, value);
+
+	//set if high order bit of the result is set(result < 0)
+	psw.negative = (value < 0);
+	//set if result = 0
+	psw.zero = (value == 0);
+	//loaded from the exclusive OR of the N-bit and C-bit
+	 
+	//loaded from the low order bit of the destination
 	return 0;
 }
 
