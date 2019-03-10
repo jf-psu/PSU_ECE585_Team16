@@ -3,13 +3,13 @@
 
 START: 
 	mov #5, R1 ;R1 = 5
-	sub R1, #5 ;R1 = 0
+	sub #5, R1 ;R1 = 0
     BMI L1	;testing 0
 
-	ADD R1, #5 ;R1 = 5
+	ADD #5, R1 ;R1 = 5
     BMI L2	;testing positive
 
-    SUB R1, #6 ;R1 = -1
+    SUB #6, R1 ;R1 = -1
     BMI L3	;testing negative
     
 	BR L4 	;Fallthru, Should never run!. Opcode:000400

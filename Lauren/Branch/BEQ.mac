@@ -3,10 +3,10 @@
 
 START: 
 	mov #5, R1 ;R1 = 5
-	SUB R1, #1 ;R1 = 4
+	sub #5, R1 ;R1 = 4
     BEQ L1	;Testing with positive. Opcode:001400
 
-	SUB R1, #5 ;R1 = -1
+	sub #5, R1 ;R1 = -1
     BEQ L2	;Testing negative. Opcode:001400
 
     ADD R1, #1 ;R1 = 0

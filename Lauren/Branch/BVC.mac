@@ -5,10 +5,10 @@ A: .WORD 077776
 
 START: 
 	mov A, R1 ;R1 = 077777
-	ADD R1, #1 ;R1 = 100000. Overflowed!
+	ADD #1, R1 ;R1 = 100000. Overflowed!
     BVC L1	;Shouldn't work
 
-	ADD R1, #1 ;R1 = 100001. Shouldnt cause overflow
+	ADD #1, R1 ;R1 = 100001. Shouldnt cause overflow
     BVC L2	;Should work
     
 	BR L3 	;Fallthru, Should never run!. Opcode:000400

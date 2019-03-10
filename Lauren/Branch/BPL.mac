@@ -3,13 +3,13 @@
 
 START: 
 	mov #5, R1 ;R1 = 5
-	sub R1, #5 ;R1 = 0
+	sub #5, R1 ;R1 = 0
     BPL L1	;testing 0
 
-	sub R1, #5 ;R1 = -5
+	sub #5, R1 ;R1 = -5
     BPL L2	;testing negative
 
-    add R1, #6 ;R1 = 1
+    add #6, R1 ;R1 = 1
     BPL L3	;testing positive
     
 	BR L4 	;Fallthru, Should never run!. Opcode:000400

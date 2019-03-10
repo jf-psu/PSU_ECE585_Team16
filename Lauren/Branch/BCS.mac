@@ -3,10 +3,10 @@
 
 START: 
 	mov #6, R1 ;R1 = 000006
-	ADC R1, #1 ;R1 = 000007. No carry
+	ADD #1, R1 ;R1 = 000007. No carry
     BCS L1	;Shouldn't work
 
-	ADC R1, #1 ;R1 = 000010. Carried
+	ADD #1, R1 ;R1 = 000010. Carried
     BCS L2	;Should work
     
 	BR L3 	;Fallthru, Should never run!. Opcode:000400
