@@ -3,10 +3,10 @@
 
 START: 
 	mov #5, R1 ;R1 = 5
-    sub R1, #6
+    sub #6, R1 
     BGE L1	;Shouldn't work
 
-	ADD R1, #1
+	ADD #1, R1
     BGE L2	;Should work
 
 

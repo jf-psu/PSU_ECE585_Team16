@@ -3,13 +3,13 @@
 
 START: 
 	mov #5, R1 ;R1 = 5
-    sub R1, #6
+    sub #6, R1
     BGT L1	;Shouldn't work
 
-	ADD R1, #1
+	ADD #1, R1
     BGT L2	;Shouldn't work
 
-    ADD R1, #1
+    ADD #1, R1
     BGT L3	;should work
     
 	BR L4 	;Fallthru, Should never run!. Opcode:000400

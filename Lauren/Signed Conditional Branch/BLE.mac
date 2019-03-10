@@ -3,10 +3,10 @@
 
 START: 
 	mov #5, R1 ;R1 = 5
-    sub R1, #4
+    sub #4, R1
     BLE L1	;Shouldn't work
 
-	SUB R1, #1
+	SUB #1, R1
     BLE L2	;Should work
 
 	BR L4 	;Fallthru, Should never run!. Opcode:000400
@@ -17,7 +17,7 @@ L1:
     HALT
 L2:
 	mov #2, R1
-    SUB R1, #3
+    SUB #3, R1
     BLE L3	;should work
     HALT
 
