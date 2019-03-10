@@ -87,12 +87,18 @@ uint16_t read_operand_value(uint8_t src_field, int byte)
                 the PC is used as a pointer to fetch the operand before being incremented by two to point to the next instruction.  */
 
             /* Register is used as a pointer to sequential data then incremented. contents of the general register is the address of the operand
-            /* FIXME Contents of registers are stepped (by one for bytes, by two for words, always by two for R6 and R7 */
-            value = data_read_word(reg[src]);
+            /* Contents of registers are stepped (by one for bytes, by two for words, always by two for R6 and R7 */
+
+            if (byte)
+                value = data_read_byte(reg[src]);
+            else
+                value = data_read_word(reg[src]);
+
             if(byte && src != 6 && src != 7)
 				reg[src] += 1;
             else
 				reg[src] += 2;
+
             break;
             
         case 3: // GEN_MODE_AUTO_INCREMENT_DEFERRED / PC_MODE_ABSOLUTE
@@ -102,22 +108,17 @@ uint16_t read_operand_value(uint8_t src_field, int byte)
 
             /* Register is first used as a pointer to a word containing the address of the operand, then incremented (always by 2; even for byte instructions). */
             /* The contents of register used as the address of the address of the operand. Operation is performed,  Contents of register incremented by 2. */
-            if(byte)
-				addr_word = data_read_byte(reg[src]);
-			else
-				addr_word = data_read_word(reg[src]);
+
+            addr_word = data_read_word(reg[src]);
             reg[src] += 2;
-            
+
+            ptr = data_read_word(addr_word);
+
             if(byte)
-            {
-				ptr = data_read_byte(addr_word);
 				value = data_read_byte(ptr);
-			}
 			else
-			{
-				ptr = data_read_word(addr_word);
 				value = data_read_word(ptr);
-			}
+
             break;
 
         case 4:// GEN_MODE_AUTO_DECREMENT:
@@ -127,25 +128,26 @@ uint16_t read_operand_value(uint8_t src_field, int byte)
 				reg[src] -= 1;
             else
 				reg[src] -= 2;
-            value = data_read_word(reg[src]);
+
+            if (byte)
+                value = data_read_byte(reg[src]);
+            else
+                value = data_read_word(reg[src]);
+
             break;
 
         case 5:// GEN_MODE_AUTO_DECREMENT_DEFERRED:
             /* Register is decremented (always by two; even for byte instructions) and then used as a pointer to a word
                containing the address of the operand */
             reg[src] -= 2;
+            addr_word = data_read_word(reg[src]);
+			ptr = data_read_word(addr_word);
+
             if(byte)
-            {
-				addr_word = data_read_byte(reg[src]);
-				ptr = data_read_byte(addr_word);
 				value = data_read_byte(ptr);
-			}
 			else
-			{
-				addr_word = data_read_word(reg[src]);
-				ptr = data_read_word(addr_word);
 				value = data_read_word(ptr);
-			}
+
             break;
 
         case 6: // GEN_MODE_INDEX / PC_MODE_RELATIVE
@@ -157,7 +159,11 @@ uint16_t read_operand_value(uint8_t src_field, int byte)
             addr_word = data_read_word(reg[7]);
             reg[7] += 2; // move PC past data operand
             ptr = (uint16_t)(reg[src] + addr_word);
-            value = data_read_word(ptr);
+            if (byte)
+                value = data_read_byte(ptr);
+            else
+                value = data_read_word(ptr);
+
             break;
 
         case 7: // GEN_MODE_INDEX_DEFERRED / PC_MODE_RELATIVE_DEFERRED
@@ -168,7 +174,12 @@ uint16_t read_operand_value(uint8_t src_field, int byte)
             reg[src] += 2; // move PC past data operand                
             addr_word = (uint16_t)(addr_word + reg[src]);
             ptr = data_read_word(addr_word);
-            value = data_read_word(ptr);    
+
+            if (byte)
+                value = data_read_byte(ptr);
+            else
+                value = data_read_word(ptr);
+
             break;
     }
 
@@ -210,14 +221,17 @@ uint16_t write_operand_value(uint8_t dst_field, uint16_t value, int byte)
             if(byte)
             {
 				data_write_byte(reg[dst], value);
-				if(dst != 6 && dst != 7)
-					reg[dst] += 1;
-				else
+				if(dst == 6 || dst == 7)
 					reg[dst] += 2;
+				else
+					reg[dst] += 1;
 			}
             else
+            {
 				data_write_word(reg[dst], value);
-				reg[dst] += 2;
+                reg[dst] += 2;
+            }
+
             break;
             
         case 3: // GEN_MODE_AUTO_INCREMENT_DEFERRED / PC_MODE_ABSOLUTE
@@ -227,25 +241,17 @@ uint16_t write_operand_value(uint8_t dst_field, uint16_t value, int byte)
 
             /* Register is first used as a pointer to a word containing the address of the operand, then incremented (always by 2; even for byte instructions). */
             /* The contents of register used as the address of the address of the operand. Operation is performed,  Contents of register incremented by 2. */
-            if(byte)
-				addr_word = data_read_byte(reg[dst]);
-			else
-				addr_word = data_read_word(reg[dst]);
+
+			addr_word = data_read_word(reg[dst]);
             reg[dst] += 2;
             
+            ptr = data_read_word(addr_word);
+
             if(byte)
-            {
-				ptr = data_read_byte(addr_word);
 				data_write_byte(ptr, value);
-			}
 			else
-			{
-				ptr = data_read_word(addr_word);
 				data_write_word(ptr, value);
-			}
             
-            
-            //data_write_word(addr_word, value);
             break;
 
         case 4:// GEN_MODE_AUTO_DECREMENT:
@@ -253,15 +259,18 @@ uint16_t write_operand_value(uint8_t dst_field, uint16_t value, int byte)
                and then used as the address of the operand */
             if(byte)
             {
-				if(dst != 6 && dst != 7)
-					reg[dst] -= 1;
-				else
+				if(dst == 6 || dst == 7)
 					reg[dst] -= 2;
+				else
+					reg[dst] -= 1;
+
 				data_write_byte(reg[dst], value);
 			}
             else
+            {
 				reg[dst] -= 2;
 				data_write_word(reg[dst], value);
+            }
             
             break;
 
@@ -269,18 +278,14 @@ uint16_t write_operand_value(uint8_t dst_field, uint16_t value, int byte)
             /* Register is decremented (always by two; even for byte instructions) and then used as a pointer to a word
                containing the address of the operand */
 			reg[dst] -= 2;
+			addr_word = data_read_word(reg[dst]);
+			ptr = data_read_word(addr_word);     
+
 			if(byte)
-			{
-				addr_word = data_read_byte(reg[dst]);
-				ptr = data_read_byte(addr_word);
 				data_write_byte(ptr, value);
-			}
 			else
-			{
-				addr_word = data_read_word(reg[dst]);
-				ptr = data_read_word(addr_word);
 				data_write_word(ptr, value);
-			}
+
             break;
 
         case 6: // GEN_MODE_INDEX / PC_MODE_RELATIVE
@@ -291,7 +296,12 @@ uint16_t write_operand_value(uint8_t dst_field, uint16_t value, int byte)
             addr_word = data_read_word(reg[7]);
             reg[7] += 2; // move PC past data operand
             ptr = (uint16_t)(reg[dst] + addr_word);
-            data_write_word(ptr, value);
+
+            if (byte)
+                data_write_byte(ptr, value);
+            else
+                data_write_word(ptr, value);
+
             break;
 
         case 7: // GEN_MODE_INDEX_DEFERRED / PC_MODE_RELATIVE_DEFERRED
@@ -302,7 +312,12 @@ uint16_t write_operand_value(uint8_t dst_field, uint16_t value, int byte)
             reg[7] += 2; // move PC past data operand                
             addr_word = (uint16_t)(addr_word + reg[dst]);
             ptr = data_read_word(addr_word);
-            data_write_word(ptr, value);    
+
+            if (byte)
+                data_write_byte(ptr, value);
+            else
+                data_write_word(ptr, value);
+
             break;
     }
 
