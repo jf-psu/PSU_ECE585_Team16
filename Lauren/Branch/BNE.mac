@@ -3,11 +3,11 @@
 
 START: 
 	mov #5, R1 ;R1 = 5
-	sub R1, #5 ;R1 = 0
+	sub #5, R1 ;R1 = 0
     BNE L1	;Zero condition
 
     mov #5, R1 ;R1 = 5
-	SUB R1, #6 ;R1 = -1
+	SUB #6, R1  ;R1 = -1
     BNE L2	;testing for negative. Opcode:001000
 
 	BR L4 	;Should never run!. Opcode:000400
@@ -18,7 +18,7 @@ L1:
     HALT
 L2:
 	mov #2, R1
-	SUB R1, #1 ;R1 = 1
+	SUB #1, R1 ;R1 = 1
     BNE L3	;Testing for positive. Opcode:001000
     HALT
 
