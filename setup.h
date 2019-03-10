@@ -27,11 +27,6 @@ char memory[MEMORY_SIZE];
 uint16_t reg[8];
 psw_t psw;
 
-//Functions used throughout
-uint16_t write_operand_value(uint8_t dst_field, uint16_t value);
-uint16_t read_operand_value(uint8_t src_field);
-
-
 //SINGLE OPERAND
 //General
 int op_clr(uint16_t instruction);

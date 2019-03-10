@@ -40,7 +40,6 @@ Bits 5-0 indicate the 3-bit addressing mode field and the 3-bit general register
 
 Some double-operand instructions (ASH, ASHC, MUL, DIV) must have the destination operand only in a register. Bits 15-9 specify the opcode. Bits 8-6 specify the destination register. Bits 5-0 contain the source field. XOR has a similar format, except that the source is in a register specified by bits 8-6, and the destination field is specified by bits 5-0.
 
-
 */
 
 uint16_t fetch_instruction(uint16_t memory_address)
@@ -58,245 +57,6 @@ uint16_t fetch_instruction(uint16_t memory_address)
     log(LOG_NORMAL, "2 %0.6o (instruction fetch)\n", memory_address);
     return *word;
 }
-
-/*
-Full 16-bit words or 8-bit bytes of information can be transferred on the
-bus between a master and a slave. The information can be instructions,
-addresses, or data. 
-*/
-
-
-uint16_t data_read_word(uint16_t memory_address)
-{
-    uint16_t *word = NULL;
-    if (memory_address % 2)
-    {
-        log(LOG_ERROR, "Invalid word size data read from odd memory location %0.6o\n",  memory_address);
-        exit;
-    }
-
-    word = (uint16_t *)memory + memory_address / 2;
-
-    printf("0 %0.6o (data read)\n", memory_address);
-    return *word;
-}
-
-
-uint8_t data_read_byte(uint16_t memory_address)
-{
-    uint8_t *byte;
-    byte = (uint8_t *)memory + memory_address;
-
-    printf("0 %0.6o (data read)\n", memory_address);
-    return *byte;
-}
-
-
-
-uint16_t data_write_word(uint16_t memory_address, uint16_t data)
-{
-    uint16_t *word = NULL;
-    if (memory_address % 2)
-    {
-        log(LOG_ERROR, "Invalid data word write to odd memory location %0.6o\n",  memory_address);
-        exit;
-    }
-
-    word = (uint16_t *)memory + memory_address / 2;
-
-    printf("1 %0.6o (data write)\n", memory_address);
-    return *word = data;
-}
-
-
-
-uint8_t data_write_byte(uint16_t memory_address, uint8_t data)
-{
-    uint8_t *byte;
-    byte = (uint8_t *)memory + memory_address;
-
-    printf("1 %0.6o (data write)\n", memory_address);
-    return *byte = data;
-}
-
-
-
-
-// Decode 6-bit addressing mode field and write the appropriate value
-uint16_t write_operand_value(uint8_t dst_field, uint16_t value)
-{
-    uint8_t mode = (dst_field >> 3) & 07; // bits 5-3
-    uint8_t dst = dst_field & 07; // bits 2-0
-    uint16_t addr_word, ptr;
-
-    log(LOG_DEBUG, "write_operand_value(%0.2o, %0.6o) mode: %o reg: %o\n", dst_field, value, mode, dst);
-
-    switch (mode)
-    {
-        case 0:// GEN_MODE_REGISTER:
-            reg[dst] = value;            
-            break;
-
-        case 1:// GEN_MODE_REGISTER_DEFERRED:
-            /* Register contains the address of the operand */
-            data_write_word(reg[dst], value);
-            break;
-
-        case 2: // GEN_MODE_AUTO_INCREMENT / PC_MODE_IMMEDIATE
-            /* The value is located in the second word of the instruction and is added to the contents of the register.
-                the PC is used as a pointer to fetch the operand before being incremented by two to point to the next instruction.  */
-
-            /* Register is used as a pointer to sequential data then incremented. contents of the general register is the address of the operand
-            /* Contents of registers are stepped (by one for bytes, by two for words, always by two for R6 and R7 */
-            data_write_word(reg[dst], value);
-            reg[dst] += 2;
-            break;
-            
-        case 3: // GEN_MODE_AUTO_INCREMENT_DEFERRED / PC_MODE_ABSOLUTE
-            /*  The contents of the location following the instruction are taken as the
-                address of the operand. Immediate data is interpreted as an absolute address
-                (i.e., an address that remains constant no matter where in memory the assembled instruction is executed). */
-
-            /* Register is first used as a pointer to a word containing the address of the operand, then incremented (always by 2; even for byte instructions). */
-            /* The contents of register used as the address of the address of the operand. Operation is performed,  Contents of register incremented by 2. */
-            addr_word = data_read_word(reg[dst]);
-            reg[dst] += 2;
-            ptr = data_read_word(addr_word);
-            data_write_word(ptr, value);
-            //data_write_word(addr_word, value);
-            break;
-
-        case 4:// GEN_MODE_AUTO_DECREMENT:
-            /* The contents of the selected general register are decremented (by two for word instructions, by one for byte instructions)
-               and then used as the address of the operand */
-            reg[dst] -= 2;
-            data_write_word(reg[dst], value);
-            break;
-
-        case 5:// GEN_MODE_AUTO_DECREMENT_DEFERRED:
-            /* Register is decremented (always by two; even for byte instructions) and then used as a pointer to a word
-               containing the address of the operand */
-            reg[dst] -= 2;
-            addr_word = data_read_word(reg[dst]);
-            ptr = data_read_word(addr_word);
-            data_write_word(ptr, value);
-            break;
-
-        case 6: // GEN_MODE_INDEX / PC_MODE_RELATIVE
-            /*  contents of memory location immediately following instruction word are added to (PC) to produce address */
-            /* The contents of the selected general register, and an index word following the instruction word, are summed to form the address of the operand.  */
-            /* Index addressing instructions are of the form OPR X(Rn) where X is the indexed word and is located in the
-            memory location following the instruction word and Rn is the selected general register. */
-            addr_word = data_read_word(reg[7]);
-            reg[7] += 2; // move PC past data operand
-            ptr = (uint16_t)(reg[dst] + addr_word);
-            data_write_word(ptr, value);
-            break;
-
-        case 7: // GEN_MODE_INDEX_DEFERRED / PC_MODE_RELATIVE_DEFERRED
-            // second word of the instruction, when added to the PC, contains the address of the address of the operand                
-            /* Value X (stored in a word following the instruction) and (Rn) are added and used as a pointer to a word containing the
-            address of the operand. Neither X nor (Rn) are modified. */
-            addr_word = data_read_word(reg[7]);
-            reg[7] += 2; // move PC past data operand                
-            addr_word = (uint16_t)(addr_word + reg[dst]);
-            ptr = data_read_word(addr_word);
-            data_write_word(ptr, value);    
-            break;
-    }
-
-    return value;
-}
-
-
-
-// Decode 6 bit addressing mode field and return the appropriate value
-uint16_t read_operand_value(uint8_t src_field)
-{
-    uint8_t mode = (src_field >> 3) & 07; // bits 5-3
-    uint8_t src = src_field & 07; // bits 2-0
-    uint16_t value, addr_word, ptr;
-
-    log(LOG_DEBUG, "read_operand_value(%0.2o) mode: %o reg: %o\n", src_field, mode, src);
-
-    switch (mode)
-    {
-        case 0:// GEN_MODE_REGISTER:
-            value = reg[src];            
-            break;
-
-        case 1:// GEN_MODE_REGISTER_DEFERRED:
-            /* Register contains the address of the operand */
-            value = data_read_word(reg[src]);
-            break;
-
-        case 2: // GEN_MODE_AUTO_INCREMENT / PC_MODE_IMMEDIATE
-            /* The value is located in the second word of the instruction and is added to the contents of the register.
-                the PC is used as a pointer to fetch the operand before being incremented by two to point to the next instruction.  */
-
-            /* Register is used as a pointer to sequential data then incremented. contents of the general register is the address of the operand
-            /* FIXME Contents of registers are stepped (by one for bytes, by two for words, always by two for R6 and R7 */
-            value = data_read_word(reg[src]);
-            reg[src] += 2;
-            break;
-            
-        case 3: // GEN_MODE_AUTO_INCREMENT_DEFERRED / PC_MODE_ABSOLUTE
-            /*  The contents of the location following the instruction are taken as the
-                address of the operand. Immediate data is interpreted as an absolute address
-                (i.e., an address that remains constant no matter where in memory the assembled instruction is executed). */
-
-            /* Register is first used as a pointer to a word containing the address of the operand, then incremented (always by 2; even for byte instructions). */
-            /* The contents of register used as the address of the address of the operand. Operation is performed,  Contents of register incremented by 2. */
-            addr_word = data_read_word(reg[src]);
-            reg[src] += 2;
-            ptr = data_read_word(addr_word);
-            value = data_read_word(ptr);
-            break;
-
-        case 4:// GEN_MODE_AUTO_DECREMENT:
-            /* The contents of the selected general register are decremented (by two for word instructions, by one for byte instructions)
-               and then used as the address of the operand */
-            reg[src] -= 2;
-            value = data_read_word(reg[src]);
-            break;
-
-        case 5:// GEN_MODE_AUTO_DECREMENT_DEFERRED:
-            /* Register is decremented (always by two; even for byte instructions) and then used as a pointer to a word
-               containing the address of the operand */
-            reg[src] -= 2;
-            addr_word = data_read_word(reg[src]);
-            ptr = data_read_word(addr_word);
-            value = data_read_word(ptr);
-            break;
-
-        case 6: // GEN_MODE_INDEX / PC_MODE_RELATIVE
-            /*  contents of memory location immediately following instruction word are added to (PC) to produce address */
-            /* The contents of the selected general register, and an index word following the instruction word, are summed to form the address of the operand.  */
-            /* Index addressing instructions are of the form OPR X(Rn) where X is the indexed word and is located in the
-            memory location following the instruction word and Rn is the selected general register. */
-            addr_word = data_read_word(reg[7]);
-            reg[7] += 2; // move PC past data operand
-            ptr = (uint16_t)(reg[src] + addr_word);
-            value = data_read_word(ptr);
-            break;
-
-        case 7: // GEN_MODE_INDEX_DEFERRED / PC_MODE_RELATIVE_DEFERRED
-            // second word of the instruction, when added to the PC, contains the address of the address of the operand                
-            /* Value X (stored in a word following the instruction) and (Rn) are added and used as a pointer to a word containing the
-            address of the operand. Neither X nor (Rn) are modified. */
-            addr_word = data_read_word(reg[src]);
-            reg[src] += 2; // move PC past data operand                
-            addr_word = (uint16_t)(addr_word + reg[src]);
-            ptr = data_read_word(addr_word);
-            value = data_read_word(ptr);    
-            break;
-    }
-
-    return value;
-}
-
-
-
 
 void decode_single_operand(uint16_t instruction)
 {
@@ -451,7 +211,6 @@ int op_mov_old(uint16_t instruction) // double operand instruction
 
     uint16_t src_value, addr_word, ptr, data_word;
 
-
     switch (src_mode)
     {
         case 0:// GEN_MODE_REGISTER:
@@ -464,6 +223,13 @@ int op_mov_old(uint16_t instruction) // double operand instruction
             break;
 
         case 2: // GEN_MODE_AUTO_INCREMENT / PC_MODE_IMMEDIATE
+			/*
+				Register is first used as a
+				pointer to a word containing the
+				address of the operand, then in·
+				cremented (always by 2; even
+				for byte instructions). 
+			 * /
             /* The value is located in the second word of the instruction and is added to the contents of the register.
                 the PC is used as a pointer to fetch the operand before being incremented by two to point to the next instruction.  */
 
@@ -527,7 +293,6 @@ int op_mov_old(uint16_t instruction) // double operand instruction
 
             break;
     }
-
 
     switch (dst_mode)
     {
@@ -628,8 +393,6 @@ int op_mov_old(uint16_t instruction) // double operand instruction
 
     return 0;
 }
-
-
 
 
 
@@ -827,15 +590,101 @@ int decode_and_execute(uint16_t instruction)
     
     if (instruction == 0000000)
         decoder = op_halt; 
-
+	//SINGLE OPERAND
     log(LOG_DEBUG, "instruction >> 6: %o\n", instruction >> 6);
-    switch (instruction >> 6)   // 10 bit op codes
+    switch ((instruction >> 6) & 00077)// 10 bit op codes (finding just base)
     {
+		//General
         case OP_CLR: 
             decoder = op_clr; 
             break;
+        case OP_COM: 
+            decoder = op_com; 
+            break;
+        case OP_INC: 
+            decoder = op_inc; 
+            break;
+        case OP_DEC: 
+            decoder = op_dec; 
+            break;
+        case OP_NEG: 
+            decoder = op_neg; 
+            break;
+            
+        //Shift and Rotate
+        case OP_ASR: 
+            decoder = op_asr; 
+            break;
+        case OP_ASL: 
+            decoder = op_asl; 
+            break;
+        case OP_ROR: 
+            decoder = op_ror; 
+            break;
+        case OP_SWAB:
+			decoder = op_swab; 
+            break;
+        //Multiple Precision
+        case OP_ADC: 
+            decoder = op_adc; 
+            break;
+        case OP_SBC: 
+            decoder = op_sbc; 
+            break;
     }
 
+
+
+    //DOUBLE OPERAND
+    log(LOG_DEBUG, "(instruction >> 12)& 007: %o\n", (instruction >> 12)& 007);
+    switch ((instruction >> 12)& 007) // 3 bit op codes
+    {
+		//General
+        case OP_MOV: 
+            decoder = op_mov;
+            break;
+        case OP_CMP: 
+            decoder = op_cmp;
+            break;
+        case OP_ADD:
+            decoder = op_add;
+            break;
+        case OP_SUB:
+            decoder = op_sub;
+            break;
+        //Logical
+        case OP_BIT: 
+            decoder = op_bit;
+            break;
+        case OP_BIC: 
+            decoder = op_bic;
+            break;
+        case OP_BIS: 
+            decoder = op_bis;
+            break;
+    }
+    
+    log(LOG_DEBUG, "instruction >> 9: %o\n", instruction >> 9);
+    switch (instruction >> 9) // 6 bit op codes
+    {
+		//Register
+        case OP_MUL: 
+            decoder = op_mul;
+            break;
+        case OP_DIV: 
+            decoder = op_div;
+            break;
+        case OP_ASH: 
+            decoder = op_ash;
+            break;
+        case OP_ASHC: 
+            decoder = op_ashc;
+            break;
+        case OP_XOR: 
+            decoder = op_xor;
+            break;           
+    }
+    
     log(LOG_DEBUG, "(instruction >> 8)<<2: %o\n", (instruction >> 8)<<2);
     switch ((instruction >> 8)<<2)   // Branch opcodes (opcode + offset)
     {
@@ -886,27 +735,6 @@ int decode_and_execute(uint16_t instruction)
             break;
         case OP_BLOS: 
             decoder = op_blos;
-            break;
-    }
-
-
-    log(LOG_DEBUG, "instruction >> 9: %o\n", instruction >> 9);
-    switch (instruction >> 9) // 6 bit op codes
-    {
-        case OP_XOR: 
-            decoder = op_xor;
-            break;
-    }
-
-    log(LOG_DEBUG, "instruction >> 12: %o\n", instruction >> 12);
-    switch (instruction >> 12) // 3 bit op codes
-    {
-        case OP_MOV: 
-            decoder = op_mov;
-            break;
-
-        case OP_ADD:
-            decoder = op_add;
             break;
     }
     if (decoder)
