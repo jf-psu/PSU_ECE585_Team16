@@ -1,3 +1,7 @@
+#include "setup.h"
+#include "log.h"
+#include "opcodes.h"
+
 //Contains code for execution of instructions
 
 /*
@@ -64,7 +68,10 @@ uint16_t read_operand_value(uint8_t src_field, int byte)
     switch (mode)
     {
         case 0:// GEN_MODE_REGISTER:
-            value = reg[src];            
+            if(byte)
+				value = reg[src] & 0377; // only return the low byte
+			else        
+                value = reg[src];            
             break;
 
         case 1:// GEN_MODE_REGISTER_DEFERRED:
@@ -180,7 +187,10 @@ uint16_t write_operand_value(uint8_t dst_field, uint16_t value, int byte)
     switch (mode)
     {
         case 0:// GEN_MODE_REGISTER:
-            reg[dst] = value;            
+            if(byte)
+				reg[dst] = (reg[dst] & 0177400) | value; // only modify the low byte of register
+			else
+                reg[dst] = value;            
             break;
 
         case 1:// GEN_MODE_REGISTER_DEFERRED:
@@ -304,11 +314,10 @@ uint16_t write_operand_value(uint8_t dst_field, uint16_t value, int byte)
 int op_clr(uint16_t instruction)
 {
 	int byte = instruction >> 15;
-    uint8_t dst = instruction && 077;
+    uint8_t dst = instruction & 077;
     log(LOG_INFO, "CLR function called\n"); //, mode: %o reg: %o\n", mode, reg_num);
-	log(LOG_INFO, "byte mode is: %d\n", byte);
 	
-    write_operand_value(0, dst, byte);
+    write_operand_value(dst, 0, byte);
     psw.negative = 0;
     psw.zero = 1;
     psw.overflow = 0;
@@ -495,8 +504,7 @@ int op_add(uint16_t instruction)
     int16_t src_val = read_operand_value(src, byte);
     int16_t dst_val = read_operand_value(dst, byte);
     value = src_val + dst_val;
-    
-	psw.carry = value & (1 << 17);
+
     write_operand_value(dst, (uint16_t)value, byte);
     
 /*
@@ -513,6 +521,7 @@ result; cleared otherwise
     psw.overflow = (((src_val < 0) && (dst_val < 0) && (value >=0)) || 
 					((src_val >= 0) && (dst_val >= 0) && (value < 0)));
 
+    psw.carry = (value >> 17 & 1 == 1);
     return 0;
 
 }
