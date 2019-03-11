@@ -182,8 +182,10 @@ int op_asr(uint16_t instruction){
 	//set if result = 0
 	psw.zero = (value == 0);
 	//loaded from the exclusive OR of the N-bit and C-bit
-	 
+	psw.carry = (dst & 0000001);
 	//loaded from the low order bit of the destination
+    psw.overflow = (psw.negative ^ psw.carry);
+    
 	return 0;
 }
 
@@ -193,6 +195,18 @@ int op_asrb(uint16_t instruction){
 
 
 int op_asl(uint16_t instruction){
+    uint8_t dst = instruction & 077;
+	log(LOG_INFO, "ASR function called\n");
+	uint16_t value;
+	value = operand_value_read_word(dst);
+	value = value << 1;
+	log(LOG_INFO, "Value %d\n", value);
+	operand_value_write_word(dst, value);
+
+    psw.negative = (value < 0);
+    psw.zero = (value == 0);
+    psw.carry = (dst >> 15);
+    psw.overflow = (psw.negative ^ psw.carry);
 	return 0;
 }
 
