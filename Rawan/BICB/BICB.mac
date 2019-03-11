@@ -14,42 +14,42 @@ Test1:  MOV A,R0
 
 
 ;Register Deffered
-Test2:   MOV A,R0
+Test2:  MOV A,R0
 		MOV B,R5
-		BICB (R0),R5
-		BICB (R5),R0
+		BICB R0,(R5)
+		BICB R5,(R0)
 		 HALT
 		.END TEST2
 
 
 ;Autoincrement
-Test3:   MOV A,R0
+Test3:  MOV A,R0
 		MOV B,R5
-		BICB (R0)+,R5
-		BICB (R5)+,R0
+		BICB R0,(R5)+
+		BICB R5,(R0)+
 		 HALT
 		.END TEST3
 
 
 ;Autoincrement deffered
-Test4:   MOV A,R0
+Test4:  MOV A,R0
 		MOV B,R5
-		BICB @(R0)+,R5
-		BICB @(R5)+,R0
+		BICB R0,@(R5)+
+		BICB R5,@(R0)+
 		 HALT
 		.END TEST4
 ;Autodecrment
-Test5:   MOV A,R0
+Test5:  MOV A,R0
 		MOV B,R5
-		BICB -(R0),R5
-		BICB -(R5),R0
+		BICB R0,-(R5)
+		BICB R5,-(R0)
 		 HALT
 		.END TEST5
 ;Autodecrement deffered
 Test6:  MOV A,R0
 		MOV B,R5
-		BICB @-(R0),R5
-		BICB @-(R5),R0
+		BICB R0,@-(R5)
+		BICB R5,@-(R0)
 		 HALT
 		.END TEST14
 
@@ -57,8 +57,8 @@ Test6:  MOV A,R0
 ;Index
 Test7:  MOV A,R0
 		MOV B,R5
-		BICB 3(R0),R5
-		BICB 3(R5),R0
+		BICB R0,20(R5)
+		BICB R5,20(R0)
 		 HALT
 		.END TEST7
 
@@ -66,8 +66,8 @@ Test7:  MOV A,R0
 ;index deffered
 Test8:   MOV A,R0
 		MOV B,R5
-		BICB @3(R0),R5
-		BICB @3(R5),R0
+		BICB R0,@20(R5)
+		BICB R5,@20(R0)
 		 HALT
 		.END TEST8
 ;pc addressing mode: immediate
