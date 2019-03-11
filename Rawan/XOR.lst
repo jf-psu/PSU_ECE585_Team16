@@ -1,0 +1,89 @@
+       1                                ;Test for XOR
+       2                                ;Testing addressing modes Register, Register deffered, autoincrement, autoincrement deffered, autodecrment, autodecrment deffered, index, and index deffered on Registers R0 and R5
+       3                                ;Testig addressing modes Deffered, Autoincrment, autoincrment deffered, autodecrement, indexed, and indexed deffered on Regsiter SP
+       4 000000 000070                  A: .WORD 000070
+       5 000002 000400                  B: .WORD 000400
+       6                                
+       7 000004 016700  177770          Test1:  MOV A,R0
+       8 000010 016705  177766                  MOV B,R5
+       9 000014 074005                          XOR R0,R5 ;set flag to N
+      10 000016 074500                          XOR R5,R0 ;set flag to N
+      11 000020 000000                           HALT
+      12                                        .END TEST1
+      13                                
+      14                                ;Register Deffered
+      15 000022 016700  177752          Test2:   MOV A,R0
+      16 000026 016705  177750                  MOV B,R5
+      17 000032 074510                          XOR R5,(R0)
+      18 000034 074015                          XOR R0,(R5)
+      19 000036 000000                           HALT
+      20                                        .END TEST2
+      21                                
+      22                                ;Autoincrement
+      23 000040 016700  177734          Test3:   MOV A,R0
+      24 000044 016705  177732                  MOV B,R5
+      25 000050 074025                          XOR R0, (R5)+
+      26 000052 074520                          XOR R5,(R0)+
+      27 000054 000000                           HALT
+      28                                        .END TEST3
+      29                                
+      30                                ;Autoincrement deffered
+      31 000056 016700  177716          Test4:   MOV A,R0
+      32 000062 016705  177714                  MOV B,R5
+      33 000066 074035                          XOR R0,@(R5)+
+      34 000070 074530                          XOR R5,@(R0)+,
+      35 000072 000000                           HALT
+      36                                        .END TEST4
+      37                                ;Autodecrment
+      38 000074 016700  177700          Test5:   MOV A,R0
+      39 000100 016705  177676                  MOV B,R5
+      40 000104 074540                          XOR R5,-(R0)
+      41 000106 074045                          XOR R0,-(R5)
+      42 000110 000000                           HALT
+      43                                        .END TEST5
+      44                                ;Autodecrement deffered
+      45 000112 016700  177662          Test6:  MOV A,R0
+      46 000116 016705  177660                  MOV B,R5
+      47 000122 074550                          XOR R5,@-(R0)
+      48 000124 074050                          XOR R0,@-(R0)
+      49 000126 000000                           HALT
+      50                                        .END TEST14
+      51                                
+      52                                ;Index
+      53 000130 016700  177644          Test7:  MOV A,R0
+      54 000134 016705  177642                  MOV B,R5
+      55 000140 074560  000020                  XOR R5,20(R0)
+      56 000144 074065  000020                  XOR R0,20(R5)
+      57 000150 000000                           HALT
+      58                                        .END TEST7
+      59                                
+      60                                ;index deffered
+      61 000152 016700  177622          Test8:   MOV A,R0
+      62 000156 016705  177620                  MOV B,R5
+      63 000162 074570  000020                  XOR R5,@20(R0)
+      64 000166 074075  000020                  XOR R0,@20(R5)
+      65 000172 000000                          HALT
+      66                                        .END TEST8
+      67                                
+      68                                ;pc addressing mode: immediate
+      69 000174 016700  177600          Test9: MOV A,R0
+      70 000200 016705  177576                  MOV B,R5
+      71 000204 074027  000100                  XOR R0,#100
+      72 000210 074527  000200                  XOR R5,#200
+      73 000214 000000                          HALT
+      74                                        .END TEST9
+      75                                ;Absolute
+      76 000216 016700  177556          Test10: MOV A,R0
+      77 000222 016705  177554                  MOV B,R5
+      78 000226 074037  000100                  XOR R0,@#100
+      79 000232 074537  000100                  XOR R5,@#100
+      80 000236 000000                          HALT
+      81                                        .END TEST10
+      82 000240 016700  177534          Test11: MOV A,R0
+      83 000244 016705  177532                  MOV B,R5
+      84 000250 074077  177524                  XOR R0,@A
+      85 000254 074577  177522                  XOR R5,@B
+      86 000260 000000                          HALT
+      87                                        .END TEST11
+      88                                
+      88                                
