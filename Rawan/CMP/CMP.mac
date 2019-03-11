@@ -14,54 +14,54 @@ Test1:  MOV A,R0
 ;Register Deffered
 Test2:   MOV A,R0
         MOV B,R5
-        CMP (R0),R5
-        CMP (R5),R0
+        CMP R0,(R5)
+        CMP R5,(R0)
          HALT
         .END TEST2
 
 ;Autoincrement
 Test3:   MOV A,R0
         MOV B,R5
-        CMP (R0)+,R5
-        CMP (R5)+,R0
+        CMP R0,(R5)+
+        CMP R5,(R0)+
          HALT
         .END TEST3
 
 ;Autoincrement deffered
 Test4:   MOV A,R0
         MOV B,R5
-        CMP @(R0)+,R5
-        CMP @(R5)+,R0
+        CMP R0,@(R5)+
+        CMP R5,@(R0)+
          HALT
         .END TEST4
 ;Autodecrment
 Test5:   MOV A,R0
         MOV B,R5
-        CMP -(R0),R5
-        CMP -(R5),R0
+        CMP R0,-(R5)
+        CMP R5,-(R0)
          HALT
         .END TEST5
 ;Autodecrement deffered
 Test6:  MOV A,R0
         MOV B,R5
-        CMP @-(R0),R5
-        CMP @-(R5),R0
+        CMP R0,@-(R5)
+        CMP R5,@-(R0)
          HALT
         .END TEST14
 
 ;Index
 Test7:  MOV A,R0
         MOV B,R5
-        CMP 3(R0),R5
-        CMP 3(R5),R0
+        CMP R0,20(R5)
+        CMP R5,20(R0)
          HALT
         .END TEST7
 
 ;index deffered
-Test8:   MOV A,R0
+Test8:  MOV A,R0
         MOV B,R5
-        CMP @3(R0),R5
-        CMP @3(R5),R0
+        CMP R0,@20(R5)
+        CMP R5,@20(R0)
          HALT
         .END TEST8
 
