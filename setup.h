@@ -29,11 +29,13 @@ psw_t psw;
 
 
 //Functions used throughout
-uint16_t write_operand_value(uint8_t dst_field, uint16_t value, int byte);
-uint16_t read_operand_value(uint8_t src_field, int byte);
 
-uint8_t write_operand_value_byte(uint8_t dst_field, uint8_t value);
-uint8_t read_operand_value_byte(uint8_t src_field);
+uint16_t operand_value_write_word(uint8_t dst_field, uint16_t value);
+uint16_t operand_value_read_word(uint8_t src_field);
+
+uint8_t operand_value_write_byte(uint8_t dst_field, uint8_t value);
+uint8_t operand_value_read_byte(uint8_t src_field);
+
 
 
 int op_halt(uint16_t instruction);
