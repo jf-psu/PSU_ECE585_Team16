@@ -12,40 +12,40 @@ Test1:  MOV A,R0
         .END TEST1
 
 ;Register Deffered
-Test2:   MOV A,R0
+Test2:  MOV A,R0
         MOV B,R5
-        ADD (R0),R5
-        ADD (R5),R0
+        ADD R0,(R5)
+        ADD R5,(R0)
          HALT
         .END TEST2
 
 ;Autoincrement
-Test3:   MOV A,R0
+Test3:  MOV A,R0
         MOV B,R5
-        ADD (R0)+,R5
-        ADD (R5)+,R0
+        ADD R0,(R5)+
+        ADD R5,(R0)+
          HALT
         .END TEST3
 
 ;Autoincrement deffered
-Test4:   MOV A,R0
+Test4:  MOV A,R0
         MOV B,R5
-        ADD @(R0)+,R5
-        ADD @(R5)+,R0
+        ADD R0,@(R5)+
+        ADD R5,@(R0)+
          HALT
         .END TEST4
 ;Autodecrment
-Test5:   MOV A,R0
+Test5:  MOV A,R0
         MOV B,R5
-        ADD -(R0),R5
-        ADD -(R5),R0
+        ADD R0,-(R5)
+        ADD R5,-(R0)
          HALT
         .END TEST5
 ;Autodecrement deffered
 Test6:  MOV A,R0
         MOV B,R5
-        ADD @-(R0),R5
-        ADD @-(R5),R0
+        ADD R0,@-(R5)
+        ADD R5,@-(R0)
          HALT
         .END TEST14
 
@@ -58,7 +58,7 @@ Test7:  MOV A,R0
         .END TEST7
 
 ;index deffered
-Test8:   MOV A,R0
+Test8:  MOV A,R0
         MOV B,R5
         ADD R0,@20(R5)
         ADD R5,@20(R0)
