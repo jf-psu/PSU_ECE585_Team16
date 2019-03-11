@@ -249,10 +249,10 @@ int op_adc(uint16_t instruction){
 	log(LOG_INFO, "Value %d\n", value);
 	operand_value_write_word(dst, val);
 
-    psw.negative = (value < 0);
-    psw.zero = (value == 0);
-    psw.carry = ((dst == 017777) && (psw.carry));
-    psw.overflow = ((dst == 0077777) && (psw.carry));
+    psw.negative = (val < 0);
+    psw.zero = (val == 0);
+    psw.carry = ((value == 017777) && (psw.carry));
+    psw.overflow = ((value == 0077777) && (psw.carry));
 	return 0;
 }
 
@@ -262,6 +262,18 @@ int op_adcb(uint16_t instruction){
 
 
 int op_sbc(uint16_t instruction){
+    uint8_t dst = instruction & 077;
+	log(LOG_INFO, "ADC function called\n");
+	uint16_t value, val;
+	value = operand_value_read_word(dst);
+	val = value - psw.carry;
+	log(LOG_INFO, "Value %d\n", value);
+	operand_value_write_word(dst, val);
+
+    psw.negative = (val < 0);
+    psw.zero = (val == 0);
+    psw.carry = ((val == 0) && (psw.carry));
+    psw.overflow = (value == 0100000);
 	return 0;
 }
 
