@@ -1,0 +1,94 @@
+       1                                ;Test for CMPB
+       2                                	;Testing addressing modes Register, Register deffered, autoincrement, autoincrement deffered, autodecrment, autodecrment deffered, index, and index deffered on Registers R0 and R5
+       3                                	;Testig addressing modes Deffered, Autoincrment, autoincrment deffered, autodecrement, indexed, and indexed deffered on Regsiter SP
+       4 000000    070                  	A: .BYTE 000070
+       5 000001    000                  	B: .BYTE 000400
+       6                                	
+       7                                
+       8 000002 016700  177772          	Test1:  MOV A,R0
+       9 000006 016705  177767          	        MOV B,R5
+      10 000012 120005                  	        CMPB R0,R5 ;set flag to N
+      11 000014 120500                  	        CMPB R5,R0 ;set flag to N
+      12 000016 000000                  	         HALT
+      13                                	        .END TEST1
+      14                                	
+      15                                
+      16                                	;Register Deffered
+      17 000020 016700  177754          	Test2:   MOV A,R0
+      18 000024 016705  177751          	        MOV B,R5
+      19 000030 120015                  	        CMPB R0,(R5)
+      20 000032 120510                  	        CMPB R5,(R0)
+      21 000034 000000                  	         HALT
+      22                                	        .END TEST2
+      23                                	
+      24                                
+      25                                	;Autoincrement
+      26 000036 016700  177736          	Test3:   MOV A,R0
+      27 000042 016705  177733          	        MOV B,R5
+      28 000046 120025                  	        CMPB R0,(R5)+
+      29 000050 120520                  	        CMPB R5,(R0)+
+      30 000052 000000                  	         HALT
+      31                                	        .END TEST3
+      32                                	
+      33                                
+      34                                	;Autoincrement deffered
+      35 000054 016700  177720          	Test4:   MOV A,R0
+      36 000060 016705  177715          	        MOV B,R5
+      37 000064 120035                  	        CMPB R0,@(R5)+
+      38 000066 120530                  	        CMPB R5,@(R0)+
+      39 000070 000000                  	         HALT
+      40                                	        .END TEST4
+      41                                	;Autodecrment
+      42 000072 016700  177702          	Test5:   MOV A,R0
+      43 000076 016705  177677          	        MOV B,R5
+      44 000102 120045                  	        CMPB R0,-(R5)
+      45 000104 120540                  	        CMPB R5,-(R0)
+      46 000106 000000                  	         HALT
+      47                                	        .END TEST5
+      48                                	;Autodecrement deffered
+      49 000110 016700  177664          	Test6:  MOV A,R0
+      50 000114 016705  177661          	        MOV B,R5
+      51 000120 120055                  	        CMPB R0,@-(R5)
+      52 000122 120550                  	        CMPB R5,@-(R0)
+      53 000124 000000                  	         HALT
+      54                                	        .END TEST14
+      55                                	
+      56                                
+      57                                	;Index
+      58 000126 016700  177646          	Test7:  MOV A,R0
+      59 000132 016705  177643          	        MOV B,R5
+      60 000136 120065  000020          	        CMPB R0,20(R5)
+      61 000142 120560  000020          	        CMPB R5,20(R0)
+      62 000146 000000                  	         HALT
+      63                                	        .END TEST7
+      64                                	
+      65                                
+      66                                	;index deffered
+      67 000150 016700  177624          	Test8:   MOV A,R0
+      68 000154 016705  177621          	        MOV B,R5
+      69 000160 120075  000020          	        CMPB R0,@20(R5)
+      70 000164 120570  000020          	        CMPB R5,@20(R0)
+      71 000170 000000                  	         HALT
+      72                                	        .END TEST8
+      73                                	;pc addressing mode: immediate
+      74 000172 016700  177602          	Test9: MOV A,R0
+      75 000176 016705  177577          	        MOV B,R5
+      76 000202 122700  000100          	        CMPB #100,R0
+      77 000206 122705  000200          	        CMPB #200,R5
+      78 000212 000000                  	        HALT
+      79                                	        .END TEST9
+      80                                	;Absolute
+      81 000214 016700  177560          	Test10: MOV A,R0
+      82 000220 016705  177555          	        MOV B,R5
+      83 000224 123700  000100          	        CMPB @#100,R0
+      84 000230 123705  000100          	        CMPB @#100,R5
+      85 000234 000000                  	        HALT
+      86                                	        .END TEST10
+      87 000236 016700  177536          	Test11: MOV A,R0
+      88 000242 016705  177533          	        MOV B,R5
+      89 000246 127700  177526          	        CMPB @A,R0
+      90 000252 127705  177523          	        CMPB @B,R5
+      91 000256 000000                  	        HALT
+      92                                	        .END TEST11
+      93                                
+      93                                
