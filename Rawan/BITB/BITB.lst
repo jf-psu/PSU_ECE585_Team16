@@ -1,0 +1,87 @@
+       1                                ;Test for BITB
+       2                                ;Testing addressing modes Register, Register deffered, autoincrement, autoincrement deffered, autodecrment, autodecrment deffered, index, and index deffered on Registers R0 and R5
+       3                                ;Testig addressing modes Deffered, Autoincrment, autoincrment deffered, autodecrement, indexed, and indexed deffered on Regsiter SP
+       4 000000    070                  A: .BYTE 000070
+       5 000001    000                  B: .BYTE 000400
+       6                                
+       7 000002 016700  177772          Test1:  MOV A,R0
+       8 000006 016705  177767                  MOV B,R5
+       9 000012 130005                          BITB R0,R5 ;set flag to N
+      10 000014 130500                          BITB R5,R0 ;set flag to N
+      11 000016 000000                           HALT
+      12                                        .END TEST1
+      13                                
+      14                                ;Register Deffered
+      15 000020 016700  177754          Test2:   MOV A,R0
+      16 000024 016705  177751                  MOV B,R5
+      17 000030 130015                          BITB R0,(R5)
+      18 000032 130510                          BITB R5,(R0)
+      19 000034 000000                           HALT
+      20                                        .END TEST2
+      21                                
+      22                                ;Autoincrement
+      23 000036 016700  177736          Test3:   MOV A,R0
+      24 000042 016705  177733                  MOV B,R5
+      25 000046 130025                          BITB R0,(R5)+
+      26 000050 130520                          BITB R5,(R0)+
+      27 000052 000000                           HALT
+      28                                        .END TEST3
+      29                                
+      30                                ;Autoincrement deffered
+      31 000054 016700  177720          Test4:   MOV A,R0
+      32 000060 016705  177715                  MOV B,R5
+      33 000064 130035                          BITB R0,@(R5)+
+      34 000066 130530                          BITB R5,@(R0)+
+      35 000070 000000                           HALT
+      36                                        .END TEST4
+      37                                ;Autodecrment
+      38 000072 016700  177702          Test5:   MOV A,R0
+      39 000076 016705  177677                  MOV B,R5
+      40 000102 130045                          BITB R0,-(R5)
+      41 000104 130540                          BITB R5,-(R0)
+      42 000106 000000                           HALT
+      43                                        .END TEST5
+      44                                ;Autodecrement deffered
+      45 000110 016700  177664          Test6:  MOV A,R0
+      46 000114 016705  177661                  MOV B,R5
+      47 000120 130055                          BITB R0,@-(R5)
+      48 000122 130550                          BITB R5,@-(R0)
+      49 000124 000000                           HALT
+      50                                        .END TEST14
+      51                                
+      52                                ;Index
+      53 000126 016700  177646          Test7:  MOV A,R0
+      54 000132 016705  177643                  MOV B,R5
+      55 000136 130065  000020                  BITB R0,20(R5)
+      56 000142 130560  000020                  BITB R5,20(R0)
+      57 000146 000000                           HALT
+      58                                        .END TEST7
+      59                                
+      60                                ;index deffered
+      61 000150 016700  177624          Test8:  MOV A,R0
+      62 000154 016705  177621                  MOV B,R5
+      63 000160 130075  000020                  BITB R0,@20(R5)
+      64 000164 130570  000020                  BITB R5,@20(R0)
+      65 000170 000000                           HALT
+      66                                        .END TEST8
+      67                                ;pc addressing mode: immediate
+      68 000172 016700  177602          Test9: MOV A,R0
+      69 000176 016705  177577                  MOV B,R5
+      70 000202 132700  000100                  BITB #100,R0
+      71 000206 132705  000200                  BITB #200,R5
+      72 000212 000000                          HALT
+      73                                        .END TEST9
+      74                                ;Absolute
+      75 000214 016700  177560          Test10: MOV A,R0
+      76 000220 016705  177555                  MOV B,R5
+      77 000224 133700  000100                  BITB @#100,R0
+      78 000230 133705  000100                  BITB @#100,R5
+      79 000234 000000                          HALT
+      80                                        .END TEST10
+      81 000236 016700  177536          Test11: MOV A,R0
+      82 000242 016705  177533                  MOV B,R5
+      83 000246 137700  177526                  BITB @A,R0
+      84 000252 137705  177523                  BITB @B,R5
+      85 000256 000000                          HALT
+      86                                        .END TEST11
+      86                                
