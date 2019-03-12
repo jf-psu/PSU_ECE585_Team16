@@ -182,7 +182,7 @@ int op_negb(uint16_t instruction){
 int op_asr(uint16_t instruction){
     uint8_t dst = instruction & 077;
 	log(LOG_INFO, "ASR function called\n");
-	uint16_t old_value, val;
+	uint16_t old_value, value;
 	old_value = operand_value_read_word(dst);
 	value = (old_value & 0100000) | (old_value >> 1);
 	log(LOG_INFO, "Value %d\n", value);
@@ -203,7 +203,7 @@ int op_asr(uint16_t instruction){
 int op_asrb(uint16_t instruction){
 	uint8_t dst = instruction & 077;
 	log(LOG_INFO, "ASRB function called\n");
-	uint16_t old_value, val;
+	uint16_t old_value, value;
 	old_value = operand_value_read_byte(dst);
 	value = (old_value & 0100000) | (old_value >> 1);
 	log(LOG_INFO, "Value %d\n", value);
@@ -224,7 +224,7 @@ int op_asrb(uint16_t instruction){
 int op_asl(uint16_t instruction){
     uint8_t dst = instruction & 077;
 	log(LOG_INFO, "ASL function called\n");
-	uint16_t old_value, old_value;
+	uint16_t old_value, value;
 	old_value = operand_value_read_word(dst);
 	value = (old_value & 0000001) | (old_value << 1);
 	log(LOG_INFO, "Value %d\n", value);
@@ -303,7 +303,7 @@ int op_rol(uint16_t instruction){
 int op_rolb(uint16_t instruction){
 	uint8_t dst = instruction & 077;
 	log(LOG_INFO, "ROLB function called\n");
-	uint16_t value;
+	uint16_t old_value, value;
 	old_value = operand_value_read_byte(dst);
 	value = (old_value << 1) | (psw.carry);
 	operand_value_write_byte(dst,value);
@@ -319,7 +319,7 @@ int op_rolb(uint16_t instruction){
 int op_swab(uint16_t instruction){
 	uint8_t dst = instruction & 077;
 	log(LOG_INFO, "SWAB function called\n");
-	uint16_t value;
+	uint16_t old_value, value;
 	old_value = operand_value_read_byte(dst);
 	value = (((old_value & 0177400) >> 8) | ((old_value & 0000377) << 8)) ;
 	operand_value_write_byte(dst,value);
