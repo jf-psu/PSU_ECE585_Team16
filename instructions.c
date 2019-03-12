@@ -35,7 +35,7 @@ int op_clrb(uint16_t instruction){
 int op_com(uint16_t instruction){
     uint8_t dst = instruction & 077;
     log(LOG_INFO, "COM function called\n");
-    uint16_t value;
+    uint16_t old_value;
     value = operand_value_read_word(dst);
     value = (~value);
     operand_value_write_word(dst, value);
@@ -52,15 +52,15 @@ int op_com(uint16_t instruction){
 int op_comb(uint16_t instruction){
 	uint8_t dst = instruction & 077;
     log(LOG_INFO, "COMB function called\n");
-    uint16_t value;
-    value = operand_value_read_byte(dst);
-    value = (~value);
-    operand_value_write_byte(dst, value);
+    uint8_t old_value;
+    old_value = operand_value_read_byte(dst);
+    old_value = (~old_value);
+    operand_value_write_byte(dst, old_value);
 
     //if msb of result is set 
-    psw.negative = ((value >> 15) == 1);
+    psw.negative = ((old_value >> 7) == 1);
     //set if result is 0
-    psw.zero = (value == 0);
+    psw.zero = (old_value == 0);
     psw.overflow = 0;
     psw.carry = 1;
 	return 0;
@@ -369,32 +369,32 @@ int op_adcb(uint16_t instruction){
 int op_sbc(uint16_t instruction){
     uint8_t dst = instruction & 077;
 	log(LOG_INFO, "SBC function called\n");
-	uint16_t value, val;
-	value = operand_value_read_word(dst);
-	val = value - psw.carry;
+	int16_t old_value, value;
+	old_value = (int16_t)operand_value_read_word(dst);
+	value = old_value - psw.carry;
 	log(LOG_INFO, "Value %d\n", value);
-	operand_value_write_word(dst, val);
+	operand_value_write_word(dst, value);
 
-    psw.negative = (val < 0);
-    psw.zero = (val == 0);
-    psw.carry = ((val == 0) && (psw.carry));
-    psw.overflow = (value == 0100000);
+    psw.negative = (value < 0);
+    psw.zero = (value == 0);
+    psw.carry = !((old_value == 0) && (psw.carry));
+    psw.overflow = (old_value == 0100000);  // bit 15 was set
 	return 0;
 }
 
 int op_sbcb(uint16_t instruction){
-	uint8_t dst = instruction & 077;
+    uint8_t dst = instruction & 077;
 	log(LOG_INFO, "SBCB function called\n");
-	uint16_t value, val;
-	value = operand_value_read_byte(dst);
-	val = value - psw.carry;
+	int8_t old_value, value;
+	old_value = (int8_t)operand_value_read_byte(dst);
+	value = old_value - psw.carry;
 	log(LOG_INFO, "Value %d\n", value);
-	operand_value_write_byte(dst, val);
+	operand_value_write_byte(dst, value);
 
-    psw.negative = (val < 0);
-    psw.zero = (val == 0);
-    psw.carry = ((val == 0) && (psw.carry));
-    psw.overflow = (value == 0100000);
+    psw.negative = (value < 0);
+    psw.zero = (value == 0);
+    psw.carry = !((old_value == 0) && (psw.carry));
+    psw.overflow = (old_value == 0200);  // bit 7 was set
 	return 0;
 }
 
