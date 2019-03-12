@@ -50,6 +50,20 @@ int op_com(uint16_t instruction){
 }
 
 int op_comb(uint16_t instruction){
+	uint8_t dst = instruction & 077;
+    log(LOG_INFO, "COM function called %d\n", dst);
+    uint16_t value;
+    value = operand_value_read_byte(dst);
+    value = (~value);
+    operand_value_write_byte(dst, value);
+
+    //if msb of result is set 
+    psw.negative = ((value >> 15) == 1);
+    //set if result is 0
+    psw.zero = (value == 0);
+    psw.overflow = 0;
+    psw.carry = 1;
+	return 0;
 	return 0;
 }
 
