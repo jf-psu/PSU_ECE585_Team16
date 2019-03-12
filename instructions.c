@@ -229,13 +229,13 @@ int op_asl(uint16_t instruction){
 	log(LOG_INFO, "ASR function called\n");
 	uint16_t value;
 	value = operand_value_read_word(dst);
-	value = value << 1;
+	value = (value & 0000001) | (value << 1);
 	log(LOG_INFO, "Value %d\n", value);
 	operand_value_write_word(dst, value);
 
     psw.negative = (value < 0);
     psw.zero = (value == 0);
-    psw.carry = (dst >> 15);
+    psw.carry = (value & 010000) >> 15;
     psw.overflow = (psw.negative ^ psw.carry);
 	return 0;
 }
@@ -245,13 +245,13 @@ int op_aslb(uint16_t instruction){
 	log(LOG_INFO, "ASR function called\n");
 	uint16_t value;
 	value = operand_value_read_byte(dst);
-	value = value << 1;
+	value = (value & 0000001) | (value << 1);
 	log(LOG_INFO, "Value %d\n", value);
 	operand_value_write_byte(dst, value);
 
     psw.negative = (value < 0);
     psw.zero = (value == 0);
-    psw.carry = (dst >> 15);
+    psw.carry = (value & 010000) >> 15;;
     psw.overflow = (psw.negative ^ psw.carry);
 	return 0;
 }
