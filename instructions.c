@@ -258,10 +258,32 @@ int op_aslb(uint16_t instruction){
 
 
 int op_ror(uint16_t instruction){
+	uint8_t dst = instruction & 077;
+	log(LOG_INFO, "ROR function called\n");
+	uint16_t value;
+	value = operand_value_read_word(dst);
+	value = (value >> 1) | (psw.carry << 15);
+	operand_value_write_word(dst,value);
+
+	psw.carry = (value & 0000001);
+	psw.zero = (value == 0);
+	psw.negative = (value < 0);
+	psw.overflow = psw.negative ^ psw.carry;
 	return 0;
 }
 
 int op_rorb(uint16_t instruction){
+	uint8_t dst = instruction & 077;
+	log(LOG_INFO, "ROR function called\n");
+	uint16_t value;
+	value = operand_value_read_byte(dst);
+	value = (value >> 1) | (psw.carry << 15);
+	operand_value_write_byte(dst,value);
+
+	psw.carry = (value & 0000001);
+	psw.zero = (value == 0);
+	psw.negative = (value < 0);
+	psw.overflow = psw.negative ^ psw.carry;
 	return 0;
 }
 
