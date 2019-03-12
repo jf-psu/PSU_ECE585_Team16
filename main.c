@@ -56,7 +56,8 @@ uint16_t fetch_instruction(uint16_t memory_address)
 
     word = (uint16_t *)memory + memory_address / 2;
 
-    log(LOG_NORMAL, "2 %0.6o (instruction fetch)\n", memory_address);
+    log(LOG_INFO, "(instruction fetch) ", memory_address);
+    printf("2 %0.6o\n", memory_address);
     return *word;
 }
 
@@ -78,7 +79,8 @@ uint16_t data_read_word(uint16_t memory_address)
 
     word = (uint16_t *)memory + memory_address / 2;
 
-    printf("0 %0.6o (data read)\n", memory_address);
+    log(LOG_INFO, "data read (word) ");
+    printf("0 %0.6o\n", memory_address);
     return *word;
 }
 
@@ -88,7 +90,8 @@ uint8_t data_read_byte(uint16_t memory_address)
     uint8_t *byte;
     byte = (uint8_t *)memory + memory_address;
 
-    printf("0 %0.6o (data read)\n", memory_address);
+    log(LOG_INFO, "data read (byte) ");
+    printf("0 %0.6o\n", memory_address);
     return *byte;
 }
 
@@ -105,7 +108,8 @@ uint16_t data_write_word(uint16_t memory_address, uint16_t data)
 
     word = (uint16_t *)memory + memory_address / 2;
 
-    printf("1 %0.6o (data write)\n", memory_address);
+    log(LOG_INFO, "data write (word) ");
+    printf("1 %0.6o\n", memory_address);
     return *word = data;
 }
 
@@ -116,7 +120,8 @@ uint8_t data_write_byte(uint16_t memory_address, uint8_t data)
     uint8_t *byte;
     byte = (uint8_t *)memory + memory_address;
 
-    printf("1 %0.6o (data write)\n", memory_address);
+    log(LOG_INFO, "data write (byte) ");
+    printf("1 %0.6o\n", memory_address);
     return *byte = data;
 }
 
@@ -681,7 +686,7 @@ int decode_and_execute(uint16_t instruction)
 
     int (*decoder)(uint16_t) = NULL;    //function pointer to actual decoder
 
-    log(LOG_NORMAL, "checking for opcode in (octal): %0.6o \n", instruction);
+    log(LOG_INFO, "checking for opcode in (octal): %0.6o \n", instruction);
 
 
     
@@ -867,20 +872,17 @@ int run_simulation()
     {
         opcode = fetch_instruction(reg[7]);
         reg[7] += 2;  // move PC to next instruction
-        if (log_level == LOG_DEBUG)
+
+        result = decode_and_execute(opcode);
+
+        if (log_level >= LOG_INFO)
         {
-            print_memory();
             print_psw();
             print_regs();
-            result = decode_and_execute(opcode);
-            print_psw();
-            print_regs();
+        }
+
+        if (log_level >= LOG_DEBUG)
             print_memory();
-        }
-        else
-        {
-            result = decode_and_execute(opcode);
-        }
 
         if (result == E_INVALID_OP_CODE)
         {
@@ -890,7 +892,7 @@ int run_simulation()
 
         if (opcode == OP_HALT)
         {
-            log(LOG_NORMAL, "Ending simulation due to halt instruction");
+            log(LOG_INFO, "Ending simulation due to halt instruction");
             break;
         }
     }
@@ -930,8 +932,6 @@ int main(int argc, char *argv[])
     int result;
 
 
-    printf("PDP11 Instruction Set Simulator\n");
-
     log_level = LOG_NONE;//LOG_DEBUG; //LOG_INFO; //LOG_NONE;
 
 
@@ -948,6 +948,7 @@ int main(int argc, char *argv[])
             break;
 
         default:
+            printf("PDP11 Instruction Set Simulator\n");
             printf("Usage: %s file.ascii [starting adress] [debug level]\n", argv[0]);
             exit(-1);
             break;
@@ -1010,7 +1011,9 @@ int main(int argc, char *argv[])
 
     fclose(fp);
 
-    print_memory();
+    if (log_level >= LOG_DEBUG)
+        print_memory();
+
     log(LOG_INFO, "Processor start address %0.6o\n", proc_start_address);
 
     init_cpu(proc_start_address);

@@ -325,7 +325,7 @@ int op_swab(uint16_t instruction){
 	log(LOG_INFO, "SWAB function called\n");
 	uint16_t value;
 	value = operand_value_read_byte(dst);
-	value = (((value << 0177400) >> 8) | ((value & 0000377) << 8)) ;
+	value = (((value & 0177400) >> 8) | ((value & 0000377) << 8)) ;
 	operand_value_write_byte(dst,value);
 
 	psw.carry = 0;
