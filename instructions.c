@@ -34,7 +34,7 @@ int op_clrb(uint16_t instruction){
 
 int op_com(uint16_t instruction){
     uint8_t dst = instruction & 077;
-    log(LOG_INFO, "COM function called %d\n", dst);
+    log(LOG_INFO, "COM function called\n");
     uint16_t value;
     value = operand_value_read_word(dst);
     value = (~value);
@@ -51,7 +51,7 @@ int op_com(uint16_t instruction){
 
 int op_comb(uint16_t instruction){
 	uint8_t dst = instruction & 077;
-    log(LOG_INFO, "COM function called %d\n", dst);
+    log(LOG_INFO, "COM function called\n");
     uint16_t value;
     value = operand_value_read_byte(dst);
     value = (~value);
@@ -70,7 +70,7 @@ int op_comb(uint16_t instruction){
 
 int op_inc(uint16_t instruction){
     uint8_t dst = instruction & 077;
-	log(LOG_INFO, "INC function called\n", dst);
+	log(LOG_INFO, "INC function called\n");
 	int16_t value, val;
 	val = operand_value_read_word(dst);
 	value = (1 + value);
@@ -87,7 +87,7 @@ int op_inc(uint16_t instruction){
 
 int op_incb(uint16_t instruction){
     uint8_t dst = instruction & 077;
-	log(LOG_INFO, "INCB function called\n", dst);
+	log(LOG_INFO, "INCB function called\n");
 	int16_t value;
 	value = operand_value_read_byte(dst);
 	value = (1 + value);
@@ -106,9 +106,9 @@ int op_incb(uint16_t instruction){
 
 int op_dec(uint16_t instruction){
     uint8_t dst = instruction & 077;
-	log(LOG_INFO, "DEC function called %d\n", dst);
+	log(LOG_INFO, "DEC function called\n");
     int16_t value, val;
-    value = operand_value_read_word(dst) 
+    value = operand_value_read_word(dst);
     val = value - 1;
 	operand_value_write_word(dst,val);
 
@@ -125,7 +125,7 @@ int op_dec(uint16_t instruction){
 
 int op_decb(uint16_t instruction){
     uint8_t dst = instruction & 077;
-	log(LOG_INFO, "DECB function called %d\n", dst);
+	log(LOG_INFO, "DECB function called\n");
     int16_t value;
     value = operand_value_read_byte(dst) -1;
 	operand_value_write_byte(dst, value);
