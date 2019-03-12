@@ -36,8 +36,8 @@ int op_com(uint16_t instruction){
     uint8_t dst = instruction & 077;
     log(LOG_INFO, "COM function called\n");
     uint16_t old_value;
-    value = operand_value_read_word(dst);
-    value = (~value);
+    old_value = operand_value_read_word(dst);
+    old_value = (~old_value);
     operand_value_write_word(dst, value);
 
     //if msb of result is set 
@@ -321,7 +321,7 @@ int op_swab(uint16_t instruction){
 	log(LOG_INFO, "SWAB function called\n");
 	uint16_t value;
 	value = operand_value_read_byte(dst);
-	value = (((value << 0177400) >> 8) | ((value & 0000377) << 8)) ;
+	value = (((value & 0177400) >> 8) | ((value & 0000377) << 8)) ;
 	operand_value_write_byte(dst,value);
 
 	psw.carry = 0;
