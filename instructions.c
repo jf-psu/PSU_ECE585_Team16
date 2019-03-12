@@ -38,12 +38,12 @@ int op_com(uint16_t instruction){
     uint16_t old_value;
     old_value = operand_value_read_word(dst);
     old_value = (~old_value);
-    operand_value_write_word(dst, value);
+    operand_value_write_word(dst, old_value);
 
     //if msb of result is set 
-    psw.negative = ((value >> 15) == 1);
+    psw.negative = ((old_value >> 15) == 1);
     //set if result is 0
-    psw.zero = (value == 0);
+    psw.zero = (old_value == 0);
     psw.overflow = 0;
     psw.carry = 1;
 	return 0;
