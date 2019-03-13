@@ -97,7 +97,7 @@ int op_inc(uint16_t instruction){
 int op_incb(uint16_t instruction){
     uint8_t dst = instruction & 077;
 	log(LOG_INFO, "INCB function called\n");
-	int16_t old_value, value;
+	int8_t old_value, value;
 	old_value = operand_value_read_byte(dst);
 	value = (1 + old_value);
 	operand_value_write_byte(dst,value);
@@ -133,7 +133,7 @@ int op_dec(uint16_t instruction){
 int op_decb(uint16_t instruction){
     uint8_t dst = instruction & 077;
 	log(LOG_INFO, "DECB function called\n");
-    int16_t old_value, value;
+    int8_t old_value, value;
     old_value = operand_value_read_byte(dst);
 	value = old_value - 1;
 	operand_value_write_byte(dst, value);
@@ -142,7 +142,7 @@ int op_decb(uint16_t instruction){
     psw.negative = (value < 0);
     //set if result is 0
     psw.zero = (value == 0);
-    psw.overflow = (old_value == 0100000);
+    psw.overflow = (old_value == 0100000); //not sure about this
 	return 0;
 }
 
@@ -150,7 +150,7 @@ int op_decb(uint16_t instruction){
 int op_neg(uint16_t instruction){
     uint8_t dst = instruction & 077;
 	log(LOG_INFO, "NEG function called\n");
-	uint16_t old_value, value, i;
+	int16_t old_value, value, i;
 	old_value = operand_value_read_word(dst);
 	i = (~old_value);
 	value = i + 1;
@@ -171,7 +171,7 @@ int op_neg(uint16_t instruction){
 int op_negb(uint16_t instruction){
     uint8_t dst = instruction & 077;
 	log(LOG_INFO, "NEGB function called\n");
-	uint8_t old_value, value, i;
+	int8_t old_value, value, i;
 	old_value = operand_value_read_byte(dst);
 	i = (~old_value);
 	value = i + 1;
@@ -181,7 +181,7 @@ int op_negb(uint16_t instruction){
     psw.negative = (value < 0);
     //set if result is 0
     psw.zero = (value == 0);
-    psw.overflow = (old_value == 0100000);  // max 8 bit + 1
+    psw.overflow = (old_value == 0100000);  // max 8 bit + 1, not sure about this
     psw.carry = (value != 0);
 
 	return 0;
@@ -199,7 +199,7 @@ int op_asr(uint16_t instruction){
 	operand_value_write_word(dst, value);
 
 	//set if high order bit of the result is set(result < 0)
-	psw.negative = (value < 0);
+	psw.negative = ((value >> 15) == 1);
 	//set if result = 0
 	psw.zero = (value == 0);
 	//loaded from the exclusive OR of the N-bit and C-bit
@@ -213,18 +213,18 @@ int op_asr(uint16_t instruction){
 int op_asrb(uint16_t instruction){
 	uint8_t dst = instruction & 077;
 	log(LOG_INFO, "ASRB function called\n");
-	uint16_t old_value, value;
+	uint8_t old_value, value;
 	old_value = operand_value_read_byte(dst);
-	value = (old_value & 0100000) | (old_value >> 1);
+	value = (old_value & 0100000) | (old_value >> 1); //value = (old_value & 0200) | (old_value >> 1);
 	log(LOG_INFO, "Value %d\n", value);
 	operand_value_write_byte(dst, value);
 
 	//set if high order bit of the result is set(result < 0)
-	psw.negative = (value < 0);
+	psw.negative = ((value >> 7) == 1);
 	//set if result = 0
 	psw.zero = (value == 0);
 	//loaded from the exclusive OR of the N-bit and C-bit
-	psw.carry = (old_value & 0000001);
+	psw.carry = (old_value & 0001);
 	//loaded from the low order bit of the destination
     psw.overflow = (psw.negative ^ psw.carry);
 	return 0;
@@ -236,11 +236,11 @@ int op_asl(uint16_t instruction){
 	log(LOG_INFO, "ASL function called\n");
 	uint16_t old_value, value;
 	old_value = operand_value_read_word(dst);
-	value = (old_value & 0000001) | (old_value << 1);
+	value = (0177776) & (old_value << 1);
 	log(LOG_INFO, "Value %d\n", value);
 	operand_value_write_word(dst, value);
 
-    psw.negative = (value < 0);
+    psw.negative = ((value >> 15) == 1);
     psw.zero = (value == 0);
     psw.carry = ((old_value & 0100000) >> 15);
     psw.overflow = (psw.negative ^ psw.carry);
@@ -250,15 +250,15 @@ int op_asl(uint16_t instruction){
 int op_aslb(uint16_t instruction){
 	uint8_t dst = instruction & 077;
 	log(LOG_INFO, "ASLB function called\n");
-	uint16_t old_value, value;
+	uint8_t old_value, value;
 	old_value = operand_value_read_byte(dst);
-	value = ((old_value & 0000001) | (old_value << 1));
+	value = ((0374) & (old_value << 1));
 	log(LOG_INFO, "Value %d\n", value);
 	operand_value_write_byte(dst, value);
 
-    psw.negative = (value < 0);
+    psw.negative = ((value >> 7) == 1);
     psw.zero = (value == 0);
-    psw.carry = ((old_value & 0100000) >> 15);
+    psw.carry = ((old_value & 0200) >> 7);
     psw.overflow = (psw.negative ^ psw.carry);
 	return 0;
 }
@@ -274,7 +274,7 @@ int op_ror(uint16_t instruction){
 
 	psw.carry = (old_value & 0000001);
 	psw.zero = (value == 0);
-	psw.negative = (value < 0);
+	psw.negative = ((value >> 15) == 1);
 	psw.overflow = (psw.negative ^ psw.carry);
 	return 0;
 }
@@ -282,14 +282,14 @@ int op_ror(uint16_t instruction){
 int op_rorb(uint16_t instruction){
 	uint8_t dst = instruction & 077;
 	log(LOG_INFO, "RORB function called\n");
-	uint16_t old_value, value;
+	uint8_t old_value, value;
 	old_value = operand_value_read_byte(dst);
-	value = ((old_value >> 1) | (psw.carry << 15));
+	value = ((old_value >> 1) | (psw.carry << 7));
 	operand_value_write_byte(dst,value);
 
-	psw.carry = (old_value & 0000001);
+	psw.carry = (old_value & 0001);
 	psw.zero = (value == 0);
-	psw.negative = (value < 0);
+	psw.negative = ((value >> 7) == 1);
 	psw.overflow = (psw.negative ^ psw.carry);
 	return 0;
 }
@@ -305,7 +305,7 @@ int op_rol(uint16_t instruction){
 
 	psw.carry = ((old_value & 0100000) >> 15);
 	psw.zero = (value == 0);
-	psw.negative = (value < 0);
+	psw.negative = ((value >> 15) == 1);
 	psw.overflow = (psw.negative ^ psw.carry);
 	return 0;
 }
@@ -313,14 +313,14 @@ int op_rol(uint16_t instruction){
 int op_rolb(uint16_t instruction){
 	uint8_t dst = instruction & 077;
 	log(LOG_INFO, "ROLB function called\n");
-	uint16_t old_value, value;
+	uint8_t old_value, value;
 	old_value = operand_value_read_byte(dst);
 	value = (old_value << 1) | (psw.carry);
 	operand_value_write_byte(dst,value);
 
-	psw.carry = ((old_value & 0100000) >> 15);
+	psw.carry = ((old_value & 0200) >> 7);
 	psw.zero = (value == 0);
-	psw.negative = (value < 0);
+	psw.negative = ((value >> 7) == 1);
 	psw.overflow = (psw.negative ^ psw.carry);
 	return 0;
 }
@@ -336,7 +336,7 @@ int op_swab(uint16_t instruction){
 
 	psw.carry = 0;
 	psw.zero = ((value & 0000377) == 0);
-	psw.negative = ((value & 0000100) >> 7);
+	psw.negative = ((value & 0000200) >> 7);
 	psw.overflow = 0;
 	return 0;
 }
@@ -346,7 +346,7 @@ int op_swab(uint16_t instruction){
 int op_adc(uint16_t instruction){
     uint8_t dst = instruction & 077;
 	log(LOG_INFO, "ADC function called\n");
-	uint16_t old_value, value;
+	int16_t old_value, value;
 	old_value = operand_value_read_word(dst);
 	value = old_value + psw.carry;
 	log(LOG_INFO, "Value %d\n", value);
@@ -362,7 +362,7 @@ int op_adc(uint16_t instruction){
 int op_adcb(uint16_t instruction){
 	uint8_t dst = instruction & 077;
 	log(LOG_INFO, "ADCB function called\n");
-	uint16_t old_value, value;
+	int8_t old_value, value;
 	old_value = operand_value_read_byte(dst);
 	value = old_value + psw.carry;
 	log(LOG_INFO, "Value %d\n", value);
@@ -370,8 +370,8 @@ int op_adcb(uint16_t instruction){
 
     psw.negative = (value < 0);
     psw.zero = (value == 0);
-    psw.carry = ((old_value == 0177777) && (psw.carry));
-    psw.overflow = ((old_value == 0077777) && (psw.carry));
+    psw.carry = ((old_value == 0377) && (psw.carry));
+    psw.overflow = ((old_value == 0177) && (psw.carry));
 	return 0;
 }
 
@@ -422,7 +422,7 @@ int op_mov(uint16_t instruction)
     log(LOG_INFO, "MOV function called\n");
 
     value = operand_value_read_word(src);
-	operand_value_write_word(dst, (uint16_t)value);
+	operand_value_write_word(dst_reg, (uint16_t)value);
     
 /*
     N: set if (src) <0; cleared otherwise
@@ -548,10 +548,10 @@ int op_cmpb(uint16_t instruction)
 
 int op_add(uint16_t instruction)
 {
-    uint8_t src = (instruction >> 6) & 077; // bits 6-11
+    uint8_t src = (instruction >> 6) & 077; // bits 6-8
     uint8_t dst = instruction & 077; // bits 0-5
     uint8_t dst_reg = instruction & 07; // bits 0-2
-    uint8_t dst_mode = (instruction >> 3)& 07; // bits 9-11
+    uint8_t dst_mode = (instruction >> 3)& 07; // bits 0-2
     int32_t value;
     uint16_t src_value;
     log(LOG_INFO, "ADD function called\n");
@@ -582,8 +582,8 @@ int op_add(uint16_t instruction)
 
 int op_sub(uint16_t instruction)
 {
-    uint8_t src = (instruction >> 6) & 077; // bits 6-11
-    uint8_t dst = instruction & 077; // bits 0-5
+    uint8_t src = (instruction >> 6) & 077; // bits 6-8
+    uint8_t dst = instruction & 077; // bits 0-2
     uint8_t dst_reg = instruction & 07;
     int32_t value;
     uint16_t src_value;
@@ -593,7 +593,7 @@ int op_sub(uint16_t instruction)
     int16_t dst_val = operand_value_read_word(dst);
     value = dst_val - src_val;
 
-    operand_value_write_word(dst, (uint16_t)value);
+    operand_value_write_word(dst_reg, (uint16_t)value);
     
 	/*
 	N: set if result <0; cleared otherwise
@@ -634,7 +634,7 @@ int op_bit(uint16_t instruction)
     
     value = src_val & dst_val;
 	log(LOG_INFO,"result is %o\n", value);
-	operand_value_write_word(dst, value);
+	operand_value_write_word(dst_reg, value);
 	/*  N: set if high-order bit of result set: cleared otherwise
 		Z: set if result = 0; cleared otherwise
 		V: cleared
@@ -665,7 +665,7 @@ int op_bitb(uint16_t instruction)
     value = src_val & dst_val;
     
 	log(LOG_INFO,"result is %o\n", value);
-	operand_value_write_byte(dst, value);
+	operand_value_write_byte(dst_reg, value);
 	/*
 	N: set if high-order bit of result set: cleared otherwise
 	Z: set if result = 0; cleared otherwise
@@ -696,7 +696,7 @@ int op_bic(uint16_t instruction)
     
     value = ~(src_val) & dst_val;
 	log(LOG_INFO,"result is %o\n", value);
-    operand_value_write_word(dst, value);
+    operand_value_write_word(dst_reg, value);
 	/*
 	N: set if high order bit of result set; cleared otherwise
 	Z: set if result = 0; cleared otherwise
@@ -727,7 +727,7 @@ int op_bicb(uint16_t instruction)
     
     value = ~(src_val) & dst_val;
 	log(LOG_INFO,"result is %o\n", value);
-    operand_value_write_byte(dst, value);
+    operand_value_write_byte(dst_reg, value);
 	/*
 	N: set if high order bit of result set; cleared otherwise
 	Z: set if result = 0; cleared otherwise
@@ -758,7 +758,7 @@ int op_bis(uint16_t instruction)
     
     value = src_val | dst_val;
 	log(LOG_INFO,"result is %o\n", value);
-    operand_value_write_word(dst, value);
+    operand_value_write_word(dst_reg, value);
 	/*
 	N: set if high-order bit of result set. cleared otherwise
 	Z: set if result = 0: cleared otherwise
@@ -789,7 +789,7 @@ int op_bisb(uint16_t instruction)
     
     value = src_val | dst_val;
 	log(LOG_INFO,"result is %o\n", value);
-    operand_value_write_byte(dst, value);
+    operand_value_write_byte(dst_reg, value);
 	/*
 	N: set if high-order bit of result set. cleared otherwise
 	Z: set if result = 0: cleared otherwise
