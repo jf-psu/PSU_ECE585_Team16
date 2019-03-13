@@ -159,17 +159,23 @@ uint16_t operand_value_write_word(uint8_t dst_field, uint16_t value)
             break;
             
         case 3: // GEN_MODE_AUTO_INCREMENT_DEFERRED / PC_MODE_ABSOLUTE
-            /*  The contents of the location following the instruction are taken as the
+            /*  For PC mode absoute, The contents of the location following the instruction are taken as the
                 address of the operand. Immediate data is interpreted as an absolute address
-                (i.e., an address that remains constant no matter where in memory the assembled instruction is executed). */
+                (i.e., an address that remains constant no matter where in memory the assembled instruction is executed).*/
 
             /* Register is first used as a pointer to a word containing the address of the operand, then incremented (always by 2; even for byte instructions). */
             /* The contents of register used as the address of the address of the operand. Operation is performed,  Contents of register incremented by 2. */
             addr_word = data_read_word(reg[dst]);
             reg[dst] += 2;
-            ptr = data_read_word(addr_word);
-            data_write_word(ptr, value);
-            //data_write_word(addr_word, value);
+
+            if (dst == 7) {
+                data_write_word(addr_word, value);
+            }
+            else {
+                ptr = data_read_word(addr_word);
+                data_write_word(ptr, value);
+            }
+
             break;
 
         case 4:// GEN_MODE_AUTO_DECREMENT:
@@ -255,8 +261,14 @@ uint16_t operand_value_read_word(uint8_t src_field)
             /* The contents of register used as the address of the address of the operand. Operation is performed,  Contents of register incremented by 2. */
             addr_word = data_read_word(reg[src]);
             reg[src] += 2;
-            ptr = data_read_word(addr_word);
-            value = data_read_word(ptr);
+
+            if (src == 7) {
+                data_read_word(addr_word);
+            }
+            else {
+                ptr = data_read_word(addr_word);
+                value = data_read_word(ptr);
+            }
             break;
 
         case 4:// GEN_MODE_AUTO_DECREMENT:
@@ -346,9 +358,14 @@ uint8_t operand_value_write_byte(uint8_t dst_field, uint8_t value)
             /* The contents of register used as the address of the address of the operand. Operation is performed,  Contents of register incremented by 2. */
             addr_word = data_read_word(reg[dst]);
             reg[dst] += 2;
-            ptr = data_read_word(addr_word);
-            data_write_byte(ptr, value);
-            //data_write_word(addr_word, value);
+
+            if (dst == 7) {
+                data_write_byte(addr_word, value);
+            }
+            else {
+                ptr = data_read_word(addr_word);
+                data_write_byte(ptr, value);
+            }
             break;
 
         case 4:// GEN_MODE_AUTO_DECREMENT:
@@ -445,8 +462,14 @@ uint8_t operand_value_read_byte(uint8_t src_field)
             /* The contents of register used as the address of the address of the operand. Operation is performed,  Contents of register incremented by 2. */
             addr_word = data_read_word(reg[src]);
             reg[src] += 2;
-            ptr = data_read_word(addr_word);
-            value = data_read_byte(ptr);
+
+            if (src == 7) {
+                value = data_read_byte(addr_word);
+            }
+            else {
+                ptr = data_read_word(addr_word);
+                value = data_read_byte(ptr);
+            }
             break;
 
         case 4:// GEN_MODE_AUTO_DECREMENT:
