@@ -97,7 +97,7 @@ int op_incb(uint16_t instruction){
 	//set if result is 0
    	psw.zero = (value == 0);
 	//set if dst held 077777 cleared otherwise
-    psw.overflow = (old_value == 0077777);
+    psw.overflow = (old_value == 0377); 
 	return 0;
 }
 
