@@ -1,20 +1,24 @@
        1                                ;Test for CLRB(Ming)
        2 000000 007070                  A: .WORD 007070
        3 000002 005400                  B: .WORD 005400
-       4                                
-       5 000004 016702  177770          START: MOV A, R2 ;R2 = 007070
-       6 000010 105002                         CLRB R2 ;R2 = 007000
-       7 000012 105012                  	   CLRB (R2) ;content(lowest byte) of address 007000 = XXX000(X is don't care)
-       8 000014 105022                  	   CLRB (R2)+ ;content(lowest byte) of address 007000 = 0, then R2 = 007001
-       9 000016 105032                  	   CLRB @(R2)+ ;content(lowest byte) of address which is the content of address 007001 = XXX000, then R2 = 007002
-      10 000020 105042                  	   CLRB -(R2) ;R2 = 007001, then clear the content(lowest byte) of address 007001
-      11 000022 105052                  	   CLRB @-(R2) ;R2 = 007000, then clear the content(lowest byte) of address which is the content of address 007000
-      12 000024 105067  000000'         	   CLRB 8(R2) ;clear the content(lowest byte) of address 007000
-      13 000030 105077  000000'         	   CLRB @8(R2) ;clear the content(lowest byte) of address which is the content of address 007000
-      14                                	   
-      15 000034 105037  000100          	   CLRB @#100 ;clear the content(lowest byte) of address 100
-      16 000040 105067  177734          	   CLRB A ;Relative: A = 007000(not sure about this)
-      17 000044 005077  177732          	   CLR @B ;Relative deferred: clear the content(lowest byte) of address 005400(not sure about this)
-      18 000050 000000                  	   HALT
-      19                                
-      19                                .END START
+       4 000004 002001                  C: .WORD 002001
+       5                                
+       6 000006 016702  177766          START: MOV A, R2 ;R2 = 007070
+       7 000012 105002                         CLRB R2 ;R2 = 007000
+       8 000014 105012                  	   CLRB (R2) ;content(lowest byte) of address 007000 = XXX000(X is don't care)
+       9 000016 105022                  	   CLRB (R2)+ ;content(lowest byte) of address 007000 = 0, then R2 = 007001
+      10 000020 016703  177754          	   MOV A, R3;
+      11 000024 105033                  	   CLRB @(R3)+ 
+      12 000026 016704  177752          	   MOV C, R4;
+      13 000032 105044                  	   CLRB -(R4) 
+      14 000034 016705  177744          	   MOV C, R5;
+      15 000040 105055                  	   CLRB @-(R5) 
+      16 000042 105067  000000'         	   CLRB 8(R2) ;clear the content(lowest byte) of address 007000
+      17 000046 105077  000000'         	   CLRB @8(R2) ;clear the content(lowest byte) of address which is the content of address 007000
+      18                                	   
+      19 000052 105037  000100          	   CLRB @#100 ;clear the content(lowest byte) of address 100
+      20 000056 105067  177716          	   CLRB A ;Relative: A = 007000(not sure about this)
+      21 000062 005077  177714          	   CLR @B ;Relative deferred: clear the content(lowest byte) of address 005400(not sure about this)
+      22 000066 000000                  	   HALT
+      23                                
+      23                                .END START

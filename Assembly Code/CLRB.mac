@@ -1,14 +1,18 @@
 ;Test for CLRB(Ming)
 A: .WORD 007070
 B: .WORD 005400
+C: .WORD 002001
 
 START: MOV A, R2 ;R2 = 007070
        CLRB R2 ;R2 = 007000
 	   CLRB (R2) ;content(lowest byte) of address 007000 = XXX000(X is don't care)
 	   CLRB (R2)+ ;content(lowest byte) of address 007000 = 0, then R2 = 007001
-	   CLRB @(R2)+ ;content(lowest byte) of address which is the content of address 007001 = XXX000, then R2 = 007002
-	   CLRB -(R2) ;R2 = 007001, then clear the content(lowest byte) of address 007001
-	   CLRB @-(R2) ;R2 = 007000, then clear the content(lowest byte) of address which is the content of address 007000
+	   MOV A, R3;
+	   CLRB @(R3)+ 
+	   MOV C, R4;
+	   CLRB -(R4) 
+	   MOV C, R5;
+	   CLRB @-(R5) 
 	   CLRB 8(R2) ;clear the content(lowest byte) of address 007000
 	   CLRB @8(R2) ;clear the content(lowest byte) of address which is the content of address 007000
 	   
