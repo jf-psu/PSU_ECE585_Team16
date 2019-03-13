@@ -14,9 +14,10 @@ START: MOV A, R2 ;R2 = 007070
 	   CLRB -(R4) 
 	   MOV D, R5;
 	   CLRB @-(R5) 
-	   CLRB 6(R2) ;clear the content(lowest byte) of address 007000
-	   CLRB @6(R2) ;clear the content(lowest byte) of address which is the content of address 007000
 	   
+	   MOV A, R2 ;R2 = 007070
+	   CLRB 6(R2) 
+	   CLRB @6(R2) 
 	   CLRB @#100 ;clear the content(lowest byte) of address 100
 	   CLRB A ;Relative: A = 007000(not sure about this)
 	   CLRB @B ;Relative deferred: clear the content(lowest byte) of address 005400(not sure about this)
