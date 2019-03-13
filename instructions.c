@@ -560,7 +560,7 @@ int op_add(uint16_t instruction)
     int16_t dst_val = operand_value_read_word(dst);
     value = src_val + dst_val;
 	
-	operand_value_write_word(src, (uint16_t)value);
+	operand_value_write_word(dst, (uint16_t)value);
 	/*
 	N: set if result <0; cleared otherwise
 	Z: set if result = 0; cleared otherwise
