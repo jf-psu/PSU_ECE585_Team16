@@ -422,7 +422,7 @@ int op_mov(uint16_t instruction)
     log(LOG_INFO, "MOV function called\n");
 
     value = operand_value_read_word(src);
-	operand_value_write_word(dst_reg, (uint16_t)value);
+	operand_value_write_word(dst, (uint16_t)value);
     
 /*
     N: set if (src) <0; cleared otherwise
@@ -548,10 +548,10 @@ int op_cmpb(uint16_t instruction)
 
 int op_add(uint16_t instruction)
 {
-    uint8_t src = (instruction >> 6) & 077; // bits 6-8
+    uint8_t src = (instruction >> 6) & 077; // bits 6-11
     uint8_t dst = instruction & 077; // bits 0-5
     uint8_t dst_reg = instruction & 07; // bits 0-2
-    uint8_t dst_mode = (instruction >> 3)& 07; // bits 0-2
+    uint8_t dst_mode = (instruction >> 3)& 07; // bits 9-11
     int32_t value;
     uint16_t src_value;
     log(LOG_INFO, "ADD function called\n");
@@ -582,8 +582,8 @@ int op_add(uint16_t instruction)
 
 int op_sub(uint16_t instruction)
 {
-    uint8_t src = (instruction >> 6) & 077; // bits 6-8
-    uint8_t dst = instruction & 077; // bits 0-2
+    uint8_t src = (instruction >> 6) & 077; // bits 6-11
+    uint8_t dst = instruction & 077; // bits 0-5
     uint8_t dst_reg = instruction & 07;
     int32_t value;
     uint16_t src_value;
@@ -593,7 +593,7 @@ int op_sub(uint16_t instruction)
     int16_t dst_val = operand_value_read_word(dst);
     value = dst_val - src_val;
 
-    operand_value_write_word(dst_reg, (uint16_t)value);
+    operand_value_write_word(dst, (uint16_t)value);
     
 	/*
 	N: set if result <0; cleared otherwise
@@ -634,7 +634,7 @@ int op_bit(uint16_t instruction)
     
     value = src_val & dst_val;
 	log(LOG_INFO,"result is %o\n", value);
-	operand_value_write_word(dst_reg, value);
+	operand_value_write_word(dst, value);
 	/*  N: set if high-order bit of result set: cleared otherwise
 		Z: set if result = 0; cleared otherwise
 		V: cleared
@@ -665,7 +665,7 @@ int op_bitb(uint16_t instruction)
     value = src_val & dst_val;
     
 	log(LOG_INFO,"result is %o\n", value);
-	operand_value_write_byte(dst_reg, value);
+	operand_value_write_byte(dst, value);
 	/*
 	N: set if high-order bit of result set: cleared otherwise
 	Z: set if result = 0; cleared otherwise
@@ -696,7 +696,7 @@ int op_bic(uint16_t instruction)
     
     value = ~(src_val) & dst_val;
 	log(LOG_INFO,"result is %o\n", value);
-    operand_value_write_word(dst_reg, value);
+    operand_value_write_word(dst, value);
 	/*
 	N: set if high order bit of result set; cleared otherwise
 	Z: set if result = 0; cleared otherwise
@@ -727,7 +727,7 @@ int op_bicb(uint16_t instruction)
     
     value = ~(src_val) & dst_val;
 	log(LOG_INFO,"result is %o\n", value);
-    operand_value_write_byte(dst_reg, value);
+    operand_value_write_byte(dst, value);
 	/*
 	N: set if high order bit of result set; cleared otherwise
 	Z: set if result = 0; cleared otherwise
@@ -758,7 +758,7 @@ int op_bis(uint16_t instruction)
     
     value = src_val | dst_val;
 	log(LOG_INFO,"result is %o\n", value);
-    operand_value_write_word(dst_reg, value);
+    operand_value_write_word(dst, value);
 	/*
 	N: set if high-order bit of result set. cleared otherwise
 	Z: set if result = 0: cleared otherwise
@@ -789,7 +789,7 @@ int op_bisb(uint16_t instruction)
     
     value = src_val | dst_val;
 	log(LOG_INFO,"result is %o\n", value);
-    operand_value_write_byte(dst_reg, value);
+    operand_value_write_byte(dst, value);
 	/*
 	N: set if high-order bit of result set. cleared otherwise
 	Z: set if result = 0: cleared otherwise
