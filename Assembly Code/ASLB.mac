@@ -1,17 +1,22 @@
 ;Test for ASLB(Ming), arithmetic shift left.
 A: .WORD 000070
 B: .WORD 000400
+C: .WORD 002001
+D: .WORD 003002
 
 START: MOV A, R1 ;R1 = 000070
        ASLB R1 ;R1 = 000160
        MOV A, R1
        ASLB (R1)
        ASLB (R1)+ ;R1 = 000071
-       ASLB @(R1)+ ;R1 = 000072
-       ASLB -(R1) ;R1 = 000071
-       ASLB @-(R1) ; R1 = 000070
-       ASLB 8(R1)
-       ASLB @8(R1)
+	   MOV A, R3;
+       ASLB @(R3)+ ;R1 = 000072
+	   MOV C, R4;
+       ASLB -(R4) ;R4 = 002000
+       ASLB @-(R4) ; R4 = 001776
+	   MOV A, R1
+       ASLB 6(R1)
+       ASLB @6(R1)
        
        ASLB #000050 ;000120(not sure)
        ASLB @#100

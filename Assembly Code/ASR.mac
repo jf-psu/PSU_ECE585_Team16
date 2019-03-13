@@ -10,8 +10,8 @@ START: MOV A, R1 ;R1 = 000070
        ASR @(R1)+ ;R1 = 000074
        ASR -(R1) ;R1 = 000072
        ASR @-(R1) ; R1 = 000070
-       ASR 8(R1)
-       ASR @8(R1)
+       ASR 6(R1)
+       ASR @6(R1)
        
        ASR #000050 ;000024(not sure)
        ASR @#100

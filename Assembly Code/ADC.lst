@@ -1,22 +1,26 @@
        1                                ;Test for ADC(Ming), add the content of the C-bit into the destination.
        2 000000 000070                  A: .WORD 000070
        3 000002 000400                  B: .WORD 000400
-       4                                
-       5 000004 016701  177770          START: MOV A, R1 ;R1 = 000070
-       6 000010 005501                         ADC R1 ;R1 = 000070 assume previous C-bit is 0
-       7 000012 016701  177762                 MOV A, R1
-       8 000016 005511                         ADC (R1)
-       9 000020 005521                         ADC (R1)+ ;R1 = 000072
-      10 000022 005531                         ADC @(R1)+ ;R1 = 000074
-      11 000024 005541                         ADC -(R1) ;R1 = 000072
-      12 000026 005551                         ADC @-(R1) ; R1 = 000070
-      13 000030 005567  000000'                ADC 8(R1)
-      14 000034 005577  000000'                ADC @8(R1)
-      15                                       
-      16 000040 005527  000050                 ADC #000050 ;000050(not sure) assume previous C-bit is 0
-      17 000044 005537  000100                 ADC @#100
-      18 000050 005567  177724                 ADC A ;Relative: A = 000070(not sure) assume previous C-bit is 0
-      19 000054 005577  177722                 ADC @B ;Relative deferred: add C-bit to the content of address 000400
-      20 000060 000000                  	   HALT
-      21                                
-      21                                .END START
+       4 000004 002002                  C: .WORD 002002
+       5 000006 003002                  D: .WORD 003002
+       6                                
+       7 000010 016701  177764          START: MOV A, R1 ;R1 = 000070
+       8 000014 005501                         ADC R1 ;R1 = 000070 assume previous C-bit is 0
+       9 000016 016701  177756                 MOV A, R1
+      10 000022 005511                         ADC (R1)
+      11 000024 005521                         ADC (R1)+ ;R1 = 000072
+      12 000026 005531                         ADC @(R1)+ ;R1 = 000074
+      13 000030 016704  177750          	   MOV C, R4;
+      14 000034 005544                         ADC -(R4) ;R4 = 002000
+      15 000036 016705  177744          	   MOV D, R5;
+      16 000042 005555                         ADC @-(R5) ;R5 = 003000
+      17 000044 005561  000006                 ADC 6(R1)
+      18 000050 005571  000006                 ADC @6(R1)
+      19                                       
+      20 000054 005527  000050                 ADC #000050 ;000050(not sure) assume previous C-bit is 0
+      21 000060 005537  000100                 ADC @#100
+      22 000064 005567  177710                 ADC A ;Relative: A = 000070(not sure) assume previous C-bit is 0
+      23 000070 005577  177706                 ADC @B ;Relative deferred: add C-bit to the content of address 000400
+      24 000074 000000                  	   HALT
+      25                                
+      25                                .END START

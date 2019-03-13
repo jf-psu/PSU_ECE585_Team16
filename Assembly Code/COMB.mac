@@ -1,17 +1,21 @@
 ;Test for COMB(Ming)
 A: .WORD 000070
 B: .WORD 000400
+C: .WORD 002001
+D: .WORD 003002
 
 START: MOV A, R1 ;R1 = 000070
        COMB R1 ;R1 = 000307
        MOV A, R1 ;R1 = 000070
        COMB (R1) ;content of address(lowest byte(7:0)) 000070 becomes its complement
        COMB (R1)+ ;content of address(lowest byte(7:0)) 000070 becomes its complement, then R1 = 000071
+	   MOV A, R1
        COMB @(R1)+ ;content of address which is the content of address 000071 becomes its complement, then R1 = 000072
-       COMB -(R1) ;R1 = 000071, then the content of address 000071 becomes its complement
-       COMB @-(R1) ;R1 = 000070, then the content of address(lowest byte(7:0)) which it the content of address 000070 becomes its complement
-       COMB 8(R1) ;content of address(lowest byte(7:0)) 000078 becomes its complement
-       COMB @8(R1) ;content of address(lowest byte(7:0)) which is the content of address 000078 becomes its complement
+	   MOV C, R1
+       COMB -(R1) ;R1 = 002000, then the content of address 000071 becomes its complement
+       COMB @-(R1) ;R1 = 001776, then the content of address(lowest byte(7:0)) which it the content of address 000070 becomes its complement
+       COMB 6(R1) ;content of address(lowest byte(7:0)) 000078 becomes its complement
+       COMB @6(R1) ;content of address(lowest byte(7:0)) which is the content of address 000078 becomes its complement
 
        COMB #000050 ; 000327
        COMB @#100 ;content of address(lowest byte(7:0)) 100 becomes its complement

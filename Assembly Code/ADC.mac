@@ -1,6 +1,8 @@
 ;Test for ADC(Ming), add the content of the C-bit into the destination.
 A: .WORD 000070
 B: .WORD 000400
+C: .WORD 002002
+D: .WORD 003002
 
 START: MOV A, R1 ;R1 = 000070
        ADC R1 ;R1 = 000070 assume previous C-bit is 0
@@ -8,10 +10,12 @@ START: MOV A, R1 ;R1 = 000070
        ADC (R1)
        ADC (R1)+ ;R1 = 000072
        ADC @(R1)+ ;R1 = 000074
-       ADC -(R1) ;R1 = 000072
-       ADC @-(R1) ; R1 = 000070
-       ADC 8(R1)
-       ADC @8(R1)
+	   MOV C, R4;
+       ADC -(R4) ;R4 = 002000
+	   MOV D, R5;
+       ADC @-(R5) ;R5 = 003000
+       ADC 6(R1)
+       ADC @6(R1)
        
        ADC #000050 ;000050(not sure) assume previous C-bit is 0
        ADC @#100

@@ -1,22 +1,26 @@
        1                                ;Test for SWAB(Ming), exchanges high-order byte and low-order byte of the destination word.
        2 000000 000070                  A: .WORD 000070
        3 000002 000400                  B: .WORD 000400
-       4                                
-       5 000004 016701  177770          START: MOV A, R1 ;R1 = 000070
-       6 000010 000301                         SWAB R1 ;R1 = 034000
-       7 000012 016701  177762                 MOV A, R1
-       8 000016 000311                         SWAB (R1)
-       9 000020 000321                         SWAB (R1)+ ;R1 = 000072
-      10 000022 000331                         SWAB @(R1)+ ;R1 = 000074
-      11 000024 000341                         SWAB -(R1) ;R1 = 000072
-      12 000026 000351                         SWAB @-(R1) ; R1 = 000070
-      13 000030 000367  000000'                SWAB 8(R1)
-      14 000034 000377  000000'                SWAB @8(R1)
-      15                                       
-      16 000040 000327  000050                 SWAB #000050 ;024000(not sure)
-      17 000044 000337  000100                 SWAB @#100
-      18 000050 000367  177724                 SWAB A ;Relative: A = 034000(not sure)
-      19 000054 000377  177722                 SWAB @B ;Relative deferred: exchange high-order content of address 000400 and low-order content of address 000400
-      20 000060 000000                  	   HALT
-      21                                
-      21                                .END START
+       4 000004 002001                  C: .WORD 002001
+       5 000006 003002                  D: .WORD 003002
+       6                                
+       7 000010 016701  177764          START: MOV A, R1 ;R1 = 000070
+       8 000014 000301                         SWAB R1 ;R1 = 034000
+       9 000016 016701  177756                 MOV A, R1
+      10 000022 000311                         SWAB (R1)
+      11 000024 000321                         SWAB (R1)+ ;R1 = 000071
+      12 000026 016701  177746          	   MOV A, R1
+      13 000032 000331                         SWAB @(R1)+ ;R1 = 000072
+      14 000034 016701  177744          	   MOV C, R1
+      15 000040 000341                         SWAB -(R1) ;R1 = 002000
+      16 000042 000351                         SWAB @-(R1) ; R1 = 001776
+      17 000044 000361  000006                 SWAB 6(R1)
+      18 000050 000371  000006                 SWAB @6(R1)
+      19                                       
+      20 000054 000327  000050                 SWAB #000050 ;024000(not sure)
+      21 000060 000337  000100                 SWAB @#100
+      22 000064 000367  177710                 SWAB A ;Relative: A = 034000(not sure)
+      23 000070 000377  177706                 SWAB @B ;Relative deferred: exchange high-order content of address 000400 and low-order content of address 000400
+      24 000074 000000                  	   HALT
+      25                                
+      25                                .END START

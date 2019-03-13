@@ -1,22 +1,26 @@
        1                                ;Test for INCB(Ming)
        2 000000 000070                  A: .WORD 000070
        3 000002 000400                  B: .WORD 000400
-       4                                
-       5 000004 016701  177770          START: MOV A, R1 ;R1 = 000070
-       6 000010 105201                         INCB R1 ;R1 = 000071
-       7 000012 016701  177762                 MOV A, R1
-       8 000016 105211                         INCB (R1)
-       9 000020 105221                         INCB (R1)+ ;R1 = 000071
-      10 000022 105231                         INCB @(R1)+ ;R1 = 000072
-      11 000024 105241                         INCB -(R1) ;R1 = 000071
-      12 000026 105251                         INCB @-(R1) ;R1 = 000070
-      13 000030 105267  000000'                INCB 8(R1)
-      14 000034 105277  000000'                INCB @8(R1)
-      15                                       
-      16 000040 105227  000050                 INCB #000050 ;000051(not sure)
-      17 000044 105237  000100                 INCB @#100 ;content of address(lowest byte(7:0)) 100 increments by 1
-      18 000050 105267  177724                 INCB A ;Relative: A = 000071(not sure)
-      19 000054 105277  177722                 INCB @B ;Relative deferred: content(lowest byte(7:0)) of address 0000400 increment by 1.(not sure)
-      20 000060 000000                  	   HALT
-      21                                
-      21                                .END START
+       4 000004 002001                  C: .WORD 002001
+       5 000006 003002                  D: .WORD 003002
+       6                                
+       7 000010 016701  177764          START: MOV A, R1 ;R1 = 000070
+       8 000014 105201                         INCB R1 ;R1 = 000071
+       9 000016 016701  177756                 MOV A, R1
+      10 000022 105211                         INCB (R1)
+      11 000024 105221                         INCB (R1)+ ;R1 = 000071
+      12 000026 016701  177746          	   MOV A, R1
+      13 000032 105231                         INCB @(R1)+ ;R1 = 000072
+      14 000034 016701  177744          	   MOV C, R1
+      15 000040 105241                         INCB -(R1) ;R1 = 002000
+      16 000042 105251                         INCB @-(R1) ;R1 = 001776
+      17 000044 105261  000006                 INCB 6(R1)
+      18 000050 105271  000006                 INCB @6(R1)
+      19                                       
+      20 000054 105227  000050                 INCB #000050 ;000051(not sure)
+      21 000060 105237  000100                 INCB @#100 ;content of address(lowest byte(7:0)) 100 increments by 1
+      22 000064 105267  177710                 INCB A ;Relative: A = 000071(not sure)
+      23 000070 105277  177706                 INCB @B ;Relative deferred: content(lowest byte(7:0)) of address 0000400 increment by 1.(not sure)
+      24 000074 000000                  	   HALT
+      25                                
+      25                                .END START

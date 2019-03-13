@@ -10,8 +10,8 @@ START: MOV A, R1 ;R1 = 000070
        ROR @(R1)+ ;R1 = 000074
        ROR -(R1) ;R1 = 000072
        ROR @-(R1) ; R1 = 000070
-       ROR 8(R1)
-       ROR @8(R1)
+       ROR 6(R1)
+       ROR @6(R1)
        
        ROR #000050 ;000024(not sure) assume previous C-bit is 0
        ROR @#100

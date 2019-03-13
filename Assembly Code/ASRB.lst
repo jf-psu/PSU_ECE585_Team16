@@ -1,22 +1,27 @@
        1                                ;Test for ASRB(Ming), arithmetic shift right. Bit 15 or 7is replicated.
        2 000000 000070                  A: .WORD 000070
        3 000002 000400                  B: .WORD 000400
-       4                                
-       5 000004 016701  177770          START: MOV A, R1 ;R1 = 000070
-       6 000010 106201                         ASRB R1 ;R1 = 000034
-       7 000012 016701  177762                 MOV A, R1
-       8 000016 106211                         ASRB (R1)
-       9 000020 106221                         ASRB (R1)+ ;R1 = 000071
-      10 000022 106231                         ASRB @(R1)+ ;R1 = 000072
-      11 000024 106241                         ASRB -(R1) ;R1 = 000071
-      12 000026 106251                         ASRB @-(R1) ; R1 = 000070
-      13 000030 106267  000000'                ASRB 8(R1)
-      14 000034 106277  000000'                ASRB @8(R1)
-      15                                       
-      16 000040 106227  000050                 ASRB #000050 ;000024(not sure)
-      17 000044 106237  000100                 ASRB @#100
-      18 000050 106267  177724                 ASRB A ;Relative: A = 000034(not sure)
-      19 000054 106277  177722                 ASRB @B ;Relative deferred: shift content(lowest byte (7:0)) of address 000400 1 bit to right.(not sure)
-      20 000060 000000                  	   HALT
-      21                                
-      21                                .END START
+       4 000004 002001                  C: .WORD 002001
+       5 000006 003002                  D: .WORD 003002
+       6                                
+       7 000010 016701  177764          START: MOV A, R1 ;R1 = 000070
+       8 000014 106201                         ASRB R1 ;R1 = 000034
+       9 000016 016701  177756                 MOV A, R1
+      10 000022 106211                         ASRB (R1)
+      11 000024 106221                         ASRB (R1)+ ;R1 = 000071
+      12 000026 016704  177746          	   MOV A, R4
+      13 000032 106234                         ASRB @(R4)+ ;R4 = 000072
+      14 000034 016704  177744          	   MOV C, R4
+      15 000040 106244                         ASRB -(R4) ;R4 = 002000
+      16 000042 016704  177740          	   MOV D, R4
+      17 000046 106254                         ASRB @-(R4) ; R4 = 003000
+      18 000050 106264  000006                 ASRB 6(R4)
+      19 000054 106274  000006                 ASRB @6(R4)
+      20                                       
+      21 000060 106227  000050                 ASRB #000050 ;000024(not sure)
+      22 000064 106237  000100                 ASRB @#100
+      23 000070 106267  177704                 ASRB A ;Relative: A = 000034(not sure)
+      24 000074 106277  177702                 ASRB @B ;Relative deferred: shift content(lowest byte (7:0)) of address 000400 1 bit to right.(not sure)
+      25 000100 000000                  	   HALT
+      26                                
+      26                                .END START

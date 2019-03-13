@@ -1,17 +1,21 @@
 ;Test for DECB(Ming)
 A: .WORD 000070
 B: .WORD 000400
+C: .WORD 002001
+D: .WORD 003002
 
 START: MOV A, R1 ;R1 = 000070
        DECB R1 ;R1 = 000067
        MOV A, R1
        DECB (R1)
        DECB (R1)+ ;R1 = 000071 
+	   MOV A, R1
        DECB @(R1)+ ;R1 = 000072
-       DECB -(R1) ;R1 = 000071
-       DECB @-(R1) ;R1 = 000070
-       DECB 8(R1)
-       DECB @8(R1)
+	   MOV C, R1
+       DECB -(R1) ;R1 = 002000
+       DECB @-(R1) ;R1 = 001776
+       DECB 6(R1)
+       DECB @6(R1)
        
        DECB #000050 ;000047(not sure)
        DECB @#100

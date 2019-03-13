@@ -1,17 +1,21 @@
 ;Test for ADCB(Ming), add the content of the C-bit into the destination(high byte or low byte).
 A: .WORD 000070
 B: .WORD 000400
+C: .WORD 002001
+D: .WORD 003002
 
 START: MOV A, R1 ;R1 = 000070
        ADCB R1 ;R1 = 000070 assume previous C-bit is 0
        MOV A, R1
        ADCB (R1)
        ADCB (R1)+ ;R1 = 000071
+	   MOV A, R1 ;R1 = 000070
        ADCB @(R1)+ ;R1 = 000072
-       ADCB -(R1) ;R1 = 000071
-       ADCB @-(R1) ; R1 = 000070
-       ADCB 8(R1)
-       ADCB @8(R1)
+	   MOV C, R3
+       ADCB -(R3) ;R3 = 002000
+       ADCB @-(R3) ; R3 = 001776
+       ADCB 6(R1)
+       ADCB @6(R1)
        
        ADCB #000050 ;000050(not sure) assume previous C-bit is 0
        ADCB @#100

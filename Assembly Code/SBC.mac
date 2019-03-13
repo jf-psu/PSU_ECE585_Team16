@@ -10,8 +10,8 @@ START: MOV A, R1 ;R1 = 000070
        SBC @(R1)+ ;R1 = 000074
        SBC -(R1) ;R1 = 000072
        SBC @-(R1) ; R1 = 000070
-       SBC 8(R1)
-       SBC @8(R1)
+       SBC 6(R1)
+       SBC @6(R1)
        
        SBC #000050 ;000050(not sure) assume previous C-bit is 0
        SBC @#100

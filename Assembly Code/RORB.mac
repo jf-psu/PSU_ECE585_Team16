@@ -1,17 +1,21 @@
 ;Test for RORB(Ming), rotate all bits of one byte to right. Bit 0 or Bit 8 is loaded to C-bit and previous C-bit is loaded to bit 15 or bit 7.
 A: .WORD 000070
 B: .WORD 000400
+C: .WORD 002001
+D: .WORD 003002
 
 START: MOV A, R1 ;R1 = 000070
        RORB R1 ;R1 = 000034 assume previous C-bit is 0
        MOV A, R1
        RORB (R1)
        RORB (R1)+ ;R1 = 000071
+	   MOV A, R1
        RORB @(R1)+ ;R1 = 000072
-       RORB -(R1) ;R1 = 000071
-       RORB @-(R1) ; R1 = 000070
-       RORB 8(R1)
-       RORB @8(R1)
+	   MOV C, R1
+       RORB -(R1) ;R1 = 002000
+       RORB @-(R1) ; R1 = 001776
+       RORB 6(R1)
+       RORB @6(R1)
        
        RORB #000050 ;000024(not sure) assume previous C-bit is 0
        RORB @#100

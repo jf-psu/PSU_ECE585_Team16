@@ -1,17 +1,22 @@
 ;Test for ASRB(Ming), arithmetic shift right. Bit 15 or 7is replicated.
 A: .WORD 000070
 B: .WORD 000400
+C: .WORD 002001
+D: .WORD 003002
 
 START: MOV A, R1 ;R1 = 000070
        ASRB R1 ;R1 = 000034
        MOV A, R1
        ASRB (R1)
        ASRB (R1)+ ;R1 = 000071
-       ASRB @(R1)+ ;R1 = 000072
-       ASRB -(R1) ;R1 = 000071
-       ASRB @-(R1) ; R1 = 000070
-       ASRB 8(R1)
-       ASRB @8(R1)
+	   MOV A, R4
+       ASRB @(R4)+ ;R4 = 000072
+	   MOV C, R4
+       ASRB -(R4) ;R4 = 002000
+	   MOV D, R4
+       ASRB @-(R4) ; R4 = 003000
+       ASRB 6(R4)
+       ASRB @6(R4)
        
        ASRB #000050 ;000024(not sure)
        ASRB @#100

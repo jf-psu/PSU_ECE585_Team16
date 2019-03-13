@@ -10,8 +10,8 @@
       10 000022 005131                         COM @(R1)+ ;content of address which is the content of address 000072 becomes its complement, then R1 = 000074
       11 000024 005141                         COM -(R1) ;R1 = 000072, then the content of address 000072 becomes its complement
       12 000026 005151                         COM @-(R1) ;R1 = 000070, then the content of address which it the content of address 000070 becomes its complement
-      13 000030 005167  000000'                COM 8(R1) ;content of address 000078 becomes its complement
-      14 000034 005177  000000'                COM @8(R1) ;content of address which is the content of address 000078 becomes its complement
+      13 000030 005161  000006                 COM 6(R1) ;content of address 000078 becomes its complement
+      14 000034 005171  000006                 COM @6(R1) ;content of address which is the content of address 000078 becomes its complement
       15                                
       16 000040 005127  000050                 COM #000050 ; 177727
       17 000044 005137  000100                 COM @#100 ;content of address 100 becomes its complement

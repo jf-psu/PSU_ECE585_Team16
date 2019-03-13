@@ -1,17 +1,21 @@
 ;Test for INCB(Ming)
 A: .WORD 000070
 B: .WORD 000400
+C: .WORD 002001
+D: .WORD 003002
 
 START: MOV A, R1 ;R1 = 000070
        INCB R1 ;R1 = 000071
        MOV A, R1
        INCB (R1)
        INCB (R1)+ ;R1 = 000071
+	   MOV A, R1
        INCB @(R1)+ ;R1 = 000072
-       INCB -(R1) ;R1 = 000071
-       INCB @-(R1) ;R1 = 000070
-       INCB 8(R1)
-       INCB @8(R1)
+	   MOV C, R1
+       INCB -(R1) ;R1 = 002000
+       INCB @-(R1) ;R1 = 001776
+       INCB 6(R1)
+       INCB @6(R1)
        
        INCB #000050 ;000051(not sure)
        INCB @#100 ;content of address(lowest byte(7:0)) 100 increments by 1

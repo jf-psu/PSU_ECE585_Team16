@@ -10,8 +10,8 @@ START: MOV A, R1 ;R1 = 000070
 	   CLR @(R1)+ ;content of address which is the content of address 000072 = 0, then R1 = 000074
 	   CLR -(R1) ;R1 = 000072, then clear the content of address 000072
 	   CLR @-(R1) ;R1 = 000070, then clear the content of address which is the content of address 000070
-	   CLR 8(R1) ;clear the content of address 000078
-	   CLR @8(R1) ;clear the content of address which is the content of address 000078
+	   CLR 6(R1) ;clear the content of address 000078
+	   CLR @6(R1) ;clear the content of address which is the content of address 000078
 	   
 	   CLR @#100 ;clear the content of address 100
 	   CLR A ;Relative: A = 0(not sure about this)

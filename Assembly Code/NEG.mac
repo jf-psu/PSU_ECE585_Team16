@@ -10,8 +10,8 @@ START: MOV A, R1 ;R1 = 000070
        NEG @(R1)+ ;R1 = 000074
        NEG -(R1) ;R1 = 000072
        NEG @-(R1) ; R1 = 000070
-       NEG 8(R1)
-       NEG @8(R1)
+       NEG 6(R1)
+       NEG @6(R1)
        
        NEG #000050 ;177730(not sure)
        NEG @#100

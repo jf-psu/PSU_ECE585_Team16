@@ -1,22 +1,26 @@
        1                                ;Test for COMB(Ming)
        2 000000 000070                  A: .WORD 000070
        3 000002 000400                  B: .WORD 000400
-       4                                
-       5 000004 016701  177770          START: MOV A, R1 ;R1 = 000070
-       6 000010 105101                         COMB R1 ;R1 = 000307
-       7 000012 016701  177762                 MOV A, R1 ;R1 = 000070
-       8 000016 105111                         COMB (R1) ;content of address(lowest byte(7:0)) 000070 becomes its complement
-       9 000020 105121                         COMB (R1)+ ;content of address(lowest byte(7:0)) 000070 becomes its complement, then R1 = 000071
-      10 000022 105131                         COMB @(R1)+ ;content of address which is the content of address 000071 becomes its complement, then R1 = 000072
-      11 000024 105141                         COMB -(R1) ;R1 = 000071, then the content of address 000071 becomes its complement
-      12 000026 105151                         COMB @-(R1) ;R1 = 000070, then the content of address(lowest byte(7:0)) which it the content of address 000070 becomes its complement
-      13 000030 105167  000000'                COMB 8(R1) ;content of address(lowest byte(7:0)) 000078 becomes its complement
-      14 000034 105177  000000'                COMB @8(R1) ;content of address(lowest byte(7:0)) which is the content of address 000078 becomes its complement
-      15                                
-      16 000040 105127  000050                 COMB #000050 ; 000327
-      17 000044 105137  000100                 COMB @#100 ;content of address(lowest byte(7:0)) 100 becomes its complement
-      18 000050 105167  177724                 COMB A ;Relative: A = 000307(not sure about this)
-      19 000054 105177  177722                 COMB @B ;Relative deferred: the content of address(lowest byte(7:0)) 000400 becomes its complement(not sure about this)
-      20 000060 000000                  	   HALT
-      21                                
-      21                                .END START
+       4 000004 002001                  C: .WORD 002001
+       5 000006 003002                  D: .WORD 003002
+       6                                
+       7 000010 016701  177764          START: MOV A, R1 ;R1 = 000070
+       8 000014 105101                         COMB R1 ;R1 = 000307
+       9 000016 016701  177756                 MOV A, R1 ;R1 = 000070
+      10 000022 105111                         COMB (R1) ;content of address(lowest byte(7:0)) 000070 becomes its complement
+      11 000024 105121                         COMB (R1)+ ;content of address(lowest byte(7:0)) 000070 becomes its complement, then R1 = 000071
+      12 000026 016701  177746          	   MOV A, R1
+      13 000032 105131                         COMB @(R1)+ ;content of address which is the content of address 000071 becomes its complement, then R1 = 000072
+      14 000034 016701  177744          	   MOV C, R1
+      15 000040 105141                         COMB -(R1) ;R1 = 002000, then the content of address 000071 becomes its complement
+      16 000042 105151                         COMB @-(R1) ;R1 = 001776, then the content of address(lowest byte(7:0)) which it the content of address 000070 becomes its complement
+      17 000044 105161  000006                 COMB 6(R1) ;content of address(lowest byte(7:0)) 000078 becomes its complement
+      18 000050 105171  000006                 COMB @6(R1) ;content of address(lowest byte(7:0)) which is the content of address 000078 becomes its complement
+      19                                
+      20 000054 105127  000050                 COMB #000050 ; 000327
+      21 000060 105137  000100                 COMB @#100 ;content of address(lowest byte(7:0)) 100 becomes its complement
+      22 000064 105167  177710                 COMB A ;Relative: A = 000307(not sure about this)
+      23 000070 105177  177706                 COMB @B ;Relative deferred: the content of address(lowest byte(7:0)) 000400 becomes its complement(not sure about this)
+      24 000074 000000                  	   HALT
+      25                                
+      25                                .END START

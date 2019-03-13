@@ -1,22 +1,26 @@
        1                                ;Test for NEGB(Ming), convert to 2's complement.(not sure about this)
        2 000000 000070                  A: .WORD 000070
        3 000002 000400                  B: .WORD 000400
-       4                                
-       5 000004 016701  177770          START: MOV A, R1 ;R1 = 000070
-       6 000010 105401                         NEGB R1 ;R1 = 000310(not sure about this)
-       7 000012 016701  177762                 MOV A, R1
-       8 000016 105411                         NEGB (R1)
-       9 000020 105421                         NEGB (R1)+ ;R1 = 000071
-      10 000022 105431                         NEGB @(R1)+ ;R1 = 000072
-      11 000024 105441                         NEGB -(R1) ;R1 = 000071
-      12 000026 105451                         NEGB @-(R1) ; R1 = 000070
-      13 000030 105467  000000'                NEGB 8(R1) ;lowest byte(7:0) becomes its 2's complement
-      14 000034 105477  000000'                NEGB @8(R1) ;lowest byte(7:0) becomes its 2's complement
-      15                                       
-      16 000040 105427  000050                 NEGB #000050 ;000330(not sure)
-      17 000044 105437  000100                 NEGB @#100 ;lowest byte(7:0) becomes its 2's complement
-      18 000050 105467  177724                 NEGB A ;Relative: A = 000310(not sure)
-      19 000054 105477  177722                 NEGB @B ;Relative deferred: content(lowest byte(7:0)) of address 0000400 becomes its 2's complement.(not sure)
-      20 000060 000000                  	   HALT
-      21                                
-      21                                .END START
+       4 000004 002001                  C: .WORD 002001
+       5 000006 003002                  D: .WORD 003002
+       6                                
+       7 000010 016701  177764          START: MOV A, R1 ;R1 = 000070
+       8 000014 105401                         NEGB R1 ;R1 = 000310(not sure about this)
+       9 000016 016701  177756                 MOV A, R1
+      10 000022 105411                         NEGB (R1)
+      11 000024 105421                         NEGB (R1)+ ;R1 = 000071
+      12 000026 016701  177746          	   MOV A, R1
+      13 000032 105431                         NEGB @(R1)+ ;R1 = 000072
+      14 000034 016701  177744          	   MOV C, R1
+      15 000040 105441                         NEGB -(R1) ;R1 = 002000
+      16 000042 105451                         NEGB @-(R1) ; R1 = 001776
+      17 000044 105461  000006                 NEGB 6(R1) ;lowest byte(7:0) becomes its 2's complement
+      18 000050 105471  000006                 NEGB @6(R1) ;lowest byte(7:0) becomes its 2's complement
+      19                                       
+      20 000054 105427  000050                 NEGB #000050 ;000330(not sure)
+      21 000060 105437  000100                 NEGB @#100 ;lowest byte(7:0) becomes its 2's complement
+      22 000064 105467  177710                 NEGB A ;Relative: A = 000310(not sure)
+      23 000070 105477  177706                 NEGB @B ;Relative deferred: content(lowest byte(7:0)) of address 0000400 becomes its 2's complement.(not sure)
+      24 000074 000000                  	   HALT
+      25                                
+      25                                .END START

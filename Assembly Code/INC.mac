@@ -10,8 +10,8 @@ START: MOV A, R1 ;R1 = 000070
        INC @(R1)+
        INC -(R1)
        INC @-(R1)
-       INC 8(R1)
-       INC @8(R1)
+       INC 6(R1)
+       INC @6(R1)
        
        INC #000050 ;000051(not sure)
        INC @#100

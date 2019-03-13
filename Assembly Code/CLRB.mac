@@ -9,11 +9,11 @@ START: MOV A, R2 ;R2 = 007070
 	   CLRB (R2) ;content(lowest byte) of address 007000 = XXX000(X is don't care)
 	   CLRB (R2)+ ;content(lowest byte) of address 007000 = 0, then R2 = 007001
 	   MOV A, R3;
-	   CLRB @(R3)+ 
+	   CLRB @(R3)+ ;R3 = 007072
 	   MOV C, R4;
-	   CLRB -(R4) 
+	   CLRB -(R4) ; R4 = 002000
 	   MOV D, R5;
-	   CLRB @-(R5) 
+	   CLRB @-(R5) ;R5 = 003000
 	   
 	   MOV A, R2 ;R2 = 007070
 	   CLRB 6(R2) 

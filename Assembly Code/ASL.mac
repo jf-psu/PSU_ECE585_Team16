@@ -1,6 +1,8 @@
 ;Test for ASL(Ming), arithmetic shift left.
 A: .WORD 000070
 B: .WORD 000400
+C: .WORD 002002
+D: .WORD 003002
 
 START: MOV A, R1 ;R1 = 000070
        ASL R1 ;R1 = 000160
@@ -10,8 +12,8 @@ START: MOV A, R1 ;R1 = 000070
        ASL @(R1)+ ;R1 = 000074
        ASL -(R1) ;R1 = 000072
        ASL @-(R1) ; R1 = 000070
-       ASL 8(R1)
-       ASL @8(R1)
+       ASL 6(R1)
+       ASL @6(R1)
        
        ASL #000050 ;000120(not sure)
        ASL @#100

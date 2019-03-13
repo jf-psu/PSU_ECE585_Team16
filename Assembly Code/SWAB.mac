@@ -1,17 +1,21 @@
 ;Test for SWAB(Ming), exchanges high-order byte and low-order byte of the destination word.
 A: .WORD 000070
 B: .WORD 000400
+C: .WORD 002001
+D: .WORD 003002
 
 START: MOV A, R1 ;R1 = 000070
        SWAB R1 ;R1 = 034000
        MOV A, R1
        SWAB (R1)
-       SWAB (R1)+ ;R1 = 000072
-       SWAB @(R1)+ ;R1 = 000074
-       SWAB -(R1) ;R1 = 000072
-       SWAB @-(R1) ; R1 = 000070
-       SWAB 8(R1)
-       SWAB @8(R1)
+       SWAB (R1)+ ;R1 = 000071
+	   MOV A, R1
+       SWAB @(R1)+ ;R1 = 000072
+	   MOV C, R1
+       SWAB -(R1) ;R1 = 002000
+       SWAB @-(R1) ; R1 = 001776
+       SWAB 6(R1)
+       SWAB @6(R1)
        
        SWAB #000050 ;024000(not sure)
        SWAB @#100

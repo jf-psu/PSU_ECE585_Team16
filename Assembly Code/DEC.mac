@@ -10,8 +10,8 @@ START: MOV A, R1 ;R1 = 000070
        DEC @(R1)+ ;R1 = 000074
        DEC -(R1) ;R1 = 000072
        DEC @-(R1) ;R1 = 000070
-       DEC 8(R1)
-       DEC @8(R1)
+       DEC 6(R1)
+       DEC @6(R1)
        
        DEC #000050 ;000047(not sure)
        DEC @#100
