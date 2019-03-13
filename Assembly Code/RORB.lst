@@ -1,0 +1,22 @@
+       1                                ;Test for RORB(Ming), rotate all bits of one byte to right. Bit 0 or Bit 8 is loaded to C-bit and previous C-bit is loaded to bit 15 or bit 7.
+       2 000000 000070                  A: .WORD 000070
+       3 000002 000400                  B: .WORD 000400
+       4                                
+       5 000004 016701  177770          START: MOV A, R1 ;R1 = 000070
+       6 000010 106001                         RORB R1 ;R1 = 000034 assume previous C-bit is 0
+       7 000012 016701  177762                 MOV A, R1
+       8 000016 106011                         RORB (R1)
+       9 000020 106021                         RORB (R1)+ ;R1 = 000071
+      10 000022 106031                         RORB @(R1)+ ;R1 = 000072
+      11 000024 106041                         RORB -(R1) ;R1 = 000071
+      12 000026 106051                         RORB @-(R1) ; R1 = 000070
+      13 000030 106067  000000'                RORB 8(R1)
+      14 000034 106077  000000'                RORB @8(R1)
+      15                                       
+      16 000040 106027  000050                 RORB #000050 ;000024(not sure) assume previous C-bit is 0
+      17 000044 106037  000100                 RORB @#100
+      18 000050 106067  177724                 RORB A ;Relative: A = 000034(not sure)
+      19 000054 106077  177722                 RORB @B ;Relative deferred: rotate content(lowest byte (7:0)) of address 000400 to right 1 bit.(not sure)
+      20 000060 000000                  	   HALT
+      21                                
+      21                                .END START

@@ -1,0 +1,22 @@
+       1                                ;Test for SBCB(Ming), subtract the content of the C-bit from the destination(high byte or low byte).
+       2 000000 000070                  A: .WORD 000070
+       3 000002 000400                  B: .WORD 000400
+       4                                
+       5 000004 016701  177770          START: MOV A, R1 ;R1 = 000070
+       6 000010 105601                         SBCB R1 ;R1 = 000070 assume previous C-bit is 0
+       7 000012 016701  177762                 MOV A, R1
+       8 000016 105611                         SBCB (R1)
+       9 000020 105621                         SBCB (R1)+ ;R1 = 000071
+      10 000022 105631                         SBCB @(R1)+ ;R1 = 000072
+      11 000024 105641                         SBCB -(R1) ;R1 = 000071
+      12 000026 105651                         SBCB @-(R1) ; R1 = 000070
+      13 000030 105667  000000'                SBCB 8(R1)
+      14 000034 105677  000000'                SBCB @8(R1)
+      15                                       
+      16 000040 105627  000050                 SBCB #000050 ;000050(not sure) assume previous C-bit is 0
+      17 000044 105637  000100                 SBCB @#100
+      18 000050 105667  177724                 SBCB A ;Relative: A = 000070(not sure)
+      19 000054 105677  177722                 SBCB @B ;Relative deferred: subtract C-bit to the content(lowest byte(7:0)) of address 000400
+      20 000060 000000                  	   HALT
+      21                                
+      21                                .END START

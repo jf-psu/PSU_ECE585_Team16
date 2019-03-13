@@ -1,0 +1,22 @@
+       1                                ;Test for ASLB(Ming), arithmetic shift left.
+       2 000000 000070                  A: .WORD 000070
+       3 000002 000400                  B: .WORD 000400
+       4                                
+       5 000004 016701  177770          START: MOV A, R1 ;R1 = 000070
+       6 000010 106301                         ASLB R1 ;R1 = 000160
+       7 000012 016701  177762                 MOV A, R1
+       8 000016 106311                         ASLB (R1)
+       9 000020 106321                         ASLB (R1)+ ;R1 = 000071
+      10 000022 106331                         ASLB @(R1)+ ;R1 = 000072
+      11 000024 106341                         ASLB -(R1) ;R1 = 000071
+      12 000026 106351                         ASLB @-(R1) ; R1 = 000070
+      13 000030 106367  000000'                ASLB 8(R1)
+      14 000034 106377  000000'                ASLB @8(R1)
+      15                                       
+      16 000040 106327  000050                 ASLB #000050 ;000120(not sure)
+      17 000044 106337  000100                 ASLB @#100
+      18 000050 106367  177724                 ASLB A ;Relative: A = 000160(not sure)
+      19 000054 106377  177722                 ASLB @B ;Relative deferred: shift content(lowest byte (7:0)) of address 000400 to left 1 bit.(not sure)
+      20 000060 000000                  	   HALT
+      21                                
+      21                                .END START

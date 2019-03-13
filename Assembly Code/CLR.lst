@@ -1,0 +1,23 @@
+       1                                ;Test for CLR(Ming)
+       2 000000 000070                  A: .WORD 000070
+       3 000002 000400                  B: .WORD 000400
+       4                                
+       5 000004 016701  177770          START: MOV A, R1 ;R1 = 000070
+       6 000010 005001                         CLR R1 ;R1 = 0
+       7 000012 016701  177762          	   MOV A, R1 ;R1 = 000070
+       8 000016 005011                  	   CLR (R1) ;content of address 000070 = 0
+       9 000020 005021                  	   CLR (R1)+ ;content of address 000070 = 0, then R1 = 000072
+      10 000022 005031                  	   CLR @(R1)+ ;content of address which is the content of address 000072 = 0, then R1 = 000074
+      11 000024 005041                  	   CLR -(R1) ;R1 = 000072, then clear the content of address 000072
+      12 000026 005051                  	   CLR @-(R1) ;R1 = 000070, then clear the content of address which is the content of address 000070
+      13 000030 005067  000000'         	   CLR 8(R1) ;clear the content of address 000078
+      14 000034 005077  000000'         	   CLR @8(R1) ;clear the content of address which is the content of address 000078
+      15                                	   
+      16 000040 005037  000100          	   CLR @#100 ;clear the content of address 100
+      17 000044 005067  177730          	   CLR A ;Relative: A = 0(not sure about this)
+      18 000050 005077  177726          	   CLR @B ;Relative deferred: clear the content of address 000400(not sure about this)
+      19 000054 000000                  	   HALT
+      20                                
+      21                                .END START
+      22                                	   
+      22                                	   

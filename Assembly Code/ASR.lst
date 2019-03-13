@@ -1,0 +1,22 @@
+       1                                ;Test for ASR(Ming), arithmetic shift right. Bit 15 is replicated.
+       2 000000 000070                  A: .WORD 000070
+       3 000002 000400                  B: .WORD 000400
+       4                                
+       5 000004 016701  177770          START: MOV A, R1 ;R1 = 000070
+       6 000010 006201                         ASR R1 ;R1 = 000034
+       7 000012 016701  177762                 MOV A, R1
+       8 000016 006211                         ASR (R1)
+       9 000020 006221                         ASR (R1)+ ;R1 = 000072
+      10 000022 006231                         ASR @(R1)+ ;R1 = 000074
+      11 000024 006241                         ASR -(R1) ;R1 = 000072
+      12 000026 006251                         ASR @-(R1) ; R1 = 000070
+      13 000030 006267  000000'                ASR 8(R1)
+      14 000034 006277  000000'                ASR @8(R1)
+      15                                       
+      16 000040 006227  000050                 ASR #000050 ;000024(not sure)
+      17 000044 006237  000100                 ASR @#100
+      18 000050 006267  177724                 ASR A ;Relative: A = 000034(not sure)
+      19 000054 006277  177722                 ASR @B ;Relative deferred: shift content of address 000400 1 bit to right.(not sure)
+      20 000060 000000                  	   HALT
+      21                                
+      21                                .END START

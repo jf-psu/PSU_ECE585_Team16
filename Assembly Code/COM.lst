@@ -1,0 +1,22 @@
+       1                                ;Test for COM(Ming)
+       2 000000 000070                  A: .WORD 000070
+       3 000002 000400                  B: .WORD 000400
+       4                                
+       5 000004 016701  177770          START: MOV A, R1 ;R1 = 000070
+       6 000010 005101                         COM R1 ;R1 = 177707
+       7 000012 016701  177762                 MOV A, R1 ;R1 = 000070
+       8 000016 005111                         COM (R1) ;content of address 000070 becomes its complement
+       9 000020 005121                         COM (R1)+ ;content of address 000070 becomes its complement, then R1 = 000072
+      10 000022 005131                         COM @(R1)+ ;content of address which is the content of address 000072 becomes its complement, then R1 = 000074
+      11 000024 005141                         COM -(R1) ;R1 = 000072, then the content of address 000072 becomes its complement
+      12 000026 005151                         COM @-(R1) ;R1 = 000070, then the content of address which it the content of address 000070 becomes its complement
+      13 000030 005167  000000'                COM 8(R1) ;content of address 000078 becomes its complement
+      14 000034 005177  000000'                COM @8(R1) ;content of address which is the content of address 000078 becomes its complement
+      15                                
+      16 000040 005127  000050                 COM #000050 ; 177727
+      17 000044 005137  000100                 COM @#100 ;content of address 100 becomes its complement
+      18 000050 005167  177724                 COM A ;Relative: A = 177707(not sure about this)
+      19 000054 005177  177722                 COM @B ;Relative deferred: the content of address 000400 becomes its complement(not sure about this)
+      20 000060 000000                  	   HALT
+      21                                
+      21                                .END START
