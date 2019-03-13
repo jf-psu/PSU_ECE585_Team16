@@ -2,6 +2,7 @@
 A: .WORD 007070
 B: .WORD 005400
 C: .WORD 002001
+D: .WORD 003002
 
 START: MOV A, R2 ;R2 = 007070
        CLRB R2 ;R2 = 007000
@@ -11,7 +12,7 @@ START: MOV A, R2 ;R2 = 007070
 	   CLRB @(R3)+ 
 	   MOV C, R4;
 	   CLRB -(R4) 
-	   MOV C, R5;
+	   MOV D, R5;
 	   CLRB @-(R5) 
 	   CLRB 8(R2) ;clear the content(lowest byte) of address 007000
 	   CLRB @8(R2) ;clear the content(lowest byte) of address which is the content of address 007000
