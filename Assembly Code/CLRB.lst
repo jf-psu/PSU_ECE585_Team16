@@ -14,12 +14,12 @@
       14 000034 105044                  	   CLRB -(R4) 
       15 000036 016705  177744          	   MOV D, R5;
       16 000042 105055                  	   CLRB @-(R5) 
-      17 000044 105067  000000'         	   CLRB 8(R2) ;clear the content(lowest byte) of address 007000
-      18 000050 105077  000000'         	   CLRB @8(R2) ;clear the content(lowest byte) of address which is the content of address 007000
+      17 000044 105062  000006          	   CLRB 6(R2) ;clear the content(lowest byte) of address 007000
+      18 000050 105072  000006          	   CLRB @6(R2) ;clear the content(lowest byte) of address which is the content of address 007000
       19                                	   
       20 000054 105037  000100          	   CLRB @#100 ;clear the content(lowest byte) of address 100
       21 000060 105067  177714          	   CLRB A ;Relative: A = 007000(not sure about this)
-      22 000064 005077  177712          	   CLR @B ;Relative deferred: clear the content(lowest byte) of address 005400(not sure about this)
+      22 000064 105077  177712          	   CLRB @B ;Relative deferred: clear the content(lowest byte) of address 005400(not sure about this)
       23 000070 000000                  	   HALT
       24                                
       24                                .END START
