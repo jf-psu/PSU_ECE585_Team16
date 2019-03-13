@@ -738,6 +738,9 @@ int decode_and_execute(uint16_t instruction)
         case OP_SBC: 
             decoder = op_sbc; 
             break;
+        case OP_INCB:
+            decoder = op_incb;
+            break;
     }
 
 
