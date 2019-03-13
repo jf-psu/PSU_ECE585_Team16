@@ -447,14 +447,23 @@ int op_movb(uint16_t instruction)
 {
     uint8_t src = (instruction >> 6) & 077; // bits 11-6
     uint8_t dst = instruction & 077; // bits 5-0
+	uint8_t dst_mode = (instruction >> 3) & 07; // bits 3-5
     int16_t full_value = 0;
 	uint8_t value;
 	
 	value = operand_value_read_byte(src);
 	//extend sign out
-	full_value = (((value & 0200) << 8) | value);
+	//full_value = (((value & 0200) << 8) | value);
+
+	if (dst_mode == 0) { // destination is register
+		if ((value & 0200) >> 7 == 1)
+			full_value = 0177400 | value;
+		else
+			full_value = value;
+	}
+
     log(LOG_INFO, "MOVB function called\n");
-    operand_value_write_word(dst_reg, full_value);
+    operand_value_write_word(dst, full_value);
     
 /*
     N: set if (src) <0; cleared otherwise
