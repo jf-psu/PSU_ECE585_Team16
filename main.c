@@ -718,7 +718,6 @@ int test_psw()
     psw.prev_mode = 0;
     psw.reserved = 0;
     psw.priority = 0;
-    psw.trap = 0;
     psw.negative = 0;
     psw.zero = 1;
     psw.overflow = 0;
@@ -817,38 +816,69 @@ int decode_and_execute(uint16_t instruction)
         case OP_COM: 
             decoder = op_com; 
             break;
+        case OP_COMB:
+            decoder = op_comb;
+            break;
         case OP_INC: 
             decoder = op_inc; 
+            break;
+        case OP_INCB:
+            decoder = op_incb;
             break;
         case OP_DEC: 
             decoder = op_dec; 
             break;
+        case OP_DECB:
+            decoder = op_decb;
+            break;
         case OP_NEG: 
             decoder = op_neg; 
             break;
-        case OP_INCB:
-            decoder = op_incb;
+        case OP_NEGB:
+            decoder = op_negb;
             break;
               
         //Shift and Rotate
         case OP_ASR: 
             decoder = op_asr; 
             break;
+        case OP_ASRB:
+            decoder = op_asrb;
+            break;
         case OP_ASL: 
             decoder = op_asl; 
+            break;
+        case OP_ASLB:
+            decoder = op_aslb;
             break;
         case OP_ROR: 
             decoder = op_ror; 
             break;
+        case OP_RORB:
+            decoder = op_ror;
+            break;
+        case OP_ROL:
+            decoder = op_rol;
+            break;
+        case OP_ROLB:
+            decoder = op_rolb;
+            break;
         case OP_SWAB:
 			decoder = op_swab; 
             break;
+
         //Multiple Precision
         case OP_ADC: 
             decoder = op_adc; 
             break;
+        case OP_ADCB: 
+            decoder = op_adcb;
+            break;
         case OP_SBC: 
             decoder = op_sbc; 
+            break;
+        case OP_SBCB:
+            decoder = op_sbcb;
             break;
     }
 
