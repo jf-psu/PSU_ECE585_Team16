@@ -815,7 +815,7 @@ int op_mul(uint16_t instruction)
 {
     uint8_t dst_reg = (instruction >> 6) & 07; // bits 6-8
     uint8_t src_reg = instruction & 07; // bits 0-2
-    //uint8_t dst = (instruction >> 6) & 077; // bits 6-11
+    uint8_t dst = (instruction >> 6) & 077; // bits 6-11
     uint8_t src = (instruction) & 077; // bits 0-5
     int32_t value;
     uint16_t src_value;
@@ -865,7 +865,7 @@ is of the same sign as the dividend. R must be even.
 int op_div(uint16_t instruction){
     uint8_t dst_reg = (instruction >> 6) & 07; // bits 6-8
     uint8_t src_reg = instruction & 07; // bits 0-2
-    //uint8_t dst = (instruction >> 6) & 077; // bits 6-11
+    uint8_t dst = (instruction >> 6) & 077; // bits 6-11
     uint8_t src = (instruction) & 077; // bits 0-5
     int32_t value, rem;
     uint16_t src_value;
@@ -994,7 +994,7 @@ shift count
 int op_ashc(uint16_t instruction){
 	uint8_t dst_reg = (instruction >> 6) & 07; // bits 6-8
     uint8_t src_reg = instruction & 07; // bits 0-2
-    //uint8_t dst = (instruction >> 6) & 077; // bits 6-11
+    uint8_t dst = (instruction >> 6) & 077; // bits 6-11
     uint8_t src = (instruction) & 077; // bits 0-5
     uint8_t carry;
     int32_t value;
@@ -1055,7 +1055,7 @@ unaffected. Assembler format is: XOR R.D
 int op_xor(uint16_t instruction){
 	uint8_t r_reg = (instruction >> 6) & 07; // bits 6-8
     uint8_t dst_reg = instruction & 07; // bits 0-2
-    //uint8_t dst = (instruction >> 6) & 077; // bits 6-11
+    uint8_t dst = (instruction >> 6) & 077; // bits 6-11
     uint8_t dst = (instruction) & 077; // bits 0-5
     
     int16_t value;
