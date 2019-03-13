@@ -896,8 +896,14 @@ int decode_and_execute(uint16_t instruction)
         case OP_MOV: 
             decoder = op_mov;
             break;
+        case OP_MOVB: 
+            decoder = op_movb;
+            break;
         case OP_CMP: 
             decoder = op_cmp;
+            break;
+        case OP_CMPB: 
+            decoder = op_cmpb;
             break;
         case OP_ADD:
             decoder = op_add;
@@ -909,11 +915,20 @@ int decode_and_execute(uint16_t instruction)
         case OP_BIT: 
             decoder = op_bit;
             break;
+        case OP_BITB: 
+            decoder = op_bitb;
+            break;
         case OP_BIC: 
             decoder = op_bic;
             break;
+        case OP_BICB: 
+            decoder = op_bicb;
+            break;
         case OP_BIS: 
             decoder = op_bis;
+            break;
+        case OP_BISB: 
+            decoder = op_bisb;
             break;
     }
     
