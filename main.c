@@ -717,7 +717,10 @@ int decode_and_execute(uint16_t instruction)
         case OP_NEG: 
             decoder = op_neg; 
             break;
-            
+        case OP_INCB:
+            decoder = op_incb;
+            break;
+              
         //Shift and Rotate
         case OP_ASR: 
             decoder = op_asr; 
@@ -737,9 +740,6 @@ int decode_and_execute(uint16_t instruction)
             break;
         case OP_SBC: 
             decoder = op_sbc; 
-            break;
-        case OP_INCB:
-            decoder = op_incb;
             break;
     }
 
