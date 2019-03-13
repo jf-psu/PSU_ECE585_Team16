@@ -142,7 +142,7 @@ int op_decb(uint16_t instruction){
     psw.negative = (value < 0);
     //set if result is 0
     psw.zero = (value == 0);
-    psw.overflow = (old_value == 0100000); //FIXME jeff just made up that value, max 8 bit + 1
+    psw.overflow = (old_value == 0100000);
 	return 0;
 }
 
@@ -560,7 +560,7 @@ int op_add(uint16_t instruction)
     int16_t dst_val = operand_value_read_word(dst);
     value = src_val + dst_val;
 	
-	operand_value_write_word(dst_reg, (uint16_t)value);
+	operand_value_write_word(src, (uint16_t)value);
 	/*
 	N: set if result <0; cleared otherwise
 	Z: set if result = 0; cleared otherwise
@@ -902,7 +902,7 @@ int op_div(uint16_t instruction){
 	operand_value_write_word(dst_reg, value);
 	operand_value_write_word(dst_reg|1, rem);
 	log(LOG_INFO,"Quotient is %d\n", value);
-	log(LOG_INFO,"Quotient is %d\n", rem);
+	log(LOG_INFO,"Remainder is %d\n", rem);
 	/*
 	N: set if quotient <0; cleared otherwise
 	Z: set if quotient = 0; cleared otherwise
@@ -1337,6 +1337,8 @@ int op_jmp(uint16_t instruction){
     log(LOG_INFO, "PC value changed to: %o\n", dst_val);
     return 0;
 }
+
+
 
 //Halt
 int op_halt(uint16_t instruction)

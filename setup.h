@@ -36,7 +36,7 @@ uint16_t operand_value_read_word(uint8_t src_field);
 uint8_t operand_value_write_byte(uint8_t dst_field, uint8_t value);
 uint8_t operand_value_read_byte(uint8_t src_field);
 
-
+uint16_t jump_read_word(uint8_t src_field);
 
 int op_halt(uint16_t instruction);
 

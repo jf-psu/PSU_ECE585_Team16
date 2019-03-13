@@ -600,7 +600,7 @@ uint16_t jump_read_word(uint8_t src_field)
             ptr = data_read_word(addr_word);
             value = ptr;   
             
-            printf("RETURNING: %o", value); 
+            log(LOG_INFO, "RETURNING: %o", value); 
             break;
     }
 
@@ -806,6 +806,10 @@ int decode_and_execute(uint16_t instruction)
     // (instruction >> 6) & 00077)// 10 bit op codes (finding just base)
     switch ((instruction >> 6))
     {
+        case OP_JMP:
+            decoder = op_jmp;
+            break;
+            
 		//General
         case OP_CLR: 
             decoder = op_clr; 
@@ -985,6 +989,7 @@ int decode_and_execute(uint16_t instruction)
         case OP_BLOS: 
             decoder = op_blos;
             break;
+
     }
     if (decoder)
         return(decoder(instruction));
