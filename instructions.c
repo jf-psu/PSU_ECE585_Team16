@@ -69,18 +69,28 @@ int op_comb(uint16_t instruction){
 
 int op_inc(uint16_t instruction){
     uint8_t dst = instruction & 077;
-	log(LOG_INFO, "INC function called\n");
-	int16_t old_value, value;
-	old_value = operand_value_read_word(dst);
-	value = (1 + old_value);
-	operand_value_write_word(dst,value);
+    uint8_t mode = instruction & 70;
+    uint8_t dst_reg = instruction & 007;
 
-	//set if result is less than 0
-	psw.negative = (value < 0);
-	//set if result is 0
-   	psw.zero = (value == 0);
-	//set if dst held 077777 cleared otherwise
-    psw.overflow = (old_value == 0077777);
+        log(LOG_INFO, "INC function called\n");
+        int16_t old_value, value;
+        old_value = operand_value_read_word(dst);
+        value = old_value + 1;
+
+        if(mode == 6){
+                operand_value_write_word(dst_reg, value);
+        }
+        else{
+                operand_value_write_word(dst, value);
+        }
+
+        //set if result is less than 0
+        psw.negative = (value < 0);
+        //set if result is 0
+        psw.zero = (value == 0);
+        //set if dst held 077777 cleared otherwise
+    	psw.overflow = (old_value == 0077777);
+
 	return 0;
 }
 
