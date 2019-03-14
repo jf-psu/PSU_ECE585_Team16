@@ -9,7 +9,7 @@
 int op_clr(uint16_t instruction)
 {
     uint8_t dst = instruction & 077;
-    log(LOG_INFO, "CLR function called\n");
+    log(LOG_INST, "CLR function called\n");
 	
     operand_value_write_word(dst, 0);
     psw.negative = 0;
@@ -21,7 +21,7 @@ int op_clr(uint16_t instruction)
 
 int op_clrb(uint16_t instruction){
     uint8_t dst = instruction & 077;
-    log(LOG_INFO, "CLRB function called\n");
+    log(LOG_INST, "CLRB function called\n");
 	
     operand_value_write_byte(dst, 0);
     psw.negative = 0;
@@ -34,7 +34,7 @@ int op_clrb(uint16_t instruction){
 
 int op_com(uint16_t instruction){
     uint8_t dst = instruction & 077;
-    log(LOG_INFO, "COM function called\n");
+    log(LOG_INST, "COM function called\n");
     uint16_t old_value;
     old_value = operand_value_read_word(dst);
     old_value = (~old_value);
@@ -51,7 +51,7 @@ int op_com(uint16_t instruction){
 
 int op_comb(uint16_t instruction){
 	uint8_t dst = instruction & 077;
-    log(LOG_INFO, "COMB function called\n");
+    log(LOG_INST, "COMB function called\n");
     uint8_t old_value;
     old_value = operand_value_read_byte(dst);
     old_value = (~old_value);
@@ -72,7 +72,7 @@ int op_inc(uint16_t instruction){
     uint8_t mode = instruction & 70;
     uint8_t dst_reg = instruction & 007;
 
-        log(LOG_INFO, "INC function called\n");
+        log(LOG_INST, "INC function called\n");
         int16_t old_value, value;
         old_value = operand_value_read_word(dst);
         value = old_value + 1;
@@ -96,7 +96,7 @@ int op_inc(uint16_t instruction){
 
 int op_incb(uint16_t instruction){
     uint8_t dst = instruction & 077;
-	log(LOG_INFO, "INCB function called\n");
+	log(LOG_INST, "INCB function called\n");
 	int8_t old_value, value;
 	old_value = operand_value_read_byte(dst);
 	value = (1 + old_value);
@@ -114,7 +114,7 @@ int op_incb(uint16_t instruction){
 
 int op_dec(uint16_t instruction){
     uint8_t dst = instruction & 077;
-	log(LOG_INFO, "DEC function called\n");
+	log(LOG_INST, "DEC function called\n");
     int16_t old_value, value;
     old_value = operand_value_read_word(dst);
     value = old_value - 1;
@@ -132,7 +132,7 @@ int op_dec(uint16_t instruction){
 
 int op_decb(uint16_t instruction){
     uint8_t dst = instruction & 077;
-	log(LOG_INFO, "DECB function called\n");
+	log(LOG_INST, "DECB function called\n");
     int8_t old_value, value;
     old_value = operand_value_read_byte(dst);
 	value = old_value - 1;
@@ -149,7 +149,7 @@ int op_decb(uint16_t instruction){
 
 int op_neg(uint16_t instruction){
     uint8_t dst = instruction & 077;
-	log(LOG_INFO, "NEG function called\n");
+	log(LOG_INST, "NEG function called\n");
 	int16_t old_value, value, i;
 	old_value = operand_value_read_word(dst);
 	i = (~old_value);
@@ -170,7 +170,7 @@ int op_neg(uint16_t instruction){
 
 int op_negb(uint16_t instruction){
     uint8_t dst = instruction & 077;
-	log(LOG_INFO, "NEGB function called\n");
+	log(LOG_INST, "NEGB function called\n");
 	int8_t old_value, value, i;
 	old_value = operand_value_read_byte(dst);
 	i = (~old_value);
@@ -191,7 +191,7 @@ int op_negb(uint16_t instruction){
 //Shift and Rotate
 int op_asr(uint16_t instruction){
     uint8_t dst = instruction & 077;
-	log(LOG_INFO, "ASR function called\n");
+	log(LOG_INST, "ASR function called\n");
 	uint16_t old_value, value;
 	old_value = operand_value_read_word(dst);
 	value = (old_value & 0100000) | (old_value >> 1);
@@ -212,7 +212,7 @@ int op_asr(uint16_t instruction){
 
 int op_asrb(uint16_t instruction){
 	uint8_t dst = instruction & 077;
-	log(LOG_INFO, "ASRB function called\n");
+	log(LOG_INST, "ASRB function called\n");
 	uint8_t old_value, value;
 	old_value = operand_value_read_byte(dst);
 	value = (old_value & 0100000) | (old_value >> 1); //value = (old_value & 0200) | (old_value >> 1);
@@ -233,7 +233,7 @@ int op_asrb(uint16_t instruction){
 
 int op_asl(uint16_t instruction){
     uint8_t dst = instruction & 077;
-	log(LOG_INFO, "ASL function called\n");
+	log(LOG_INST, "ASL function called\n");
 	uint16_t old_value, value;
 	old_value = operand_value_read_word(dst);
 	value = (0177776) & (old_value << 1);
@@ -249,7 +249,7 @@ int op_asl(uint16_t instruction){
 
 int op_aslb(uint16_t instruction){
 	uint8_t dst = instruction & 077;
-	log(LOG_INFO, "ASLB function called\n");
+	log(LOG_INST, "ASLB function called\n");
 	uint8_t old_value, value;
 	old_value = operand_value_read_byte(dst);
 	value = ((0374) & (old_value << 1));
@@ -266,7 +266,7 @@ int op_aslb(uint16_t instruction){
 
 int op_ror(uint16_t instruction){
 	uint8_t dst = instruction & 077;
-	log(LOG_INFO, "ROR function called\n");
+	log(LOG_INST, "ROR function called\n");
 	uint16_t old_value, value;
 	old_value = operand_value_read_word(dst);
 	value = ((old_value >> 1) | (psw.carry << 15));
@@ -281,7 +281,7 @@ int op_ror(uint16_t instruction){
 
 int op_rorb(uint16_t instruction){
 	uint8_t dst = instruction & 077;
-	log(LOG_INFO, "RORB function called\n");
+	log(LOG_INST, "RORB function called\n");
 	uint8_t old_value, value;
 	old_value = operand_value_read_byte(dst);
 	value = ((old_value >> 1) | (psw.carry << 7));
@@ -297,7 +297,7 @@ int op_rorb(uint16_t instruction){
 
 int op_rol(uint16_t instruction){
 	uint8_t dst = instruction & 077;
-	log(LOG_INFO, "ROL function called\n");
+	log(LOG_INST, "ROL function called\n");
 	uint16_t old_value, value;
 	old_value = operand_value_read_word(dst);
 	value = (old_value << 1) | (psw.carry);
@@ -312,7 +312,7 @@ int op_rol(uint16_t instruction){
 
 int op_rolb(uint16_t instruction){
 	uint8_t dst = instruction & 077;
-	log(LOG_INFO, "ROLB function called\n");
+	log(LOG_INST, "ROLB function called\n");
 	uint8_t old_value, value;
 	old_value = operand_value_read_byte(dst);
 	value = (old_value << 1) | (psw.carry);
@@ -328,7 +328,7 @@ int op_rolb(uint16_t instruction){
 
 int op_swab(uint16_t instruction){
 	uint8_t dst = instruction & 077;
-	log(LOG_INFO, "SWAB function called\n");
+	log(LOG_INST, "SWAB function called\n");
 	uint16_t old_value, value;
 	old_value = operand_value_read_byte(dst);
 	value = (((old_value & 0177400) >> 8) | ((old_value & 0000377) << 8)) ;
@@ -345,7 +345,7 @@ int op_swab(uint16_t instruction){
 //Multiple Precision
 int op_adc(uint16_t instruction){
     uint8_t dst = instruction & 077;
-	log(LOG_INFO, "ADC function called\n");
+	log(LOG_INST, "ADC function called\n");
 	int16_t old_value, value;
 	old_value = operand_value_read_word(dst);
 	value = old_value + psw.carry;
@@ -361,7 +361,7 @@ int op_adc(uint16_t instruction){
 
 int op_adcb(uint16_t instruction){
 	uint8_t dst = instruction & 077;
-	log(LOG_INFO, "ADCB function called\n");
+	log(LOG_INST, "ADCB function called\n");
 	int8_t old_value, value;
 	old_value = operand_value_read_byte(dst);
 	value = old_value + psw.carry;
@@ -378,7 +378,7 @@ int op_adcb(uint16_t instruction){
 
 int op_sbc(uint16_t instruction){
     uint8_t dst = instruction & 077;
-	log(LOG_INFO, "SBC function called\n");
+	log(LOG_INST, "SBC function called\n");
 	int16_t old_value, value;
 	old_value = (int16_t)operand_value_read_word(dst);
 	value = old_value - psw.carry;
@@ -394,7 +394,7 @@ int op_sbc(uint16_t instruction){
 
 int op_sbcb(uint16_t instruction){
     uint8_t dst = instruction & 077;
-	log(LOG_INFO, "SBCB function called\n");
+	log(LOG_INST, "SBCB function called\n");
 	int8_t old_value, value;
 	old_value = (int8_t)operand_value_read_byte(dst);
 	value = old_value - psw.carry;
@@ -419,10 +419,10 @@ int op_mov(uint16_t instruction)
     uint8_t dst_mode = instruction >> 3 & 07; // bits 5-0
     uint16_t value;
     
-    log(LOG_INFO, "MOV function called\n");
+    log(LOG_INST, "MOV function called\n");
 
     value = operand_value_read_word(src);
-	operand_value_write_word(dst_reg, (uint16_t)value);
+	operand_value_write_word(dst, (uint16_t)value);
     
 /*
     N: set if (src) <0; cleared otherwise
@@ -462,7 +462,7 @@ int op_movb(uint16_t instruction)
 			full_value = value;
 	}
 
-    log(LOG_INFO, "MOVB function called\n");
+    log(LOG_INST, "MOVB function called\n");
     operand_value_write_word(dst, full_value);
     
 /*
@@ -484,7 +484,7 @@ int op_cmp(uint16_t instruction)
 	uint8_t src = (instruction >> 6) & 077; // bits 6-11
     uint8_t dst = (instruction) & 077; // bits 0-5
 	uint16_t value;
-	log(LOG_INFO, "CMP function called\n");
+	log(LOG_INST, "CMP function called\n");
 	
 	int16_t src_val = operand_value_read_word(src);
     int16_t dst_val = operand_value_read_word(dst);
@@ -517,7 +517,7 @@ int op_cmpb(uint16_t instruction)
 	uint8_t src = (instruction >> 6) & 077; // bits 6-11
     uint8_t dst = (instruction) & 077; // bits 0-5
 	uint16_t value;
-	log(LOG_INFO, "CMPB function called\n");
+	log(LOG_INST, "CMPB function called\n");
 	
 	int16_t src_val = operand_value_read_byte(src);
     int16_t dst_val = operand_value_read_byte(dst);
@@ -554,13 +554,16 @@ int op_add(uint16_t instruction)
     uint8_t dst_mode = (instruction >> 3)& 07; // bits 0-2
     int32_t value;
     uint16_t src_value;
-    log(LOG_INFO, "ADD function called\n");
+    log(LOG_INST, "ADD function called\n");
 
     int16_t src_val = operand_value_read_word(src);
     int16_t dst_val = operand_value_read_word(dst);
     value = src_val + dst_val;
 	
-	operand_value_write_word(dst, (uint16_t)value);
+	if(dst_reg == 7)
+		operand_value_write_word(src, (uint16_t)value);
+	else
+		operand_value_write_word(dst, (uint16_t)value);
 	/*
 	N: set if result <0; cleared otherwise
 	Z: set if result = 0; cleared otherwise
@@ -587,7 +590,7 @@ int op_sub(uint16_t instruction)
     uint8_t dst_reg = instruction & 07;
     int32_t value;
     uint16_t src_value;
-    log(LOG_INFO, "SUB function called\n");
+    log(LOG_INST, "SUB function called\n");
 
     int16_t src_val = operand_value_read_word(src);
     int16_t dst_val = operand_value_read_word(dst);
@@ -625,7 +628,7 @@ int op_bit(uint16_t instruction)
     
     int16_t value;
     
-    log(LOG_INFO, "BIT function called\n");
+    log(LOG_INST, "BIT function called\n");
     
     //Read values for source and destination
     int16_t src_val = operand_value_read_word(src);
@@ -655,7 +658,7 @@ int op_bitb(uint16_t instruction)
     uint8_t dst_reg = instruction & 07;
     int16_t value;
     
-    log(LOG_INFO, "BITB function called\n");
+    log(LOG_INST, "BITB function called\n");
     
     //Read values for source and destination
     int16_t src_val = operand_value_read_byte(src);
@@ -687,7 +690,7 @@ int op_bic(uint16_t instruction)
     uint8_t dst_reg = instruction & 07;
     int16_t value;
     
-    log(LOG_INFO, "BIC function called\n");
+    log(LOG_INST, "BIC function called\n");
     
     //Read values for source and destination
     int16_t src_val = operand_value_read_word(src);
@@ -718,7 +721,7 @@ int op_bicb(uint16_t instruction)
     uint8_t dst_reg = instruction & 07;
     int16_t value;
     
-    log(LOG_INFO, "BIC function called\n");
+    log(LOG_INST, "BIC function called\n");
     
     //Read values for source and destination
     int16_t src_val = operand_value_read_byte(src);
@@ -749,7 +752,7 @@ int op_bis(uint16_t instruction)
     uint8_t dst_reg = instruction & 07;
     int16_t value;
     
-    log(LOG_INFO, "BIS function called\n");
+    log(LOG_INST, "BIS function called\n");
     
     //Read values for source and destination
     int16_t src_val = operand_value_read_word(src);
@@ -780,7 +783,7 @@ int op_bisb(uint16_t instruction)
     uint8_t dst_reg = instruction & 07;
     int16_t value;
     
-    log(LOG_INFO, "BIS function called\n");
+    log(LOG_INST, "BIS function called\n");
     
     //Read values for source and destination
     int16_t src_val = operand_value_read_byte(src);
@@ -820,7 +823,7 @@ int op_mul(uint16_t instruction)
     int32_t value;
     uint16_t src_value;
     
-    log(LOG_INFO, "MUL function called\n");
+    log(LOG_INST, "MUL function called\n");
        
 	//call read/write operand with byte = 0 since there are no byte modes
     int16_t src_val = operand_value_read_word(src);
@@ -870,7 +873,7 @@ int op_div(uint16_t instruction){
     int32_t value, rem;
     uint16_t src_value;
     
-    log(LOG_INFO, "DIV function called\n");
+    log(LOG_INST, "DIV function called\n");
     if(dst_reg % 2)
 	{
 		log(LOG_INFO,"Odd destination register '%d' not allowed\n", dst_reg);
@@ -937,7 +940,7 @@ int op_ash(uint16_t instruction){
     
     uint16_t src_val = operand_value_read_word(src); //number of bits to shift
     int16_t dst_val = operand_value_read_word(dst_reg); //register val to be shifted
-    log(LOG_INFO, "ASH function called\n");
+    log(LOG_INST, "ASH function called\n");
     //log(LOG_INFO, "Source contains %o\n", src_val);
     shift_val = src_val & 077; //lower 6 bits of src value for shift
     shift_sign = (shift_val >> 5);
@@ -1005,7 +1008,7 @@ int op_ashc(uint16_t instruction){
     uint16_t dst_val1 = operand_value_read_word(src);
     uint16_t dst_val2 = operand_value_read_word(src|1);
     int32_t dst_val = (dst_val1 << 16) | dst_val2; //register val to be shifted
-    log(LOG_INFO, "ASHC function called\n");
+    log(LOG_INST, "ASHC function called\n");
     //log(LOG_INFO, "Source contains %o\n", src_val);
     shift_val = src_val & 077; //lower 6 bits of src value for shift
     shift_sign = (shift_val >> 5);
@@ -1062,7 +1065,7 @@ int op_xor(uint16_t instruction){
     
     int16_t reg_val = operand_value_read_word(r_reg); //register value
     int16_t dst_val = operand_value_read_word(dst); //destination val
-    log(LOG_INFO, "XOR function called\n");
+    log(LOG_INST, "XOR function called\n");
     value = reg_val ^ dst_val;
     
     operand_value_write_word(dst_reg, value);
@@ -1083,7 +1086,7 @@ int op_xor(uint16_t instruction){
 int op_br(uint16_t instruction)
 {
 	//Unconditional branch
-    log(LOG_INFO, "BRANCH function called\n");
+    log(LOG_INST, "BRANCH function called\n");
 
     int offset = instruction - 0400;
     printf("offset is %o\n", offset);
@@ -1097,7 +1100,7 @@ int op_br(uint16_t instruction)
 int op_bne(uint16_t instruction)
 {
 	//Branches if Z bit is clear
-    log(LOG_INFO, "Branch Not Equal function called\n");
+    log(LOG_INST, "Branch Not Equal function called\n");
 	if(psw.zero == 0){
 		int offset = instruction - 01000;
 		log(LOG_DEBUG, "offset is! %o\n", offset);
@@ -1113,7 +1116,7 @@ int op_bne(uint16_t instruction)
 int op_beq(uint16_t instruction)
 {
 	//Branches if Z bit set
-    log(LOG_INFO, "Branch Equals (Zero) function called\n");
+    log(LOG_INST, "Branch Equals (Zero) function called\n");
 	if(psw.zero == 1){
 		int offset = instruction - 01400;
 		log(LOG_DEBUG, "offset is! %o\n", offset);
@@ -1129,7 +1132,7 @@ int op_beq(uint16_t instruction)
 int op_bpl(uint16_t instruction)
 {
 	//Branches if N bit clear
-    log(LOG_INFO, "Branch Plus function called\n");
+    log(LOG_INST, "Branch Plus function called\n");
 	if(psw.negative == 0){
 		int offset = instruction - 0100000;
 		log(LOG_DEBUG, "offset is! %o\n", offset);
@@ -1146,7 +1149,7 @@ int op_bpl(uint16_t instruction)
 int op_bmi(uint16_t instruction)
 {
 	//Branches if N is set
-    log(LOG_INFO, "Branch Minus function called\n");
+    log(LOG_INST, "Branch Minus function called\n");
 	if(psw.negative == 1){
 		int offset = instruction - 0100400;
 		log(LOG_DEBUG, "offset is! %o\n", offset);
@@ -1163,7 +1166,7 @@ int op_bmi(uint16_t instruction)
 int op_bvc(uint16_t instruction)
 {
 	//Branches if V is clear
-    log(LOG_INFO, "Branch Overflow Cleared called\n");
+    log(LOG_INST, "Branch Overflow Cleared called\n");
 	if(psw.overflow == 0){
 		int offset = instruction - 0102000;
 		log(LOG_DEBUG, "offset is! %o\n", offset);
@@ -1180,7 +1183,7 @@ int op_bvc(uint16_t instruction)
 int op_bvs(uint16_t instruction)
 {
 	//Branches if V is set
-    log(LOG_INFO, "Branch Overflow Set called\n");
+    log(LOG_INST, "Branch Overflow Set called\n");
 	if(psw.overflow == 1){
 		int offset = instruction - 0102400;
 		log(LOG_DEBUG, "offset is! %o\n", offset);
@@ -1195,7 +1198,7 @@ int op_bvs(uint16_t instruction)
 int op_bcc(uint16_t instruction)
 {
 	//Branches if C is clear
-    log(LOG_INFO, "Branch Carry Cleared called\n");
+    log(LOG_INST, "Branch Carry Cleared called\n");
 	if(psw.carry == 0){
 		int offset = instruction - 0103000;
 		log(LOG_DEBUG, "offset is! %o\n", offset);
@@ -1210,7 +1213,7 @@ int op_bcc(uint16_t instruction)
 int op_bcs(uint16_t instruction)
 {
 	//Branches if C is set
-    log(LOG_INFO, "Branch Carry Set called\n");
+    log(LOG_INST, "Branch Carry Set called\n");
 	if(psw.carry == 1){
 		int offset = instruction - 0103400;
 		log(LOG_DEBUG, "offset is! %o\n", offset);
@@ -1226,7 +1229,7 @@ int op_bcs(uint16_t instruction)
 int op_bge(uint16_t instruction)
 {
 	//Branches if N and V are both set or if they are both clear
-    log(LOG_INFO, "Branch if Greater or equal called\n");
+    log(LOG_INST, "Branch if Greater or equal called\n");
 	if(psw.negative == psw.overflow){
 		int offset = instruction - 02000;
 		log(LOG_DEBUG, "offset is! %o\n", offset);
@@ -1241,7 +1244,7 @@ int op_bge(uint16_t instruction)
 int op_blt(uint16_t instruction)
 {
 	//Branches if N xor V 1
-    log(LOG_INFO, "Branch if Less Than\n");
+    log(LOG_INST, "Branch if Less Than\n");
 	if(psw.negative ^ psw.overflow == 1){
 		int offset = instruction - 02400;
 		log(LOG_DEBUG, "offset is! %o\n", offset);
@@ -1256,7 +1259,7 @@ int op_blt(uint16_t instruction)
 int op_bgt(uint16_t instruction)
 {
 	//Branches if Z xor (V xor N) is Zero
-    log(LOG_INFO, "Branch if Greater Than called\n");
+    log(LOG_INST, "Branch if Greater Than called\n");
 	if(psw.zero^(psw.negative ^ psw.overflow) == 0){
 		int offset = instruction - 03000;
 		log(LOG_DEBUG, "offset is! %o\n", offset);
@@ -1271,7 +1274,7 @@ int op_bgt(uint16_t instruction)
 int op_ble(uint16_t instruction)
 {
 	//Branches if Z xor (V xor N) is One
-    log(LOG_INFO, "Branch if Less or equal called\n");
+    log(LOG_INST, "Branch if Less or equal called\n");
 	if(psw.zero^(psw.negative ^ psw.overflow) == 1){
 		int offset = instruction - 03400;
 		log(LOG_DEBUG, "offset is! %o\n", offset);
@@ -1288,7 +1291,7 @@ int op_ble(uint16_t instruction)
 int op_bhi(uint16_t instruction)
 {
 	//Branches if both c and z are zero
-    log(LOG_INFO, "Branch if higher called\n");
+    log(LOG_INST, "Branch if higher called\n");
 	if(psw.carry == 0 && psw.zero == 0){
 		int offset = instruction - 0101000;
 		log(LOG_DEBUG, "offset is! %o\n", offset);
@@ -1303,7 +1306,7 @@ int op_bhi(uint16_t instruction)
 int op_blos(uint16_t instruction)
 {
 	//Branches if C or Z is set
-    log(LOG_INFO, "Branch if lower or same\n");
+    log(LOG_INST, "Branch if lower or same\n");
 	if(psw.carry || psw.zero == 1){
 		int offset = instruction - 0101400;
 		log(LOG_DEBUG, "offset is! %o\n", offset);
@@ -1322,7 +1325,7 @@ int op_jmp(uint16_t instruction){
 	uint8_t dst = (instruction) & 077; // bits 0-5
 	uint8_t dst_reg = (instruction) & 07; // bits 0-2
     uint8_t dst_mode = (instruction >> 3) & 07; // bits 3-5
-	log(LOG_INFO, "Jump function called\n");
+	log(LOG_INST, "Jump function called\n");
 	
 	//Illegal instruction if destination mode is 0 (cannot pass control
 	//to a register)
@@ -1343,6 +1346,6 @@ int op_jmp(uint16_t instruction){
 //Halt
 int op_halt(uint16_t instruction)
 {
-    log(LOG_INFO, "HALT function called\n");
+    log(LOG_INST, "HALT function called\n");
     return 0;
 }

@@ -5,7 +5,7 @@
 
 #define LOG_NONE -1
 #define LOG_ERROR 0
-#define LOG_NORMAL 1
+#define LOG_INST 1
 #define LOG_INFO 2
 #define LOG_DEBUG 3
 

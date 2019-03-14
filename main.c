@@ -4,7 +4,7 @@
 
 /// #include "instructions.c"
 
-int log_level = LOG_NORMAL;
+int log_level = LOG_NONE;
 
 /*
 http://pages.cpsc.ucalgary.ca/~dsb/PDP11/InsSet.html
@@ -302,11 +302,15 @@ uint16_t operand_value_read_word(uint8_t src_field)
             // second word of the instruction, when added to the PC, contains the address of the address of the operand                
             /* Value X (stored in a word following the instruction) and (Rn) are added and used as a pointer to a word containing the
             address of the operand. Neither X nor (Rn) are modified. */
-            addr_word = data_read_word(reg[src]);
-            reg[src] += 2; // move PC past data operand                
+            addr_word = data_read_word(reg[7]);
+            log(LOG_DEBUG, "addr_word = data_read_word(reg[%o]) = %0.6o\n", reg[src], addr_word);
+            reg[7] += 2; // move PC past data operand                
             addr_word = (uint16_t)(addr_word + reg[src]);
+            log(LOG_DEBUG, "addr_word = (uint16_t)(addr_word + reg[%o]) = %0.6o\n", reg[src], addr_word);
             ptr = data_read_word(addr_word);
-            value = data_read_word(ptr);    
+            log(LOG_DEBUG, "ptr = data_read_word(%0.6o) = %0.6o\n", addr_word, ptr);
+            value = data_read_word(ptr);
+            log(LOG_DEBUG, "value = data_read_word(%0.6o) = %0.6o\n", ptr, value);
             break;
     }
 
@@ -509,6 +513,7 @@ uint8_t operand_value_read_byte(uint8_t src_field)
             /* Value X (stored in a word following the instruction) and (Rn) are added and used as a pointer to a word containing the
             address of the operand. Neither X nor (Rn) are modified. */
             addr_word = data_read_word(reg[src]);
+            log(LOG_DEBUG, "addr_word = data_read_word(reg[src]) = %0.6o\n", addr_word, reg[src]);
             reg[src] += 2; // move PC past data operand                
             addr_word = (uint16_t)(addr_word + reg[src]);
             ptr = data_read_word(addr_word);
@@ -695,17 +700,25 @@ void print_memory()
 {
     uint16_t *word = NULL;
     uint8_t *hi_byte, *low_byte = NULL;
+    int data_all_zero = 0;
     
     printf("Contents of occupied memory locations (in octal):\nAddr    Word     Hi  Low\n");
     
     for(int word_offset=0; word_offset < MEMORY_SIZE / 2; word_offset++)
     {
         word = (uint16_t *)memory+word_offset;
-        if (*word != 0) // only print locations that are not 0
+        if (*word == 0) // show at most 10 empty memory locations 
         {
+            data_all_zero += 1;
+            if (data_all_zero < 10)
+                printf("%0.6o: 000000\t000 000\n", word_offset*2);
+        }
+        else 
+        {
+            data_all_zero = 0;
             low_byte = (uint8_t *)memory+(2*word_offset);
             hi_byte = (uint8_t *)memory+(2*word_offset)+1;
-            printf("%0.6o: %0.6o\t %0.3o %0.3o\n", word_offset*2, *word, *hi_byte, *low_byte);
+            printf("%0.6o: %0.6o\t%0.3o %0.3o\n", word_offset*2, *word, *hi_byte, *low_byte);
         }
     }
 }
@@ -809,7 +822,7 @@ int decode_and_execute(uint16_t instruction)
         case OP_JMP:
             decoder = op_jmp;
             break;
-            
+
 		//General
         case OP_CLR: 
             decoder = op_clr; 
