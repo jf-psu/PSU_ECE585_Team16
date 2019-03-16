@@ -1,7 +1,7 @@
-;Branch
+;Branch backwards
 
 L1:
-
+    HALT
 
 START: 
 	
