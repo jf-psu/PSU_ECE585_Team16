@@ -1,0 +1,25 @@
+;jump. 
+;Opcode:0001DD
+
+;Test for jumping backwards 
+
+L0:
+	mov #1, R1
+	HALT
+
+START: 
+	mov #5, R1 ;R1 = 5
+	ADD R1, #5 ;R1 = 0 shouldnt cause overflow
+    JMP L0
+
+	BR L2 	;Fallthru, Should never run!. Opcode:000400
+    HALT
+
+L1:
+	mov #1, R1
+    HALT
+L2:
+	mov #2, R1
+    HALT
+
+.END START
