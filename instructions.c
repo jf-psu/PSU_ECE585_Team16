@@ -9,9 +9,17 @@
 int op_clr(uint16_t instruction)
 {
     uint8_t dst = instruction & 077;
+	uint16_t dst_addr;
+
     log(LOG_INST, "CLR function called\n");
-	
-    operand_value_write_word(dst, 0);
+
+    operand_value_read_word(dst, &dst_addr);
+
+    if ( dst_addr != 0 ) // dst was a deferred address
+        data_write_word(dst_addr, 0);
+    else
+        reg[dst] = 0;
+
     psw.negative = 0;
     psw.zero = 1;
     psw.overflow = 0;
@@ -22,8 +30,15 @@ int op_clr(uint16_t instruction)
 int op_clrb(uint16_t instruction){
     uint8_t dst = instruction & 077;
     log(LOG_INST, "CLRB function called\n");
-	
-    operand_value_write_byte(dst, 0);
+
+	uint16_t dst_addr;	
+    operand_value_read_word(dst, &dst_addr);
+
+    if ( dst_addr != 0 ) // dst was a deferred address
+        data_write_byte(dst_addr, 0);
+    else
+		reg[dst] = (reg[dst] & 0177400); // only clear the low byte of register
+
     psw.negative = 0;
     psw.zero = 1;
     psw.overflow = 0;
@@ -35,15 +50,22 @@ int op_clrb(uint16_t instruction){
 int op_com(uint16_t instruction){
     uint8_t dst = instruction & 077;
     log(LOG_INST, "COM function called\n");
-    uint16_t old_value;
-    old_value = operand_value_read_word(dst);
-    old_value = (~old_value);
-    operand_value_write_word(dst, old_value);
+    uint16_t value;
+    uint16_t dst_addr;
+
+    value = operand_value_read_word(dst, &dst_addr);
+
+    value = (~value);
+
+    if ( dst_addr != 0 ) // dst was a deferred address
+        data_write_word(dst_addr, value);
+    else
+        reg[dst] = value;
 
     //if msb of result is set 
-    psw.negative = ((old_value >> 15) == 1);
+    psw.negative = ((value >> 15) == 1);
     //set if result is 0
-    psw.zero = (old_value == 0);
+    psw.zero = (value == 0);
     psw.overflow = 0;
     psw.carry = 1;
 	return 0;
@@ -52,15 +74,22 @@ int op_com(uint16_t instruction){
 int op_comb(uint16_t instruction){
 	uint8_t dst = instruction & 077;
     log(LOG_INST, "COMB function called\n");
-    uint8_t old_value;
-    old_value = operand_value_read_byte(dst);
-    old_value = (~old_value);
-    operand_value_write_byte(dst, old_value);
+    uint8_t value;
+    uint16_t dst_addr;
+
+    value = operand_value_read_word(dst, &dst_addr);
+	value = (~value);
+
+    if ( dst_addr != 0 ) // dst was a deferred address
+        data_write_byte(dst_addr, value);
+    else
+		reg[dst] = (reg[dst] & 0177400) | value; // only modify the low byte of register
+
 
     //if msb of result is set 
-    psw.negative = ((old_value >> 7) == 1);
+    psw.negative = ((value >> 7) == 1);
     //set if result is 0
-    psw.zero = (old_value == 0);
+    psw.zero = (value == 0);
     psw.overflow = 0;
     psw.carry = 1;
 	return 0;
@@ -69,27 +98,28 @@ int op_comb(uint16_t instruction){
 
 int op_inc(uint16_t instruction){
     uint8_t dst = instruction & 077;
-    uint8_t mode = instruction & 70;
-    uint8_t dst_reg = instruction & 007;
+//    uint8_t mode = instruction & 70;
+//   uint8_t dst_reg = instruction & 007;
+	log(LOG_INST, "INC function called\n");
 
-        log(LOG_INST, "INC function called\n");
-        int16_t old_value, value;
-        old_value = operand_value_read_word(dst);
-        value = old_value + 1;
+    uint16_t dst_addr;
+	int16_t old_value, value;
 
-        if(mode == 6){
-                operand_value_write_word(dst_reg, value);
-        }
-        else{
-                operand_value_write_word(dst, value);
-        }
+    old_value = operand_value_read_word(dst, &dst_addr);
+	value = (uint16_t)(old_value + 1);
 
-        //set if result is less than 0
-        psw.negative = (value < 0);
-        //set if result is 0
-        psw.zero = (value == 0);
-        //set if dst held 077777 cleared otherwise
-    	psw.overflow = (old_value == 0077777);
+    if ( dst_addr != 0 ) // dst was a deferred address
+        data_write_word(dst_addr, value);
+    else
+        reg[dst] = value;
+
+
+	//set if result is less than 0
+	psw.negative = (value < 0);
+	//set if result is 0
+	psw.zero = (value == 0);
+	//set if dst held 077777 cleared otherwise
+	psw.overflow = (old_value == 0077777);
 
 	return 0;
 }
@@ -98,9 +128,17 @@ int op_incb(uint16_t instruction){
     uint8_t dst = instruction & 077;
 	log(LOG_INST, "INCB function called\n");
 	int8_t old_value, value;
-	old_value = operand_value_read_byte(dst);
+    uint16_t dst_addr;
+
+    old_value = operand_value_read_word(dst, &dst_addr);
 	value = (1 + old_value);
-	operand_value_write_byte(dst,value);
+
+
+    if ( dst_addr != 0 ) // dst was a deferred address
+        data_write_byte(dst_addr, value);
+    else
+		reg[dst] = (reg[dst] & 0177400) | value; // only modify the low byte of register
+
 
 	//set if result is less than 0
 	psw.negative = (value < 0);
@@ -115,10 +153,17 @@ int op_incb(uint16_t instruction){
 int op_dec(uint16_t instruction){
     uint8_t dst = instruction & 077;
 	log(LOG_INST, "DEC function called\n");
-    int16_t old_value, value;
-    old_value = operand_value_read_word(dst);
-    value = old_value - 1;
-	operand_value_write_word(dst,value);
+
+	uint16_t dst_addr;
+	int16_t old_value, value;
+
+    old_value = operand_value_read_word(dst, &dst_addr);
+	value = (uint16_t)(old_value - 1);
+
+    if ( dst_addr != 0 ) // dst was a deferred address
+        data_write_word(dst_addr, value);
+    else
+        reg[dst] = value;
 
 	//set if result is less than 0
     psw.negative = (value < 0);
@@ -133,16 +178,24 @@ int op_dec(uint16_t instruction){
 int op_decb(uint16_t instruction){
     uint8_t dst = instruction & 077;
 	log(LOG_INST, "DECB function called\n");
-    int8_t old_value, value;
-    old_value = operand_value_read_byte(dst);
-	value = old_value - 1;
-	operand_value_write_byte(dst, value);
+
+	int8_t value;
+    uint16_t dst_addr;
+
+    value = operand_value_read_word(dst, &dst_addr);
+	value = value - 1;
+
+    if ( dst_addr != 0 ) // dst was a deferred address
+        data_write_byte(dst_addr, value);
+    else
+		reg[dst] = (reg[dst] & 0177400) | value; // only modify the low byte of register
+
 
 	//set if result is less than 0
     psw.negative = (value < 0);
     //set if result is 0
     psw.zero = (value == 0);
-    psw.overflow = (old_value == 0100000); //not sure about this
+    psw.overflow = (value == 0100000); //not sure about this
 	return 0;
 }
 
@@ -150,11 +203,20 @@ int op_decb(uint16_t instruction){
 int op_neg(uint16_t instruction){
     uint8_t dst = instruction & 077;
 	log(LOG_INST, "NEG function called\n");
+
+	uint16_t dst_addr;
 	int16_t old_value, value, i;
-	old_value = operand_value_read_word(dst);
+
+    old_value = operand_value_read_word(dst, &dst_addr);
+
 	i = (~old_value);
-	value = i + 1;
-	operand_value_write_word(dst, value);
+	value = (uint16_t)(i + 1);
+
+    if ( dst_addr != 0 ) // dst was a deferred address
+        data_write_word(dst_addr, value);
+    else
+        reg[dst] = value;
+
 	
 	//set if result is less than 0
     psw.negative = (value < 0);
@@ -171,11 +233,19 @@ int op_neg(uint16_t instruction){
 int op_negb(uint16_t instruction){
     uint8_t dst = instruction & 077;
 	log(LOG_INST, "NEGB function called\n");
+
 	int8_t old_value, value, i;
-	old_value = operand_value_read_byte(dst);
+	uint16_t dst_addr;
+
+	old_value = operand_value_read_word(dst, &dst_addr);
 	i = (~old_value);
 	value = i + 1;
-	operand_value_write_byte(dst, value);
+
+
+    if ( dst_addr != 0 ) // dst was a deferred address
+        data_write_byte(dst_addr, value);
+    else
+		reg[dst] = (reg[dst] & 0177400) | value; // only modify the low byte of register
 	
 	//set if result is less than 0
     psw.negative = (value < 0);
@@ -192,19 +262,26 @@ int op_negb(uint16_t instruction){
 int op_asr(uint16_t instruction){
     uint8_t dst = instruction & 077;
 	log(LOG_INST, "ASR function called\n");
-	uint16_t old_value, value;
-	old_value = operand_value_read_word(dst);
+    uint16_t dst_addr;
+    int16_t old_value, value;
+
+    old_value = operand_value_read_word(dst, &dst_addr);
+	
 	value = (old_value & 0100000) | (old_value >> 1);
 	log(LOG_INFO, "Value %d\n", value);
-	operand_value_write_word(dst, value);
+
+    if ( dst_addr != 0 ) // dst was a deferred address
+        data_write_word(dst_addr, value);
+    else
+        reg[dst] = value;
 
 	//set if high order bit of the result is set(result < 0)
 	psw.negative = ((value >> 15) == 1);
 	//set if result = 0
 	psw.zero = (value == 0);
-	//loaded from the exclusive OR of the N-bit and C-bit
-	psw.carry = (old_value & 0000001);
 	//loaded from the low order bit of the destination
+	psw.carry = (old_value & 0000001);
+	//loaded from the exclusive OR of the N-bit and C-bit
     psw.overflow = (psw.negative ^ psw.carry);
 
 	return 0;
@@ -214,10 +291,18 @@ int op_asrb(uint16_t instruction){
 	uint8_t dst = instruction & 077;
 	log(LOG_INST, "ASRB function called\n");
 	uint8_t old_value, value;
-	old_value = operand_value_read_byte(dst);
+	uint16_t dst_addr;
+
+    old_value = operand_value_read_word(dst, &dst_addr);
+
 	value = (old_value & 0100000) | (old_value >> 1); //value = (old_value & 0200) | (old_value >> 1);
 	log(LOG_INFO, "Value %d\n", value);
-	operand_value_write_byte(dst, value);
+
+    if ( dst_addr != 0 ) // dst was a deferred address
+        data_write_byte(dst_addr, value);
+    else
+		reg[dst] = (reg[dst] & 0177400) | value; // only modify the low byte of register
+
 
 	//set if high order bit of the result is set(result < 0)
 	psw.negative = ((value >> 7) == 1);
@@ -234,15 +319,24 @@ int op_asrb(uint16_t instruction){
 int op_asl(uint16_t instruction){
     uint8_t dst = instruction & 077;
 	log(LOG_INST, "ASL function called\n");
-	uint16_t old_value, value;
-	old_value = operand_value_read_word(dst);
+
+    uint16_t dst_addr;
+    int16_t old_value, value;
+
+    old_value = operand_value_read_word(dst, &dst_addr);
+
 	value = (0177776) & (old_value << 1);
 	log(LOG_INFO, "Value %d\n", value);
-	operand_value_write_word(dst, value);
 
-    psw.negative = ((value >> 15) == 1);
+    if ( dst_addr != 0 ) // dst was a deferred address
+        data_write_word(dst_addr, value);
+    else
+        reg[dst] = value;
+
+
+    psw.negative = (value >> 15);
     psw.zero = (value == 0);
-    psw.carry = ((old_value & 0100000) >> 15);
+    psw.carry = (value >> 15);
     psw.overflow = (psw.negative ^ psw.carry);
 	return 0;
 }
@@ -251,10 +345,18 @@ int op_aslb(uint16_t instruction){
 	uint8_t dst = instruction & 077;
 	log(LOG_INST, "ASLB function called\n");
 	uint8_t old_value, value;
-	old_value = operand_value_read_byte(dst);
+    uint16_t dst_addr;
+
+    old_value = operand_value_read_word(dst, &dst_addr);
+
 	value = ((0374) & (old_value << 1));
 	log(LOG_INFO, "Value %d\n", value);
-	operand_value_write_byte(dst, value);
+
+    if ( dst_addr != 0 ) // dst was a deferred address
+        data_write_byte(dst_addr, value);
+    else
+		reg[dst] = (reg[dst] & 0177400) | value; // only modify the low byte of register
+
 
     psw.negative = ((value >> 7) == 1);
     psw.zero = (value == 0);
@@ -267,14 +369,24 @@ int op_aslb(uint16_t instruction){
 int op_ror(uint16_t instruction){
 	uint8_t dst = instruction & 077;
 	log(LOG_INST, "ROR function called\n");
-	uint16_t old_value, value;
-	old_value = operand_value_read_word(dst);
+
+    uint16_t dst_addr;
+    int16_t old_value, value;
+
+    old_value = operand_value_read_word(dst, &dst_addr);	
+
 	value = ((old_value >> 1) | (psw.carry << 15));
-	operand_value_write_word(dst,value);
+
+
+    if ( dst_addr != 0 ) // dst was a deferred address
+        data_write_word(dst_addr, value);
+    else
+        reg[dst] = value;
+
 
 	psw.carry = (old_value & 0000001);
 	psw.zero = (value == 0);
-	psw.negative = ((value >> 15) == 1);
+	psw.negative = (value >> 15);
 	psw.overflow = (psw.negative ^ psw.carry);
 	return 0;
 }
@@ -283,9 +395,17 @@ int op_rorb(uint16_t instruction){
 	uint8_t dst = instruction & 077;
 	log(LOG_INST, "RORB function called\n");
 	uint8_t old_value, value;
-	old_value = operand_value_read_byte(dst);
+    uint16_t dst_addr;
+
+    old_value = operand_value_read_word(dst, &dst_addr);
+
 	value = ((old_value >> 1) | (psw.carry << 7));
-	operand_value_write_byte(dst,value);
+
+    if ( dst_addr != 0 ) // dst was a deferred address
+        data_write_byte(dst_addr, value);
+    else
+		reg[dst] = (reg[dst] & 0177400) | value; // only modify the low byte of register
+
 
 	psw.carry = (old_value & 0001);
 	psw.zero = (value == 0);
@@ -298,10 +418,17 @@ int op_rorb(uint16_t instruction){
 int op_rol(uint16_t instruction){
 	uint8_t dst = instruction & 077;
 	log(LOG_INST, "ROL function called\n");
-	uint16_t old_value, value;
-	old_value = operand_value_read_word(dst);
+	uint16_t dst_addr;
+    int16_t old_value, value;
+
+    old_value = operand_value_read_word(dst, &dst_addr);
+
 	value = (old_value << 1) | (psw.carry);
-	operand_value_write_word(dst,value);
+
+    if ( dst_addr != 0 ) // dst was a deferred address
+        data_write_word(dst_addr, value);
+    else
+        reg[dst] = value;
 
 	psw.carry = ((old_value & 0100000) >> 15);
 	psw.zero = (value == 0);
@@ -314,9 +441,16 @@ int op_rolb(uint16_t instruction){
 	uint8_t dst = instruction & 077;
 	log(LOG_INST, "ROLB function called\n");
 	uint8_t old_value, value;
-	old_value = operand_value_read_byte(dst);
+    uint16_t dst_addr;
+
+    old_value = operand_value_read_word(dst, &dst_addr);
 	value = (old_value << 1) | (psw.carry);
-	operand_value_write_byte(dst,value);
+
+    if ( dst_addr != 0 ) // dst was a deferred address
+        data_write_byte(dst_addr, value);
+    else
+		reg[dst] = (reg[dst] & 0177400) | value; // only modify the low byte of register
+
 
 	psw.carry = ((old_value & 0200) >> 7);
 	psw.zero = (value == 0);
@@ -329,10 +463,17 @@ int op_rolb(uint16_t instruction){
 int op_swab(uint16_t instruction){
 	uint8_t dst = instruction & 077;
 	log(LOG_INST, "SWAB function called\n");
+    uint16_t dst_addr;
 	uint16_t old_value, value;
-	old_value = operand_value_read_byte(dst);
-	value = (((old_value & 0177400) >> 8) | ((old_value & 0000377) << 8)) ;
-	operand_value_write_byte(dst,value);
+
+	old_value = operand_value_read_word(dst, &dst_addr);
+
+	value = (((old_value & 0177400) >> 8) | ((old_value & 0000377) << 8));
+
+    if ( dst_addr != 0 ) // dst was a deferred address
+        data_write_word(dst_addr, value);
+    else
+        reg[dst] = value;
 
 	psw.carry = 0;
 	psw.zero = ((value & 0000377) == 0);
@@ -346,11 +487,19 @@ int op_swab(uint16_t instruction){
 int op_adc(uint16_t instruction){
     uint8_t dst = instruction & 077;
 	log(LOG_INST, "ADC function called\n");
-	int16_t old_value, value;
-	old_value = operand_value_read_word(dst);
+
+    uint16_t dst_addr;
+    int16_t old_value, value;
+
+    old_value = operand_value_read_word(dst, &dst_addr);
+
 	value = old_value + psw.carry;
 	log(LOG_INFO, "Value %d\n", value);
-	operand_value_write_word(dst, value);
+
+    if ( dst_addr != 0 ) // dst was a deferred address
+        data_write_word(dst_addr, value);
+    else
+        reg[dst] = value;
 
     psw.negative = (value < 0);
     psw.zero = (value == 0);
@@ -363,10 +512,17 @@ int op_adcb(uint16_t instruction){
 	uint8_t dst = instruction & 077;
 	log(LOG_INST, "ADCB function called\n");
 	int8_t old_value, value;
-	old_value = operand_value_read_byte(dst);
+    uint16_t dst_addr;
+
+    old_value = operand_value_read_word(dst, &dst_addr);
 	value = old_value + psw.carry;
 	log(LOG_INFO, "Value %d\n", value);
-	operand_value_write_byte(dst, value);
+
+    if ( dst_addr != 0 ) // dst was a deferred address
+        data_write_byte(dst_addr, value);
+    else
+		reg[dst] = (reg[dst] & 0177400) | value; // only modify the low byte of register
+
 
     psw.negative = (value < 0);
     psw.zero = (value == 0);
@@ -379,11 +535,20 @@ int op_adcb(uint16_t instruction){
 int op_sbc(uint16_t instruction){
     uint8_t dst = instruction & 077;
 	log(LOG_INST, "SBC function called\n");
-	int16_t old_value, value;
-	old_value = (int16_t)operand_value_read_word(dst);
+
+	uint16_t dst_addr;
+    int16_t old_value, value;
+
+    old_value = operand_value_read_word(dst, &dst_addr);
+
 	value = old_value - psw.carry;
 	log(LOG_INFO, "Value %d\n", value);
-	operand_value_write_word(dst, value);
+
+    if ( dst_addr != 0 ) // dst was a deferred address
+        data_write_word(dst_addr, value);
+    else
+        reg[dst] = value;
+
 
     psw.negative = (value < 0);
     psw.zero = (value == 0);
@@ -396,10 +561,17 @@ int op_sbcb(uint16_t instruction){
     uint8_t dst = instruction & 077;
 	log(LOG_INST, "SBCB function called\n");
 	int8_t old_value, value;
-	old_value = (int8_t)operand_value_read_byte(dst);
+	uint16_t dst_addr;
+
+    old_value = (int8_t)operand_value_read_word(dst, &dst_addr);
 	value = old_value - psw.carry;
 	log(LOG_INFO, "Value %d\n", value);
-	operand_value_write_byte(dst, value);
+
+    if ( dst_addr != 0 ) // dst was a deferred address
+        data_write_byte(dst_addr, value);
+    else
+		reg[dst] = (reg[dst] & 0177400) | value; // only modify the low byte of register
+
 
     psw.negative = (value < 0);
     psw.zero = (value == 0);
@@ -415,14 +587,21 @@ int op_mov(uint16_t instruction)
 {
     uint8_t src = (instruction >> 6) & 077; // bits 11-6
     uint8_t dst = instruction & 077; // bits 5-0
-    uint8_t dst_reg = instruction & 07; // bits 5-0
-    uint8_t dst_mode = instruction >> 3 & 07; // bits 5-0
+    //uint8_t dst_reg = instruction & 07; // bits 5-0
+    //uint8_t dst_mode = instruction >> 3 & 07; // bits 5-0
     uint16_t value;
-    
+    uint16_t src_addr, dst_addr;
+
     log(LOG_INST, "MOV function called\n");
 
-    value = operand_value_read_word(src);
-	operand_value_write_word(dst, (uint16_t)value);
+    value = operand_value_read_word(src, &src_addr);
+    operand_value_read_word(dst, &dst_addr);
+
+	if ( dst_addr != 0 ) // dst was a deferred address
+        data_write_word(dst_addr, value);
+	else
+		reg[dst] = value;
+
     
 /*
     N: set if (src) <0; cleared otherwise
@@ -447,24 +626,25 @@ int op_movb(uint16_t instruction)
 {
     uint8_t src = (instruction >> 6) & 077; // bits 11-6
     uint8_t dst = instruction & 077; // bits 5-0
-	uint8_t dst_mode = (instruction >> 3) & 07; // bits 3-5
+	//uint8_t dst_mode = (instruction >> 3) & 07; // bits 3-5
     int16_t full_value = 0;
 	uint8_t value;
-	
-	value = operand_value_read_byte(src);
-	//extend sign out
-	//full_value = (((value & 0200) << 8) | value);
+	log(LOG_INST, "MOVB function called\n");
+    uint16_t src_addr, dst_addr;
 
-	if (dst_mode == 0) { // destination is register
+    value = operand_value_read_byte(src, &src_addr);
+    operand_value_read_byte(dst, &dst_addr);
+
+    if ( dst_addr != 0 ) // dst was a deferred address
+        data_write_byte(dst_addr, value);
+    else { // destination is register  The MOVB to a register (unique among byte instructions) extends the most significant bit of the low order byte (sign extension)
+		//extend sign out
 		if ((value & 0200) >> 7 == 1)
-			full_value = 0177400 | value;
+			reg[dst] = 0177400 | value;
 		else
-			full_value = value;
+			reg[dst] = value;
 	}
 
-    log(LOG_INST, "MOVB function called\n");
-    operand_value_write_word(dst, full_value);
-    
 /*
     N: set if (src) <0; cleared otherwise
     Z: set if (src) = 0; cleared otherwise
@@ -483,11 +663,14 @@ int op_cmp(uint16_t instruction)
 {
 	uint8_t src = (instruction >> 6) & 077; // bits 6-11
     uint8_t dst = (instruction) & 077; // bits 0-5
-	uint16_t value;
+	uint32_t value;
 	log(LOG_INST, "CMP function called\n");
-	
-	int16_t src_val = operand_value_read_word(src);
-    int16_t dst_val = operand_value_read_word(dst);
+
+    uint16_t src_addr, dst_addr;
+
+    int16_t src_val = operand_value_read_word(src, &src_addr);
+    int16_t dst_val = operand_value_read_word(dst, &dst_addr);
+
 	log(LOG_INFO,"Source value is %d, Dest value is %d\n", src_val, dst_val);
 	
 	value = src_val - dst_val;
@@ -507,7 +690,7 @@ int op_cmp(uint16_t instruction)
     psw.zero = (value == 0);
     psw.overflow = (((src_val < 0) && (dst_val < 0) && (value >=0)) || 
 					((src_val >= 0) && (dst_val >= 0) && (value < 0)));
-	psw.carry = (value >> 17 & 1 == 1);
+	psw.carry = (value >> 16 & 1 == 1);
 	
 	return 0;
 }
@@ -519,14 +702,22 @@ int op_cmpb(uint16_t instruction)
 	uint16_t value;
 	log(LOG_INST, "CMPB function called\n");
 	
-	int16_t src_val = operand_value_read_byte(src);
-    int16_t dst_val = operand_value_read_byte(dst);
+    uint16_t src_addr, dst_addr;
+
+    int8_t src_val = operand_value_read_byte(src, &src_addr);
+    int8_t dst_val = operand_value_read_byte(dst, &dst_addr);
+
 	log(LOG_INFO,"Source value is %d, Dest value is %d\n", src_val, dst_val);
 	
 	value = src_val - dst_val;
 	
 	log(LOG_INFO,"result is %d\n", value);
     
+    if ( dst_addr != 0 ) // dst was a deferred address
+        data_write_byte(dst_addr, value);
+    else
+		reg[dst] = (reg[dst] & 0177400) | value; // only modify the low byte of register
+
 	/*
 	N: set if result <0; cleared otherwise
 	Z: set if result = 0; cleared otherwise
@@ -540,7 +731,7 @@ int op_cmpb(uint16_t instruction)
     psw.zero = (value == 0);
     psw.overflow = (((src_val < 0) && (dst_val < 0) && (value >=0)) || 
 					((src_val >= 0) && (dst_val >= 0) && (value < 0)));
-	psw.carry = (value >> 17 & 1 == 1);
+	psw.carry = (value >> 8 & 1 == 1);
 	
 	return 0;
 }
@@ -550,20 +741,23 @@ int op_add(uint16_t instruction)
 {
     uint8_t src = (instruction >> 6) & 077; // bits 6-8
     uint8_t dst = instruction & 077; // bits 0-5
-    uint8_t dst_reg = instruction & 07; // bits 0-2
-    uint8_t dst_mode = (instruction >> 3)& 07; // bits 0-2
+    //uint8_t dst_reg = instruction & 07; // bits 0-2
+    //uint8_t dst_mode = (instruction >> 3)& 07; // bits 0-2
     int32_t value;
-    uint16_t src_value;
+    uint16_t src_addr, dst_addr;
     log(LOG_INST, "ADD function called\n");
 
-    int16_t src_val = operand_value_read_word(src);
-    int16_t dst_val = operand_value_read_word(dst);
+    int16_t src_val = operand_value_read_word(src, &src_addr);
+    int16_t dst_val = operand_value_read_word(dst, &dst_addr);
     value = src_val + dst_val;
-	
-	if(dst_reg == 7)
-		operand_value_write_word(src, (uint16_t)value);
+	log(LOG_INFO, "value = %o src_val = %o dst_val = %o\n", value, src_val, dst_val)
+
+	if ( dst_addr != 0 ) // dst was a deferred address
+        data_write_word(dst_addr, value);
 	else
-		operand_value_write_word(dst, (uint16_t)value);
+		reg[dst] = value;
+
+	
 	/*
 	N: set if result <0; cleared otherwise
 	Z: set if result = 0; cleared otherwise
@@ -589,14 +783,20 @@ int op_sub(uint16_t instruction)
     uint8_t dst = instruction & 077; // bits 0-2
     uint8_t dst_reg = instruction & 07;
     int32_t value;
-    uint16_t src_value;
+
     log(LOG_INST, "SUB function called\n");
 
-    int16_t src_val = operand_value_read_word(src);
-    int16_t dst_val = operand_value_read_word(dst);
+    uint16_t src_addr, dst_addr;
+
+    int16_t src_val = operand_value_read_word(src, &src_addr);
+    int16_t dst_val = operand_value_read_word(dst, &dst_addr);
+
     value = dst_val - src_val;
 
-    operand_value_write_word(dst_reg, (uint16_t)value);
+    if ( dst_addr != 0 ) // dst was a deferred address
+        data_write_word(dst_addr, value);
+    else
+        reg[dst] = value;
     
 	/*
 	N: set if result <0; cleared otherwise
@@ -629,15 +829,20 @@ int op_bit(uint16_t instruction)
     int16_t value;
     
     log(LOG_INST, "BIT function called\n");
+
+	
+    uint16_t src_addr, dst_addr;
+
+    int16_t src_val = operand_value_read_word(src, &src_addr);
+    int16_t dst_val = operand_value_read_word(dst, &dst_addr);
     
     //Read values for source and destination
-    int16_t src_val = operand_value_read_word(src);
-    int16_t dst_val = operand_value_read_word(dst);
     log(LOG_INFO,"Source value is %d, Dest value is %d\n", src_val, dst_val);
     
     value = src_val & dst_val;
+
 	log(LOG_INFO,"result is %o\n", value);
-	operand_value_write_word(dst_reg, value);
+
 	/*  N: set if high-order bit of result set: cleared otherwise
 		Z: set if result = 0; cleared otherwise
 		V: cleared
@@ -655,20 +860,22 @@ int op_bitb(uint16_t instruction)
 {
 	uint8_t src = (instruction >> 6) & 077; // bits 6-11
     uint8_t dst = (instruction) & 077; // bits 0-5
-    uint8_t dst_reg = instruction & 07;
+    //uint8_t dst_reg = instruction & 07;
     int16_t value;
     
     log(LOG_INST, "BITB function called\n");
     
-    //Read values for source and destination
-    int16_t src_val = operand_value_read_byte(src);
-    int16_t dst_val = operand_value_read_byte(dst);
-    log(LOG_INFO,"Source value is %d, Dest value is %d\n", src_val, dst_val);
+    uint16_t src_addr, dst_addr;
+
+    int8_t src_val = operand_value_read_byte(src, &src_addr);
+    int8_t dst_val = operand_value_read_byte(dst, &dst_addr);
+
+    log(LOG_INFO,"Source value is %o, Dest value is %o\n", src_val, dst_val);
     
     value = src_val & dst_val;
     
-	log(LOG_INFO,"result is %o\n", value);
-	operand_value_write_byte(dst_reg, value);
+	log(LOG_INFO,"Result is %o\n", value);
+
 	/*
 	N: set if high-order bit of result set: cleared otherwise
 	Z: set if result = 0; cleared otherwise
@@ -687,19 +894,27 @@ int op_bic(uint16_t instruction)
 {
 	uint8_t src = (instruction >> 6) & 077; // bits 6-11
     uint8_t dst = (instruction) & 077; // bits 0-5
-    uint8_t dst_reg = instruction & 07;
+    //uint8_t dst_reg = instruction & 07;
     int16_t value;
     
     log(LOG_INST, "BIC function called\n");
-    
-    //Read values for source and destination
-    int16_t src_val = operand_value_read_word(src);
-    int16_t dst_val = operand_value_read_word(dst);
+
+    uint16_t src_addr, dst_addr;
+
+    int16_t src_val = operand_value_read_word(src, &src_addr);
+    int16_t dst_val = operand_value_read_word(dst, &dst_addr);	
+
     log(LOG_INFO,"Source value is %o, Dest value is %o\n", src_val, dst_val);
     
     value = ~(src_val) & dst_val;
 	log(LOG_INFO,"result is %o\n", value);
-    operand_value_write_word(dst_reg, value);
+
+    if ( dst_addr != 0 ) // dst was a deferred address
+        data_write_word(dst_addr, value);
+    else
+        reg[dst] = value;
+
+
 	/*
 	N: set if high order bit of result set; cleared otherwise
 	Z: set if result = 0; cleared otherwise
@@ -722,15 +937,23 @@ int op_bicb(uint16_t instruction)
     int16_t value;
     
     log(LOG_INST, "BIC function called\n");
-    
-    //Read values for source and destination
-    int16_t src_val = operand_value_read_byte(src);
-    int16_t dst_val = operand_value_read_byte(dst);
+
+    uint16_t src_addr, dst_addr;
+
+    int8_t src_val = operand_value_read_byte(src, &src_addr);
+    int8_t dst_val = operand_value_read_byte(dst, &dst_addr);
+
     log(LOG_INFO,"Source value is %o, Dest value is %o\n", src_val, dst_val);
     
     value = ~(src_val) & dst_val;
 	log(LOG_INFO,"result is %o\n", value);
-    operand_value_write_byte(dst_reg, value);
+
+    if ( dst_addr != 0 ) // dst was a deferred address
+        data_write_byte(dst_addr, value);
+    else
+		reg[dst] = (reg[dst] & 0177400) | value; // only modify the low byte of register
+
+
 	/*
 	N: set if high order bit of result set; cleared otherwise
 	Z: set if result = 0; cleared otherwise
@@ -753,15 +976,21 @@ int op_bis(uint16_t instruction)
     int16_t value;
     
     log(LOG_INST, "BIS function called\n");
-    
-    //Read values for source and destination
-    int16_t src_val = operand_value_read_word(src);
-    int16_t dst_val = operand_value_read_word(dst);
+
+    uint16_t src_addr, dst_addr;
+
+    int16_t src_val = operand_value_read_word(src, &src_addr);
+    int16_t dst_val = operand_value_read_word(dst, &dst_addr);
+
     log(LOG_INFO,"Source value is %d, Dest value is %d\n", src_val, dst_val);
     
     value = src_val | dst_val;
-	log(LOG_INFO,"result is %o\n", value);
-    operand_value_write_word(dst_reg, value);
+	log(LOG_INFO,"Result is %o\n", value);
+
+    if ( dst_addr != 0 ) // dst was a deferred address
+        data_write_word(dst_addr, value);
+    else
+        reg[dst] = value;	
 	/*
 	N: set if high-order bit of result set. cleared otherwise
 	Z: set if result = 0: cleared otherwise
@@ -784,15 +1013,20 @@ int op_bisb(uint16_t instruction)
     int16_t value;
     
     log(LOG_INST, "BIS function called\n");
-    
-    //Read values for source and destination
-    int16_t src_val = operand_value_read_byte(src);
-    int16_t dst_val = operand_value_read_byte(dst);
+    uint16_t src_addr, dst_addr;
+
+    int8_t src_val = operand_value_read_byte(src, &src_addr);
+    int8_t dst_val = operand_value_read_byte(dst, &dst_addr);
+
     log(LOG_INFO,"Source value is %d, Dest value is %d\n", src_val, dst_val);
     
     value = src_val | dst_val;
 	log(LOG_INFO,"result is %o\n", value);
-    operand_value_write_byte(dst_reg, value);
+
+    if ( dst_addr != 0 ) // dst was a deferred address
+        data_write_byte(dst_addr, value);
+    else
+		reg[dst] = (reg[dst] & 0177400) | value; // only modify the low byte of register
 	/*
 	N: set if high-order bit of result set. cleared otherwise
 	Z: set if result = 0: cleared otherwise
@@ -817,8 +1051,8 @@ If R is odd only the low order product is stored.
 int op_mul(uint16_t instruction)
 {
     uint8_t dst_reg = (instruction >> 6) & 07; // bits 6-8
-    uint8_t src_reg = instruction & 07; // bits 0-2
-    uint8_t dst = (instruction >> 6) & 077; // bits 6-11
+    //uint8_t src_reg = instruction & 07; // bits 0-2
+    //uint8_t dst = (instruction >> 6) & 077; // bits 6-11
     uint8_t src = (instruction) & 077; // bits 0-5
     int32_t value;
     uint16_t src_value;
@@ -826,22 +1060,25 @@ int op_mul(uint16_t instruction)
     log(LOG_INST, "MUL function called\n");
        
 	//call read/write operand with byte = 0 since there are no byte modes
-    int16_t src_val = operand_value_read_word(src);
-    int16_t dst_val = operand_value_read_word(dst_reg);
-    log(LOG_INFO,"Source value is %d, Dest value is %d\n", src_val, dst_val);
-    value = src_val * dst_val;
-	log(LOG_INFO,"result is %d\n", value);
+
+    uint16_t src_addr;
+    int16_t src_val = operand_value_read_word(src, &src_addr);
+	int16_t reg_val = reg[dst_reg];
+
+    log(LOG_INFO,"Source value is %o, reg[%o] is %o\n", src_val, dst_reg, reg_val);
+    value = reg_val * src_val;
+	log(LOG_INFO,"Result is %d\n", value);
 	
 	if(dst_reg % 2)
 	{
-		log(LOG_INFO,"Odd destination register %d\n", dst_reg);
-		operand_value_write_word(dst_reg, value);
+		log(LOG_INFO,"Odd destination register %o\n", dst_reg);
+		reg[dst_reg] = value;
 	}
 	else
 	{
-		log(LOG_INFO,"Even destination register %d\n", dst_reg);
-		operand_value_write_word(dst_reg, value);
-		operand_value_write_word(dst_reg|1, value >> 16);
+		log(LOG_INFO,"Even destination register %o\n", dst_reg);
+		reg[dst_reg] = value;
+		reg[dst_reg|1] = value >> 16;
     }
 	/*
 	N: set if product is <0: cleared otherwise
@@ -867,45 +1104,48 @@ is of the same sign as the dividend. R must be even.
  */ 
 int op_div(uint16_t instruction){
     uint8_t dst_reg = (instruction >> 6) & 07; // bits 6-8
-    uint8_t src_reg = instruction & 07; // bits 0-2
-    uint8_t dst = (instruction >> 6) & 077; // bits 6-11
+    //uint8_t src_reg = instruction & 07; // bits 0-2
+    //uint8_t dst = (instruction >> 6) & 077; // bits 6-11
     uint8_t src = (instruction) & 077; // bits 0-5
     int32_t value, rem;
-    uint16_t src_value;
+    uint16_t src_addr;
     
     log(LOG_INST, "DIV function called\n");
     if(dst_reg % 2)
 	{
-		log(LOG_INFO,"Odd destination register '%d' not allowed\n", dst_reg);
+		log(LOG_INFO,"Odd destination register '%o' not allowed\n", dst_reg);
 		return 0;
 	}
+
 	//Value to be divided is held in two registers
-    int16_t src_val1 = operand_value_read_word(src);
-    int16_t src_val2 = operand_value_read_word(src|1);
-    int32_t src_val = (src_val1 << 16) + src_val2;
-    int16_t dst_val = operand_value_read_word(dst_reg);
+    int16_t reg_val1 = reg[dst_reg];
+    int16_t reg_val2 = reg[dst_reg|1];
+    int32_t comb_val = (reg_val1 << 16) + reg_val2;
+    int16_t src_val = operand_value_read_word(src, &src_addr);
     
-    log(LOG_INFO,"Source value is %d, register value is %d\n", src_val, dst_val);
-    if(!src_val || abs(dst_val) > abs(src_val))
-    {
-		if(!src_val){
-			psw.carry = 1;
-			psw.overflow = 1;
-			log(LOG_INFO,"Divide by 0 attempted! Cannot complete instruction!\n");
-		}
-		if(abs(dst_val) > abs(src_val)){
-			log(LOG_INFO,"Quotient will exceed 15 bits! Abort!\n");
-			psw.overflow = 1;
-		}
+    log(LOG_INFO,"Source value is %o, combined register value is %o\n", src_val, comb_val);
+	
+	if(src_val == 0) {
+		psw.carry = 1;
+		psw.overflow = 1;
+		log(LOG_INFO,"Divide by 0 attempted! Cannot complete instruction!\n");
 		return 0;
 	}
-    value = dst_val / src_val;
-	rem = dst_val % src_val;
-	
-	operand_value_write_word(dst_reg, value);
-	operand_value_write_word(dst_reg|1, rem);
+	if(abs(comb_val) > abs(src_val)) {
+		log(LOG_INFO,"Quotient will exceed 15 bits! Abort!\n");
+		psw.overflow = 1;
+		return 0;
+	}
+
+    value = comb_val / src_val;
+	rem = comb_val % src_val;
+
 	log(LOG_INFO,"Quotient is %d\n", value);
 	log(LOG_INFO,"Remainder is %d\n", rem);
+
+	reg[dst_reg] = value;
+	reg[dst_reg|1] = rem;
+
 	/*
 	N: set if quotient <0; cleared otherwise
 	Z: set if quotient = 0; cleared otherwise
@@ -930,16 +1170,19 @@ and positive is a left shift.
 */
 int op_ash(uint16_t instruction){
 	uint8_t dst_reg = (instruction >> 6) & 07; // bits 6-8
-    uint8_t src_reg = instruction & 07; // bits 0-2
+    //uint8_t src_reg = instruction & 07; // bits 0-2
     //uint8_t dst = (instruction >> 6) & 077; // bits 6-11
     uint8_t src = (instruction) & 077; // bits 0-5
     uint8_t carry;
     int16_t value;
     uint8_t shift_val, shift_sign;
     int8_t converted_shift;
+
+    uint16_t src_addr;
+    int16_t src_val = operand_value_read_word(src, &src_addr);
     
-    uint16_t src_val = operand_value_read_word(src); //number of bits to shift
-    int16_t dst_val = operand_value_read_word(dst_reg); //register val to be shifted
+    //uint16_t src_val = operand_value_read_word(src); //number of bits to shift
+    int16_t dst_val = reg[dst_reg]; //register val to be shifted
     log(LOG_INST, "ASH function called\n");
     //log(LOG_INFO, "Source contains %o\n", src_val);
     shift_val = src_val & 077; //lower 6 bits of src value for shift
@@ -966,7 +1209,7 @@ int op_ash(uint16_t instruction){
 		
 	}
 	log(LOG_INFO, "new value is %o\n", value);
-    operand_value_write_word(dst_reg, value);
+    reg[dst_reg] = value;
     /*
 	N: set if result <0; cleared otherwise
 	Z: set if result = 0; cleared otherwise
@@ -982,6 +1225,10 @@ int op_ash(uint16_t instruction){
 }
 
 /*
+
+The double word is shifted NN places to the
+right or left, where NN =low order six bits or source 
+
 The contents of the register and the register ORed with one
 are treated as one 32 bit word, R + 1 (bits 0-15) and R (bits
 16-31) are shifted right or left the number of times specified
@@ -996,21 +1243,20 @@ shift count
  */
 int op_ashc(uint16_t instruction){
 	uint8_t dst_reg = (instruction >> 6) & 07; // bits 6-8
-    uint8_t src_reg = instruction & 07; // bits 0-2
-    uint8_t dst = (instruction >> 6) & 077; // bits 6-11
-    uint8_t src = (instruction) & 077; // bits 0-5
+    //uint8_t src_reg = instruction & 07; // bits 0-2
+    //uint8_t dst = (instruction >> 6) & 077; // bits 6-11
+    uint8_t shift_val = (instruction) & 077; // bits 0-5
     uint8_t carry;
     int32_t value;
-    uint8_t shift_val, shift_sign;
+    uint8_t shift_sign;
     int8_t converted_shift;
-    
-    uint16_t src_val = operand_value_read_word(src); //number of bits to shift
-    uint16_t dst_val1 = operand_value_read_word(src);
-    uint16_t dst_val2 = operand_value_read_word(src|1);
+
+    //uint16_t src_val = operand_value_read_word(src); //number of bits to shift
+    uint16_t dst_val1 = reg[dst_reg];
+    uint16_t dst_val2 = reg[dst_reg|1];
     int32_t dst_val = (dst_val1 << 16) | dst_val2; //register val to be shifted
     log(LOG_INST, "ASHC function called\n");
-    //log(LOG_INFO, "Source contains %o\n", src_val);
-    shift_val = src_val & 077; //lower 6 bits of src value for shift
+
     shift_sign = (shift_val >> 5);
     
     if(shift_sign){
@@ -1034,7 +1280,9 @@ int op_ashc(uint16_t instruction){
 		
 	}
 	log(LOG_INFO, "new value is %o\n", value);
-    operand_value_write_word(dst_reg, value);
+	reg[dst_reg] = value >> 16;
+    reg[dst_reg|1] = value & 0177777;
+
     /*
 	N: set if result <0; cleared otherwise
 	Z: set if result = 0; cleared otherwise
@@ -1056,19 +1304,24 @@ stored in the destination address. Contents of register are
 unaffected. Assembler format is: XOR R.D 
 */
 int op_xor(uint16_t instruction){
-	uint8_t r_reg = (instruction >> 6) & 07; // bits 6-8
-    uint8_t dst_reg = instruction & 07; // bits 0-2
+	uint8_t reg_num = (instruction >> 6) & 07; // bits 6-8
+    //uint8_t dst_reg = instruction & 07; // bits 0-2
     //uint8_t dst = (instruction >> 6) & 077; // bits 6-11
     uint8_t dst = (instruction) & 077; // bits 0-5
     
     int16_t value;
-    
-    int16_t reg_val = operand_value_read_word(r_reg); //register value
-    int16_t dst_val = operand_value_read_word(dst); //destination val
+    uint16_t dst_addr;
+
+    value = operand_value_read_word(dst, &dst_addr);
+
     log(LOG_INST, "XOR function called\n");
-    value = reg_val ^ dst_val;
-    
-    operand_value_write_word(dst_reg, value);
+    value = reg[reg_num] ^ value;
+
+    if ( dst_addr != 0 ) // dst was a deferred address
+        data_write_word(dst_addr, value);
+    else
+        reg[dst] = value;
+
     /*
 	N: set if the result <0: cleared otherwise
 	Z set if result = 0: cleared otherwise
@@ -1335,9 +1588,10 @@ int op_jmp(uint16_t instruction){
 		return 0;
 	}
 	
-	int16_t dst_val = jump_read_word(dst);
-    operand_value_write_word(07, (uint16_t)dst_val);
-    log(LOG_INFO, "PC value changed to: %o\n", dst_val);
+    uint16_t dst_addr;
+    uint16_t dst_val = operand_value_read_word(dst, &dst_addr);
+    reg[7] = (uint16_t)dst_addr;
+    log(LOG_INFO, "PC value changed to: %o\n", dst_addr);
     return 0;
 }
 
